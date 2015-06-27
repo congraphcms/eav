@@ -12,7 +12,7 @@ namespace Cookbook\EAV\Handlers\Command;
 
 
 use Cookbook\Contracts\EAV\AttributeRepositoryContract;
-use Cookbook\EAV\Commands\CreateAttributeCommand;
+use Cookbook\EAV\Commands\AttributeCreateCommand;
 
 
 /**
@@ -27,7 +27,7 @@ use Cookbook\EAV\Commands\CreateAttributeCommand;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class CreateAttributeCommandHandler
+class AttributeCreateHandler
 {
 	/**
 	 * Repository for attribute DB operations
@@ -51,31 +51,14 @@ class CreateAttributeCommandHandler
 
 
 	/**
-	 * Handle CreateAttributeCommand
+	 * Handle AttributeCreateCommand
 	 * 
-	 * @param Cookbook\EAV\Commands\CreateAttributeCommand $command
+	 * @param Cookbook\EAV\Commands\AttributeCreateCommand $command
 	 * 
 	 * @return void
 	 */
-	public function handle(CreateAttributeCommand $command)
+	public function handle(AttributeCreateCommand $command)
 	{
-		// $attributeParams = [
-		// 	'code' => $command->code,
-		// 	'admin_label' => $command->admin_label,
-		// 	'admin_notice' => $command->admin_notice,
-		// 	'field_type' => $command->field_type,
-		// 	'localized' => $command->localized,
-		// 	'default_value' => $command->default_value,
-		// 	'unique' => $command->unique,
-		// 	'required' => $command->required,
-		// 	'filterable' => $command->filterable,
-		// 	'status' => $command->status,
-		// 	'translations' => $command->translations,
-		// 	'options' => $command->options,
-		// 	'data' => $command->data
-		// ];
-		var_dump('Create attribute');
-		var_dump($command->request->all());
 		return $this->attributeRepository->create($command->request->all());
 	}
 }

@@ -10,7 +10,7 @@
 
 namespace Cookbook\EAV\Validators;
 
-use Cookbook\EAV\Commands\CreateAttributeCommand;
+use Cookbook\EAV\Commands\AttributeCreateCommand;
 use Cookbook\EAV\Managers\AttributeManager;
 use Cookbook\Contracts\EAV\FieldValidatorFactoryContract;
 use Cookbook\Core\Exceptions\ValidationException;
@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Validator;
 
 
 /**
- * CreateAttributeValidator class
+ * AttributeCreateValidator class
  * 
  * Validating command for creating attribute
  * 
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class CreateAttributeValidator
+class AttributeCreateValidator
 {
 
 	/**
@@ -133,16 +133,16 @@ class CreateAttributeValidator
 
 
 	/**
-	 * Validate CreateAttributeCommand
+	 * Validate AttributeCreateCommand
 	 * 
-	 * @param Cookbook\EAV\Commands\CreateAttributeCommand $command
+	 * @param Cookbook\EAV\Commands\AttributeCreateCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(CreateAttributeCommand $command)
+	public function validate(AttributeCreateCommand $command)
 	{
 		$params = $command->request->all();
 

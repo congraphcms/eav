@@ -12,7 +12,7 @@ namespace Cookbook\EAV\Handlers;
 
 use Illuminate\Support\ServiceProvider;
 
-use Cookbook\EAV\Handlers\Command\CreateAttributeCommandHandler;
+use Cookbook\EAV\Handlers\Command\AttributeCreateHandler;
 
 /**
  * HandlersServiceProvider service provider for handlers
@@ -54,10 +54,10 @@ class HandlersServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function mapCommandHandlers() {
-		// $this->app->bind('Cookbook\EAV\Handlers\Command\CreateAttributeCommandHandler');
+		// $this->app->bind('Cookbook\EAV\Handlers\Command\AttributeCreateHandler');
 		
 		$mappings = [
-			'Cookbook\EAV\Commands\CreateAttributeCommand' => 'Cookbook\EAV\Handlers\Command\CreateAttributeCommandHandler@handle'
+			'Cookbook\EAV\Commands\AttributeCreateCommand' => 'Cookbook\EAV\Handlers\Command\AttributeCreateHandler@handle'
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->maps($mappings);
@@ -69,8 +69,8 @@ class HandlersServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function registerCommandHandlers() {
-		$this->app->bind('Cookbook\EAV\Handlers\Command\CreateAttributeCommandHandler', function($app){
-			return new CreateAttributeCommandHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		$this->app->bind('Cookbook\EAV\Handlers\Command\AttributeCreateHandler', function($app){
+			return new AttributeCreateHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
 		});
 	}
 
@@ -83,7 +83,7 @@ class HandlersServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'Cookbook\EAV\Handlers\Command\CreateAttributeCommandHandler'
+			'Cookbook\EAV\Handlers\Command\AttributeCreateHandler'
 		];
 	}
 }

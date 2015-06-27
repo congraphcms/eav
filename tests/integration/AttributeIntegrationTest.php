@@ -95,7 +95,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\CreateAttributeCommand($request));
+			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeCreateCommand($request));
 
 			var_dump($result);
 		}

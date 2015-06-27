@@ -12,8 +12,6 @@ namespace Cookbook\EAV\Validators;
 
 use Illuminate\Support\ServiceProvider;
 
-use Cookbook\EAV\Handlers\Command\CreateAttributeCommandHandler;
-
 /**
  * ValidatorsServiceProvider service provider for validators
  * 
@@ -56,7 +54,7 @@ class ValidatorsServiceProvider extends ServiceProvider {
 	public function mapValidators() {
 		
 		$mappings = [
-			'Cookbook\EAV\Commands\CreateAttributeCommand' => 'Cookbook\EAV\Validators\CreateAttributeValidator@validate'
+			'Cookbook\EAV\Commands\AttributeCreateCommand' => 'Cookbook\EAV\Validators\AttributeCreateValidator@validate'
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->mapValidators($mappings);
@@ -68,8 +66,8 @@ class ValidatorsServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function registerValidators() {
-		$this->app->bind('Cookbook\EAV\Validators\CreateAttributeValidator', function($app){
-			return new CreateAttributeValidator(
+		$this->app->bind('Cookbook\EAV\Validators\AttributeCreateValidator', function($app){
+			return new AttributeCreateValidator(
 				$app->make('Cookbook\EAV\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\EAV\FieldValidatorFactoryContract')
 			);
@@ -85,7 +83,7 @@ class ValidatorsServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'Cookbook\EAV\Validators\CreateAttributeValidator'
+			'Cookbook\EAV\Validators\AttributeCreateValidator'
 		];
 	}
 }
