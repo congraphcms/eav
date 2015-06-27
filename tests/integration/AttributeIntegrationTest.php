@@ -70,19 +70,47 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 		return ['Cookbook\EAV\EAVServiceProvider'];
 	}
 
-	public function testCreateAttribute()
+	// public function testCreateAttribute()
+	// {
+	// 	$params = [
+	// 		'code' => 'code',
+	// 		'admin_label' => '',
+	// 		'admin_notice' => 'admin notice',
+	// 		'field_type' => 'text',
+	// 		'localized' => false,
+	// 		'default_value' => '',
+	// 		'unique' => false,
+	// 		'required' => false,
+	// 		'filterable' => false,
+	// 		'status' => 'user_defined'
+	// 	];
+
+	// 	// $response = $this->call('POST', '/attribute', $params);
+
+	// 	// $this->assertResponseOk();
+
+	// 	// $this->assertEquals('test', $response->getContent());
+		
+	// 	$request = \Illuminate\Http\Request::create('/', 'POST', $params);
+
+	// 	try
+	// 	{
+	// 		$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeCreateCommand($request));
+
+	// 		var_dump($result);
+	// 	}
+	// 	catch(\Cookbook\Core\Exceptions\ValidationException $e)
+	// 	{
+	// 		var_dump($e->toArray());
+	// 	}
+		
+
+	// }
+
+	public function testUpdateAttribute()
 	{
 		$params = [
-			'code' => 'code',
-			'admin_label' => '',
-			'admin_notice' => 'admin notice',
-			'field_type' => 'text',
-			'localized' => false,
-			'default_value' => '',
-			'unique' => false,
-			'required' => false,
-			'filterable' => false,
-			'status' => 'user_defined'
+			'admin_notice' => 'admin notice 2',
 		];
 
 		// $response = $this->call('POST', '/attribute', $params);
@@ -91,11 +119,11 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 		// $this->assertEquals('test', $response->getContent());
 		
-		$request = \Illuminate\Http\Request::create('/', 'POST', $params);
+		$request = \Illuminate\Http\Request::create('/', 'PUT', $params);
 
 		try
 		{
-			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeCreateCommand($request));
+			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeUpdateCommand(3, $request));
 
 			var_dump($result);
 		}

@@ -10,7 +10,7 @@
 
 namespace Cookbook\EAV\Validators;
 
-use Cookbook\EAV\Commands\AttributeCreateCommand;
+use Cookbook\EAV\Commands\AttributeUpdateCommand;
 use Cookbook\EAV\Managers\AttributeManager;
 use Cookbook\Contracts\EAV\FieldValidatorFactoryContract;
 use Cookbook\Core\Exceptions\ValidationException;
@@ -180,18 +180,22 @@ class AttributeUpdateValidator
 				}
 			}
 		}
-
-		$fieldValidator = $this->fieldValidatorFactory->make($params['field_type']);
-
-		try
+		
+		if( ! empty($params['field_type']) )
 		{
-			$fieldValidator->validateAttributeForUpdate($params);
+			$fieldValidator = $this->fieldValidatorFactory->make($params['field_type']);
+
+			try
+			{
+				$fieldValidator->validateAttributeForUpdate($params);
+			}
+			catch(ValidationException $e)
+			{
+				$this->exception->setErrorKey('attribute');
+				$this->exception->addErrors($e->getErrors());
+			}
 		}
-		catch(ValidationException $e)
-		{
-			$this->exception->setErrorKey('attribute');
-			$this->exception->addErrors($e->getErrors());
-		}
+		
 
 		if( $this->exception->hasErrors() )
 		{

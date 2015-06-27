@@ -12,8 +12,8 @@ namespace Cookbook\EAV\Handlers;
 
 use Illuminate\Support\ServiceProvider;
 
-use Cookbook\EAV\Handlers\Command\AttributeCreateHandler;
-use Cookbook\EAV\Handlers\Command\AttributeUpdateHandler;
+use Cookbook\EAV\Handlers\Commands\AttributeCreateHandler;
+use Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler;
 
 /**
  * HandlersServiceProvider service provider for handlers
@@ -57,8 +57,8 @@ class HandlersServiceProvider extends ServiceProvider {
 	public function mapCommandHandlers() {
 		
 		$mappings = [
-			'Cookbook\EAV\Commands\AttributeCreateCommand' => 'Cookbook\EAV\Handlers\Command\AttributeCreateHandler@handle',
-			'Cookbook\EAV\Commands\AttributeUpdateCommand' => 'Cookbook\EAV\Handlers\Command\AttributeUpdateHandler@handle'
+			'Cookbook\EAV\Commands\AttributeCreateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeCreateHandler@handle',
+			'Cookbook\EAV\Commands\AttributeUpdateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler@handle'
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->maps($mappings);
@@ -71,11 +71,11 @@ class HandlersServiceProvider extends ServiceProvider {
 	 */
 	public function registerCommandHandlers() {
 		
-		$this->app->bind('Cookbook\EAV\Handlers\Command\AttributeCreateHandler', function($app){
+		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeCreateHandler', function($app){
 			return new AttributeCreateHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\EAV\Handlers\Command\AttributeUpdateHandler', function($app){
+		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler', function($app){
 			return new AttributeUpdateHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
 		});
 	}
@@ -89,8 +89,8 @@ class HandlersServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'Cookbook\EAV\Handlers\Command\AttributeCreateHandler',
-			'Cookbook\EAV\Handlers\Command\AttributeUpdateHandler'
+			'Cookbook\EAV\Handlers\Commands\AttributeCreateHandler',
+			'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler'
 		];
 	}
 }

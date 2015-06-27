@@ -116,9 +116,9 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		unset($model['options']);
 
 		// insert attribute
-		$attribute_id = $this->insertAttribute($model);
+		$attribute = $this->insertAttribute($model);
 
-		if(!$attribute_id)
+		if(!$attribute)
 		{
 			throw new \Exception('Failed to insert attribute');
 		}
@@ -126,14 +126,14 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// set relation to attribute in all options
 		for($i = 0; $i < count($options); $i++)
 		{
-			$options[$i]['attribute_id'] = $attribute_id;
+			$options[$i]['attribute_id'] = $attribute->id;
 		}
 
 		// update all options for attribute
-		$this->updateOptions($options, null, $model);
+		$this->updateOptions($options, null, $attribute);
 
-		// and return newly created attribute ID
-		return $attribute_id;
+		// and return newly created attribute
+		return $attribute;
 		
 	}
 
@@ -150,6 +150,14 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	protected function _update($id, $model)
 	{
 
+		// find attribute with that ID
+		$attribute = $this->db->table('attributes')->find($id);
+
+		if( ! $attribute )
+		{
+			throw new Exception(['There is no attribute with that ID.'], 400);
+		}
+
 		// extract options from model
 		$options = [];
 		if(!empty($model['options']) && is_array($model['options']))
@@ -161,7 +169,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		unset($model['options']);
 
 		// update attribute
-		$this->updateAttribute($id, $model);
+		$this->updateAttribute($id, $model, $attribute);
 
 		// set relation to attribute in all options
 		for($i = 0; $i < count($options); $i++)
@@ -183,7 +191,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$this->updateOptions($options, $keyedOptions, $attribute);
 
 		// and return ID
-		return $id;
+		return $attribute;
 	}
 
 	/**
@@ -280,7 +288,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			$this->db->table('attribute_translations')->insert($attributeTranslations);
 		}
 
-		return $attribute_id;
+		return $this->db->table('attributes')->find($attribute_id);
 	}
 
 	/**
@@ -294,7 +302,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @todo translations timestamps are not entered because of mass insert
 	 */
-	protected function updateAttribute($id, $params)
+	protected function updateAttribute($id, $params, $attribute)
 	{
 
 		// separate params array in attribute and attribute translations params
@@ -307,8 +315,6 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			$attributeTranslations = [];
 		}
 
-		$fieldType = $params['field_type'];
-		
 		unset($params['translations']);
 
 		// validate attribute translations
@@ -322,13 +328,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			$params['data'] = json_encode($params['data']);
 		}
 
-		// find attribute with that ID
-		$attribute = $this->db->table('attributes')->find($id);
-
-		if( ! $attribute )
-		{
-			throw new Exception(['There is no attribute with that ID.'], 400);
-		}
+		
 
 		$attributeParams = json_decode(json_encode($attribute), true);
 		$attributeParams = array_merge($attributeParams, $params);
@@ -347,7 +347,6 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			// insert new translations in database
 			$this->db->table('attribute_translations')->insert($attributeTranslations);
 		}
-		
 	}
 
 	/**
@@ -359,11 +358,11 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @return boolean
 	 */
-	protected function updateOptions(array $options, array $oldOptions = null, $attributeParams)
+	protected function updateOptions(array $options, array $oldOptions = null, $attribute)
 	{
 		// fabricate attribute handler for this attribute type 
 		// (needed for options update)
-		$fieldHandler = $this->fieldHandlerFactory->make($attributeParams['field_type']);
+		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
 
 		$success = true;
 		$optionIDs = [];
