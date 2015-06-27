@@ -79,9 +79,9 @@ class EAVServiceProvider extends ServiceProvider {
 		// -----------------------------------------------------------------------------
 		$this->app->register('Cookbook\EAV\Repositories\RepositoriesServiceProvider');
 
-		// Core Bus
+		// Core
 		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Core\Bus\BusServiceProvider');
+		$this->app->register('Cookbook\Core\CoreServiceProvider');
 
 		
 	}

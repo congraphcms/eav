@@ -10,6 +10,7 @@
 
 namespace Cookbook\EAV\Commands;
 
+use Illuminate\Http\Request;
 
 /**
  * CreateAttributeCommand class
@@ -131,6 +132,13 @@ class CreateAttributeCommand
 	 */
 	public $updated_at;
 
+	/**
+	 * attribute updated timestamp
+	 * 
+	 * @var array
+	 */
+	public $request;
+
 
 	/**
 	 * Create new CreateAttributeCommand
@@ -151,29 +159,24 @@ class CreateAttributeCommand
 	 * 
 	 * @return void
 	 */
-	public function __construct(
-		$code, $admin_label, $admin_notice, $field_type, 
-		$localized, $default_value, $unique, $required, 
-		$filterable, $status = '', $translations = [], 
-		$options = [], $data = []
-	)
+	public function __construct(Request $request)
 	{
 		// inject dependencies
-		$this->code = $code;
-		$this->admin_label = $admin_label;
-		$this->admin_notice = $admin_notice;
-		$this->field_type = $field_type;
-		$this->localized = $localized;
-		$this->default_value = $default_value;
-		$this->unique = $unique;
-		$this->required = $required;
-		$this->filterable = $filterable;
-		$this->status = $status;
-		$this->translations = $translations;
-		$this->options = $options;
-		$this->data = $data;
-
-		$this->created_at = $this->updated_at = date('Y-m-d H:i:s');
+		// $this->code = $code;
+		// $this->admin_label = $admin_label;
+		// $this->admin_notice = $admin_notice;
+		// $this->field_type = $field_type;
+		// $this->localized = $localized;
+		// $this->default_value = $default_value;
+		// $this->unique = $unique;
+		// $this->required = $required;
+		// $this->filterable = $filterable;
+		// $this->status = $status;
+		// $this->translations = $translations;
+		// $this->options = $options;
+		// $this->data = $data;
+		
+		$this->request = $request;
 
 	}
 }

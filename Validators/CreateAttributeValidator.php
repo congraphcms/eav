@@ -144,38 +144,7 @@ class CreateAttributeValidator
 	 */
 	public function validate(CreateAttributeCommand $command)
 	{
-		$params = [
-			'code' => $command->code,
-			'admin_label' => $command->admin_label,
-			'admin_notice' => $command->admin_notice,
-			'field_type' => $command->field_type,
-			'localized' => $command->localized,
-			'default_value' => $command->default_value,
-			'unique' => $command->unique,
-			'required' => $command->required,
-			'filterable' => $command->filterable,
-			'status' => $command->status,
-			'created_at' => $command->created_at,
-			'updated_at' => $command->updated_at
-		];
-
-		// check if there are any translations
-		if( ! empty($command->translations) )
-		{
-			$params['translations'] = $command->translations;
-		}
-
-		// check if there are any options
-		if( ! empty($command->options) )
-		{
-			$params['options'] = $command->options;
-		}
-
-		// check if there is any data
-		if( ! empty($command->data) )
-		{
-			$params['data'] = $command->data;
-		}
+		$params = $command->request->all();
 
 		$validator = Validator::make($params, $this->rules);
 

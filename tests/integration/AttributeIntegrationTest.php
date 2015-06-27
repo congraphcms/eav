@@ -74,7 +74,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 	{
 		$params = [
 			'code' => 'code',
-			'admin_label' => 'admin label',
+			'admin_label' => '',
 			'admin_notice' => 'admin notice',
 			'field_type' => 'text',
 			'localized' => false,
@@ -95,16 +95,13 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $this->bus->dispatchFrom(
-				'Cookbook\EAV\Commands\CreateAttributeCommand', 
-				$request
-			);
+			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\CreateAttributeCommand($request));
 
 			var_dump($result);
 		}
 		catch(\Cookbook\Core\Exceptions\ValidationException $e)
 		{
-			var_dump($e->getErrors());
+			var_dump($e->toArray());
 		}
 		
 

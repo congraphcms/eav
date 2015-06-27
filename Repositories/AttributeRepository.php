@@ -109,6 +109,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		{
 			$options = $model['options'];
 		}
+		
 		// unset options from model 
 		// for attribute insertation
 		unset($model['options']);

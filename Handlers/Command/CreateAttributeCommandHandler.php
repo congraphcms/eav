@@ -59,22 +59,23 @@ class CreateAttributeCommandHandler
 	 */
 	public function handle(CreateAttributeCommand $command)
 	{
-		$attributeParams = [
-			'code' => $command->code,
-			'admin_label' => $command->admin_label,
-			'admin_notice' => $command->admin_notice,
-			'field_type' => $command->field_type,
-			'localized' => $command->localized,
-			'default_value' => $command->default_value,
-			'unique' => $command->unique,
-			'required' => $command->required,
-			'filterable' => $command->filterable,
-			'status' => $command->status,
-			'translations' => $command->translations,
-			'options' => $command->options,
-			'data' => $command->data
-		];
+		// $attributeParams = [
+		// 	'code' => $command->code,
+		// 	'admin_label' => $command->admin_label,
+		// 	'admin_notice' => $command->admin_notice,
+		// 	'field_type' => $command->field_type,
+		// 	'localized' => $command->localized,
+		// 	'default_value' => $command->default_value,
+		// 	'unique' => $command->unique,
+		// 	'required' => $command->required,
+		// 	'filterable' => $command->filterable,
+		// 	'status' => $command->status,
+		// 	'translations' => $command->translations,
+		// 	'options' => $command->options,
+		// 	'data' => $command->data
+		// ];
 		var_dump('Create attribute');
-		return $this->attributeRepository->create($attributeParams);
+		var_dump($command->request->all());
+		return $this->attributeRepository->create($command->request->all());
 	}
 }
