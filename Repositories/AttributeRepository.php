@@ -10,6 +10,7 @@
 
 namespace Cookbook\EAV\Repositories;
 
+use Cookbook\Core\Exceptions\Exception;
 use Illuminate\Database\Connection;
 
 use Cookbook\Core\Repositories\AbstractRepository;
@@ -146,80 +147,43 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @throws Exception
 	 */
-	protected function _update($model)
+	protected function _update($id, $model)
 	{
 
-		try
+		// extract options from model
+		$options = [];
+		if(!empty($model['options']) && is_array($model['options']))
 		{
-
-			// check if there is ID, if not throw exception
-			if(empty($model['id']))
-			{
-				$this->addErrors('Attribute ID needs to be provided.');
-				return false;
-			}
-
-			// find attribute with that ID
-			$attribute = $this->db->table('attributes')->find($model['id']);
-			if(!$attribute)
-			{
-				$this->addErrors('Invalid attribute ID.');
-				return false;
-			}
-
-			// extract options from model
-			$options = [];
-			if(!empty($model['options']) && is_array($model['options']))
-			{
-				$options = $model['options'];
-			}
-
-			// remove options from model for update
-			unset($model['options']);
-
-			// update attribute
-			$attribute_id = $this->updateAttribute($model);
-
-			if(!$attribute_id)
-			{
-				$this->addErrors('Failed to save attribute.');
-				return false;
-			}
-
-			// set relation to attribute in all options
-			for($i = 0; $i < count($options); $i++)
-			{
-				$options[$i]['attribute_id'] = $attribute_id;
-			}
-
-			// get all options from database
-			$oldOptions = $this->db->table('attribute_options')->where('attribute_id', '=', $attribute_id)->get();
-
-			$keyedOptions = [];
-
-			foreach ($oldOptions as $option)
-			{
-				$keyedOptions[$option->id] = $option;
-			}
-
-			// update options
-			$this->updateOptions($options, $keyedOptions, $attribute);
-
-			if($this->hasErrors())
-			{
-				$this->addErrors('Failed to save attribute.');
-				return false;
-			}
-
-			// and return ID
-			return $attribute_id;
-
+			$options = $model['options'];
 		}
-		catch(Exception $e)
+
+		// remove options from model for update
+		unset($model['options']);
+
+		// update attribute
+		$this->updateAttribute($id, $model);
+
+		// set relation to attribute in all options
+		for($i = 0; $i < count($options); $i++)
 		{
-			$this->addErrors('Failed to save attribute. There was an error.');
-			return false;
+			$options[$i]['attribute_id'] = $id;
 		}
+
+		// get all options from database
+		$oldOptions = $this->db->table('attribute_options')->where('attribute_id', '=', $id)->get();
+
+		$keyedOptions = [];
+
+		foreach ($oldOptions as $option)
+		{
+			$keyedOptions[$option->id] = $option;
+		}
+
+		// update options
+		$this->updateOptions($options, $keyedOptions, $attribute);
+
+		// and return ID
+		return $id;
 	}
 
 	/**
@@ -330,11 +294,11 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @todo translations timestamps are not entered because of mass insert
 	 */
-	protected function updateAttribute($params)
+	protected function updateAttribute($id, $params)
 	{
 
 		// separate params array in attribute and attribute translations params
-		if(!empty($params['translations']))
+		if( ! empty($params['translations']) )
 		{
 			$attributeTranslations = $params['translations'];
 		}
@@ -343,55 +307,27 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			$attributeTranslations = [];
 		}
 
-		$dataType = $params['field_type'];
+		$fieldType = $params['field_type'];
 		
 		unset($params['translations']);
 
-		$this->setErrorKey('attribute.fields');
-
-		// validate and clean attribute params
-		$this->validateParams($params, $this->attributeUpdateParamRules, true);
-
-		// fabricate attribute handler for this attribute type
-		$fieldHandler = $this->fieldHandlerFactory->make($dataType);
-
-		// var_dump($params);
-
-		if(!$fieldHandler->checkAttributeForUpdate($params))
-		{
-			$this->addErrors($fieldHandler->getErrors());
-		}
-
-		$this->setErrorKey('attribute.translations.fields');
-
 		// validate attribute translations
-		for($i = 0; $i < count($attributeTranslations); $i++)
+		for( $i = 0; $i < count($attributeTranslations); $i++ )
 		{
-			$attributeTranslations[$i]['attribute_id'] = $params['id'];
-			$attributeTranslations[$i]['created_at'] = $attributeTranslations[$i]['updated_at'] = date('Y-m-d H:i:s');
-			$this->validateParams($attributeTranslations[$i], $this->attributeTranslationParamRules, true);
+			$attributeTranslations[$i]['attribute_id'] = $id;
 		}
 
-		// Fail if there were errors in previous validations
-		if($this->hasErrors())
-		{
-			$this->setErrorKey('attribute.errors');
-			return false;
-		}
-
-		if(isset($params['data']))
+		if( isset($params['data']) )
 		{
 			$params['data'] = json_encode($params['data']);
 		}
 
-		// update attribute in database
-		$attribute = $this->db->table('attributes')->find($params['id']);
+		// find attribute with that ID
+		$attribute = $this->db->table('attributes')->find($id);
 
-		if(!$attribute)
+		if( ! $attribute )
 		{
-			$this->setErrorKey('attribute.errors');
-			$this->addErrors('Invalid attribute ID.');
-			return false;
+			throw new Exception(['There is no attribute with that ID.'], 400);
 		}
 
 		$attributeParams = json_decode(json_encode($attribute), true);
@@ -401,19 +337,16 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		$attributeParams['updated_at'] = date('Y-m-d H:i:s');
 
-		$this->db->table('attributes')->where('id', '=', $params['id'])->update($attributeParams);
+		$this->db->table('attributes')->where('id', '=', $id)->update($attributeParams);
 
 		// delete all existing translations from database
-		$this->db->table('attribute_translations')->where('attribute_id', '=', $params['id'])->delete();
+		$this->db->table('attribute_translations')->where('attribute_id', '=', $id)->delete();
 		
-		if(!empty($attributeTranslations))
+		if( ! empty($attributeTranslations) )
 		{
 			// insert new translations in database
 			$this->db->table('attribute_translations')->insert($attributeTranslations);
 		}
-
-		$this->setErrorKey('attribute.errors');
-		return $params['id'];
 		
 	}
 

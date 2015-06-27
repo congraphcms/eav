@@ -13,9 +13,9 @@ namespace Cookbook\EAV\Commands;
 use Illuminate\Http\Request;
 
 /**
- * AttributeCreateCommand class
+ * AttributeUpdateCommand class
  * 
- * Command for creating attribute
+ * Command for updating attribute
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -23,26 +23,36 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeCreateCommand
+class AttributeUpdateCommand
 {
 
 	/**
-	 * Attribute Create Request
+	 * Attribute Update Request
 	 * 
 	 * @var Illuminate\Http\Request
 	 */
 	public $request;
 
+	/**
+	 * Attribute ID
+	 * 
+	 * @var int
+	 */
+	public $id;
+
 
 	/**
-	 * Create new AttributeCreateCommand
-	 * 
+	 * Create new AttributeUpdateCommand
+	 *
+	 * @param int 						$id
 	 * @param Illuminate\Http\Request 	$request
 	 * 
 	 * @return void
 	 */
-	public function __construct(Request $request)
+	public function __construct($id, Request $request)
 	{
+		$this->id = intval($id);
+		
 		$this->request = $request;
 	}
 }

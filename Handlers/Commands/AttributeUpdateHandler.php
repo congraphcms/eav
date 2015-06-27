@@ -8,17 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Handlers\Command;
+namespace Cookbook\EAV\Handlers\Commands;
 
 
 use Cookbook\Contracts\EAV\AttributeRepositoryContract;
-use Cookbook\EAV\Commands\AttributeCreateCommand;
+use Cookbook\EAV\Commands\AttributeUpdateCommand;
 
 
 /**
- * CreateAttributeCommandHandler class
+ * AttributeUpdateHandler class
  * 
- * Handling command for creating attribute
+ * Handling command for updating attribute
  * 
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -27,7 +27,7 @@ use Cookbook\EAV\Commands\AttributeCreateCommand;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeCreateHandler
+class AttributeUpdateHandler
 {
 	/**
 	 * Repository for attribute DB operations
@@ -37,7 +37,7 @@ class AttributeCreateHandler
 	protected $attributeRepository;
 
 	/**
-	 * Create new CreateAttributeCommandHandler
+	 * Create new AttributeUpdateHandler
 	 * 
 	 * @param Cookbook\Contracts\EAV\Repositories\AttributeRepositoryContract $attributeRepository
 	 * 
@@ -51,14 +51,14 @@ class AttributeCreateHandler
 
 
 	/**
-	 * Handle AttributeCreateCommand
+	 * Handle AttributeUpdateCommand
 	 * 
-	 * @param Cookbook\EAV\Commands\AttributeCreateCommand $command
+	 * @param Cookbook\EAV\Commands\AttributeUpdateCommand $command
 	 * 
 	 * @return void
 	 */
-	public function handle(AttributeCreateCommand $command)
+	public function handle(AttributeUpdateCommand $command)
 	{
-		return $this->attributeRepository->create($command->request->all());
+		return $this->attributeRepository->update($command->id, $command->request->all());
 	}
 }

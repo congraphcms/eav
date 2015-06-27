@@ -18,9 +18,9 @@ use Illuminate\Support\Facades\Validator;
 
 
 /**
- * AttributeCreateValidator class
+ * AttributeUpdateValidator class
  * 
- * Validating command for creating attribute
+ * Validating command for updating attribute
  * 
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeCreateValidator
+class AttributeUpdateValidator
 {
 
 	/**
@@ -95,16 +95,17 @@ class AttributeCreateValidator
 		$this->availableFieldTypes = $this->attributeManager->getFieldTypes();
 
 		$this->rules = [
-			'code'					=> ['required', 'unique:attributes,code', 'regex:/^[0-9a-zA-Z-_]*$/'],
-			'admin_label'			=> 'required|between:3,100',
+			'id'					=> 'required|exists:attributes,id',
+			// 'code'					=> ['required', 'unique:attributes,code', 'regex:/^[0-9a-zA-Z-_]*$/'],
+			'admin_label'			=> 'sometimes|required|between:3,100',
 			'admin_notice'			=> 'max:1000',
-			'field_type' 			=> 'required|in:' . implode(array_keys($this->availableFieldTypes), ','),
+			// 'field_type' 			=> 'required|in:' . implode(array_keys($this->availableFieldTypes), ','),
 			'default_value'			=> '',
-			'localized'				=> 'boolean',
-			'unique'				=> 'boolean',
+			// 'localized'				=> 'boolean',
+			// 'unique'				=> 'boolean',
 			'required'				=> 'boolean',
 			'filterable'			=> 'boolean',
-			'status'				=> 'required|string',
+			'status'				=> 'sometimes|required|string',
 			'data'					=> '',
 			'options'				=> 'sometimes|array',
 			'translations'			=> 'sometimes|array'
@@ -122,8 +123,8 @@ class AttributeCreateValidator
 		$this->translationRules = 
 		[
 			'locale' 				=> 'required|integer',
-			'label'					=> 'required|max:250',
-			'description'			=> 'required|max:1000',
+			'label'					=> 'max:250',
+			'description'			=> 'max:1000',
 		];
 
 		$this->exception = new ValidationException();
@@ -133,18 +134,19 @@ class AttributeCreateValidator
 
 
 	/**
-	 * Validate AttributeCreateCommand
+	 * Validate AttributeUpdateCommand
 	 * 
-	 * @param Cookbook\EAV\Commands\AttributeCreateCommand $command
+	 * @param Cookbook\EAV\Commands\AttributeUpdateCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(AttributeCreateCommand $command)
+	public function validate(AttributeUpdateCommand $command)
 	{
 		$params = $command->request->all();
+		$params['id'] = $command->id;
 
 		$validator = Validator::make($params, $this->rules);
 
@@ -183,7 +185,7 @@ class AttributeCreateValidator
 
 		try
 		{
-			$fieldValidator->validateAttributeForInsert($params);
+			$fieldValidator->validateAttributeForUpdate($params);
 		}
 		catch(ValidationException $e)
 		{
