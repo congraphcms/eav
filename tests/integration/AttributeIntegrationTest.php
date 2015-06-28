@@ -107,11 +107,39 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 	// }
 
-	public function testUpdateAttribute()
+	// public function testUpdateAttribute()
+	// {
+	// 	$params = [
+	// 		'admin_notice' => 'admin notice 2',
+	// 	];
+
+	// 	// $response = $this->call('POST', '/attribute', $params);
+
+	// 	// $this->assertResponseOk();
+
+	// 	// $this->assertEquals('test', $response->getContent());
+		
+	// 	$request = \Illuminate\Http\Request::create('/', 'PUT', $params);
+
+	// 	try
+	// 	{
+	// 		$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeUpdateCommand(3, $request));
+
+	// 		var_dump($result);
+	// 	}
+	// 	catch(\Cookbook\Core\Exceptions\ValidationException $e)
+	// 	{
+	// 		var_dump($e->toArray());
+	// 	}
+		
+
+	// }
+
+	public function testDeleteAttribute()
 	{
-		$params = [
-			'admin_notice' => 'admin notice 2',
-		];
+		// $params = [
+		// 	'admin_notice' => 'admin notice 2',
+		// ];
 
 		// $response = $this->call('POST', '/attribute', $params);
 
@@ -119,11 +147,11 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 		// $this->assertEquals('test', $response->getContent());
 		
-		$request = \Illuminate\Http\Request::create('/', 'PUT', $params);
+		$request = \Illuminate\Http\Request::create('/', 'DELETE', []);
 
 		try
 		{
-			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeUpdateCommand(3, $request));
+			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeDeleteCommand(3));
 
 			var_dump($result);
 		}

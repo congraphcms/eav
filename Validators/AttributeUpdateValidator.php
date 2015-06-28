@@ -83,7 +83,7 @@ class AttributeUpdateValidator
 	protected $exception;
 
 	/**
-	 * Create new AttributeCreateValidator
+	 * Create new AttributeUpdateValidator
 	 * 
 	 * @return void
 	 */

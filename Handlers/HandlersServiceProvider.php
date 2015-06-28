@@ -14,6 +14,7 @@ use Illuminate\Support\ServiceProvider;
 
 use Cookbook\EAV\Handlers\Commands\AttributeCreateHandler;
 use Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler;
+use Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler;
 
 /**
  * HandlersServiceProvider service provider for handlers
@@ -58,7 +59,8 @@ class HandlersServiceProvider extends ServiceProvider {
 		
 		$mappings = [
 			'Cookbook\EAV\Commands\AttributeCreateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeCreateHandler@handle',
-			'Cookbook\EAV\Commands\AttributeUpdateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler@handle'
+			'Cookbook\EAV\Commands\AttributeUpdateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler@handle',
+			'Cookbook\EAV\Commands\AttributeDeleteCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler@handle'
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->maps($mappings);
@@ -78,6 +80,10 @@ class HandlersServiceProvider extends ServiceProvider {
 		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler', function($app){
 			return new AttributeUpdateHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
 		});
+
+		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler', function($app){
+			return new AttributeDeleteHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		});
 	}
 
 
@@ -90,7 +96,8 @@ class HandlersServiceProvider extends ServiceProvider {
 	{
 		return [
 			'Cookbook\EAV\Handlers\Commands\AttributeCreateHandler',
-			'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler'
+			'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler',
+			'Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler'
 		];
 	}
 }

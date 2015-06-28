@@ -190,6 +190,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// update options
 		$this->updateOptions($options, $keyedOptions, $attribute);
 
+		$attribute = $this->db->table('attributes')->find($id);
+
 		// and return ID
 		return $attribute;
 	}
@@ -205,39 +207,29 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 */
 	protected function _delete($id)
 	{
-
-		try
+		// get the attribute
+		$attribute = $this->db->table('attributes')->find($id);
+		if(!$attribute)
 		{
-			// get the attribute
-			$attribute = $this->db->table('attributes')->find($id);
-			if(!$attribute)
-			{
-				$this->addErrors('Attribute ID needs to be provided.');
-				return false;
-			}
-
-			// init attribute handler
-			$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-
-			// delete related values for this attribute
-			$fieldHandler->sweepAfterAttribute($attribute);
-			// delete all related attributes in sets for this attribute
-			$this->db->table('set_attributes')->where('attribute_id', '=', $attribute->id)->delete();
-			// delete all related options for this attribute
-			$this->db->table('attribute_options')->where('attribute_id', '=', $attribute->id)->delete();
-			// delete attribute translations
-			$this->db->table('attribute_translations')->where('attribute_id', '=', $attribute->id)->delete();
-			// delete the attribute
-			$this->db->table('attributes')->where('id', '=', $attribute->id)->delete();
-
-			return true;
-
+			throw new Exception(['There is no attribute with that ID.'], 400);
 		}
-		catch(Exception $e)
-		{
-			$this->addErrors('Failed to delete attribute. There was an error.');
-			return false;
-		}
+
+		// init attribute handler
+		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+
+		// delete related values for this attribute
+		$fieldHandler->sweepAfterAttribute($attribute);
+
+		// delete all related attributes in sets for this attribute
+		$this->db->table('set_attributes')->where('attribute_id', '=', $attribute->id)->delete();
+		// delete all related options for this attribute
+		$this->db->table('attribute_options')->where('attribute_id', '=', $attribute->id)->delete();
+		// delete attribute translations
+		$this->db->table('attribute_translations')->where('attribute_id', '=', $attribute->id)->delete();
+		// delete the attribute
+		$this->db->table('attributes')->where('id', '=', $attribute->id)->delete();
+
+		return $attribute->id;
 	}
 
 	/**
