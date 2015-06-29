@@ -128,7 +128,7 @@ class AttributeCreateValidator
 
 		$this->exception = new ValidationException();
 
-		$this->exception->setErrorKey('attribute');
+		$this->exception->setErrorKey('attributes');
 	}
 
 

@@ -1,7 +1,7 @@
 <?php
 
 // include_once(realpath(__DIR__.'/../LaravelMocks.php'));
-
+use Illuminate\Support\Facades\Cache;
 class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 {
 
@@ -56,6 +56,13 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 			'prefix'    => '',
 		]);
 
+		$app['config']->set('cache.default', 'file');
+
+		$app['config']->set('cache.stores.file', [
+			'driver'	=> 'file',
+			'path'   	=> realpath(__DIR__ . '/../storage/cache/'),
+		]);
+
 		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
 
 		// $app['config']->set(
@@ -74,7 +81,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 	// {
 	// 	$params = [
 	// 		'code' => 'code',
-	// 		'admin_label' => '',
+	// 		'admin_label' => '123',
 	// 		'admin_notice' => 'admin notice',
 	// 		'field_type' => 'text',
 	// 		'localized' => false,
@@ -135,29 +142,65 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 	// }
 
-	public function testDeleteAttribute()
-	{
-		// $params = [
-		// 	'admin_notice' => 'admin notice 2',
-		// ];
+	// public function testDeleteAttribute()
+	// {
+	// 	// $params = [
+	// 	// 	'admin_notice' => 'admin notice 2',
+	// 	// ];
 
-		// $response = $this->call('POST', '/attribute', $params);
+	// 	// $response = $this->call('POST', '/attribute', $params);
 
-		// $this->assertResponseOk();
+	// 	// $this->assertResponseOk();
 
-		// $this->assertEquals('test', $response->getContent());
+	// 	// $this->assertEquals('test', $response->getContent());
 		
-		$request = \Illuminate\Http\Request::create('/', 'DELETE', []);
+	// 	$request = \Illuminate\Http\Request::create('/', 'DELETE', []);
+
+	// 	try
+	// 	{
+	// 		$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeDeleteCommand(3));
+
+	// 		var_dump($result);
+	// 	}
+	// 	catch(\Cookbook\Core\Exceptions\ValidationException $e)
+	// 	{
+	// 		var_dump($e->toArray());
+	// 	}
+		
+
+	// }
+	
+	// public function testFetchAttribute()
+	// {
+
+	// 	try
+	// 	{
+	// 		$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeFetchCommand(2));
+
+	// 		var_dump($result);
+	// 	}
+	// 	catch(\Cookbook\Core\Exceptions\ValidationException $e)
+	// 	{
+	// 		var_dump($e->toArray());
+	// 	}
+		
+
+	// }
+
+	public function testGetAttributes()
+	{
 
 		try
 		{
-			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeDeleteCommand(3));
+			$request = \Illuminate\Http\Request::create('/', 'GET', []);
 
-			var_dump($result);
+			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeGetCommand($request));
+
+			dd($result);
 		}
 		catch(\Cookbook\Core\Exceptions\ValidationException $e)
 		{
-			var_dump($e->toArray());
+			dd($e->toArray());
 		}
 		
 

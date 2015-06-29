@@ -56,7 +56,9 @@ class ValidatorsServiceProvider extends ServiceProvider {
 		$mappings = [
 			'Cookbook\EAV\Commands\AttributeCreateCommand' => 'Cookbook\EAV\Validators\AttributeCreateValidator@validate',
 			'Cookbook\EAV\Commands\AttributeUpdateCommand' => 'Cookbook\EAV\Validators\AttributeUpdateValidator@validate',
-			'Cookbook\EAV\Commands\AttributeDeleteCommand' => 'Cookbook\EAV\Validators\AttributeDeleteValidator@validate'
+			'Cookbook\EAV\Commands\AttributeDeleteCommand' => 'Cookbook\EAV\Validators\AttributeDeleteValidator@validate',
+			'Cookbook\EAV\Commands\AttributeFetchCommand' => 'Cookbook\EAV\Validators\AttributeFetchValidator@validate',
+			'Cookbook\EAV\Commands\AttributeGetCommand' => 'Cookbook\EAV\Validators\AttributeGetValidator@validate'
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->mapValidators($mappings);
@@ -85,6 +87,14 @@ class ValidatorsServiceProvider extends ServiceProvider {
 		$this->app->bind('Cookbook\EAV\Validators\AttributeDeleteValidator', function($app){
 			return new AttributeDeleteValidator();
 		});
+
+		$this->app->bind('Cookbook\EAV\Validators\AttributeFetchValidator', function($app){
+			return new AttributeFetchValidator();
+		});
+
+		$this->app->bind('Cookbook\EAV\Validators\AttributeGetValidator', function($app){
+			return new AttributeGetValidator();
+		});
 	}
 
 
@@ -96,7 +106,11 @@ class ValidatorsServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'Cookbook\EAV\Validators\AttributeCreateValidator'
+			'Cookbook\EAV\Validators\AttributeCreateValidator',
+			'Cookbook\EAV\Validators\AttributeUpdateValidator',
+			'Cookbook\EAV\Validators\AttributeDeleteValidator',
+			'Cookbook\EAV\Validators\AttributeFetchValidator',
+			'Cookbook\EAV\Validators\AttributeGetValidator'
 		];
 	}
 }

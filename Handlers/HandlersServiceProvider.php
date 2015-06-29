@@ -15,6 +15,8 @@ use Illuminate\Support\ServiceProvider;
 use Cookbook\EAV\Handlers\Commands\AttributeCreateHandler;
 use Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler;
 use Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler;
+use Cookbook\EAV\Handlers\Commands\AttributeFetchHandler;
+use Cookbook\EAV\Handlers\Commands\AttributeGetHandler;
 
 /**
  * HandlersServiceProvider service provider for handlers
@@ -60,7 +62,9 @@ class HandlersServiceProvider extends ServiceProvider {
 		$mappings = [
 			'Cookbook\EAV\Commands\AttributeCreateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeCreateHandler@handle',
 			'Cookbook\EAV\Commands\AttributeUpdateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler@handle',
-			'Cookbook\EAV\Commands\AttributeDeleteCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler@handle'
+			'Cookbook\EAV\Commands\AttributeDeleteCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler@handle',
+			'Cookbook\EAV\Commands\AttributeFetchCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeFetchHandler@handle',
+			'Cookbook\EAV\Commands\AttributeGetCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeGetHandler@handle'
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->maps($mappings);
@@ -84,6 +88,14 @@ class HandlersServiceProvider extends ServiceProvider {
 		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler', function($app){
 			return new AttributeDeleteHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
 		});
+
+		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeFetchHandler', function($app){
+			return new AttributeFetchHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		});
+
+		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeGetHandler', function($app){
+			return new AttributeGetHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		});
 	}
 
 
@@ -97,7 +109,9 @@ class HandlersServiceProvider extends ServiceProvider {
 		return [
 			'Cookbook\EAV\Handlers\Commands\AttributeCreateHandler',
 			'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler',
-			'Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler'
+			'Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler',
+			'Cookbook\EAV\Handlers\Commands\AttributeFetchHandler',
+			'Cookbook\EAV\Handlers\Commands\AttributeGetHandler'
 		];
 	}
 }

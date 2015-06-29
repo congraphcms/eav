@@ -13,9 +13,9 @@ namespace Cookbook\EAV\Commands;
 use Illuminate\Http\Request;
 
 /**
- * AttributeDeleteCommand class
+ * AttributeGetCommand class
  * 
- * Command for deleting attribute
+ * Command for fetching attributes
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -23,26 +23,26 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeDeleteCommand
+class AttributeGetCommand
 {
 
 	/**
-	 * Attribute ID
+	 * Get Attributes request
 	 * 
 	 * @var int
 	 */
-	public $id;
+	public $request;
 
 
 	/**
-	 * Create new AttributeDeleteCommand
+	 * Create new AttributeGetCommand
 	 *
-	 * @param int 	$id
+	 * @param Illuminate\Http\Request 	$request
 	 * 
 	 * @return void
 	 */
-	public function __construct($id)
+	public function __construct(Request $request)
 	{
-		$this->id = intval($id);
+		$this->request = $request;
 	}
 }

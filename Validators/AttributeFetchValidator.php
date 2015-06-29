@@ -10,15 +10,15 @@
 
 namespace Cookbook\EAV\Validators;
 
-use Cookbook\EAV\Commands\AttributeDeleteCommand;
+use Cookbook\EAV\Commands\AttributeFetchCommand;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Illuminate\Support\Facades\Validator;
 
 
 /**
- * AttributeDeleteValidator class
+ * AttributeFetchValidator class
  * 
- * Validating command for deleting attribute
+ * Validating command for fetching attribute by ID
  * 
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -27,11 +27,11 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeDeleteValidator
+class AttributeFetchValidator
 {
 
 	/**
-	 * Set of rules for validating attribute
+	 * Set of rules for validating attribute fetch
 	 *
 	 * @var array
 	 */
@@ -45,13 +45,12 @@ class AttributeDeleteValidator
 	protected $exception;
 
 	/**
-	 * Create new AttributeDeleteValidator
+	 * Create new AttributeFetchValidator
 	 * 
 	 * @return void
 	 */
 	public function __construct()
 	{
-
 		$this->rules = [
 			'id' => 'required|exists:attributes,id'
 		];
@@ -61,16 +60,16 @@ class AttributeDeleteValidator
 
 
 	/**
-	 * Validate AttributeDeleteCommand
+	 * Validate AttributeFetchCommand
 	 * 
-	 * @param Cookbook\EAV\Commands\AttributeDeleteCommand $command
+	 * @param Cookbook\EAV\Commands\AttributeFetchCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(AttributeDeleteCommand $command)
+	public function validate(AttributeFetchCommand $command)
 	{
 		$params = ['id' => $command->id];
 

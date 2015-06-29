@@ -62,6 +62,13 @@ class AttributeUpdateValidator
 	protected $rules;
 
 	/**
+	 * Set of rules for validating attribute ID
+	 *
+	 * @var array
+	 */
+	protected $idRules;
+
+	/**
 	 * Set of rules for validating options
 	 *
 	 * @var array
@@ -95,7 +102,7 @@ class AttributeUpdateValidator
 		$this->availableFieldTypes = $this->attributeManager->getFieldTypes();
 
 		$this->rules = [
-			'id'					=> 'required|exists:attributes,id',
+			// 'id'					=> 'required|exists:attributes,id',
 			// 'code'					=> ['required', 'unique:attributes,code', 'regex:/^[0-9a-zA-Z-_]*$/'],
 			'admin_label'			=> 'sometimes|required|between:3,100',
 			'admin_notice'			=> 'max:1000',
@@ -109,6 +116,10 @@ class AttributeUpdateValidator
 			'data'					=> '',
 			'options'				=> 'sometimes|array',
 			'translations'			=> 'sometimes|array'
+		];
+
+		$this->rules = [
+			'id'					=> 'required|exists:attributes,id'
 		];
 
 		$this->optionRules = 
@@ -129,7 +140,7 @@ class AttributeUpdateValidator
 
 		$this->exception = new ValidationException();
 
-		$this->exception->setErrorKey('attribute');
+		$this->exception->setErrorKey('attributes');
 	}
 
 
@@ -146,7 +157,15 @@ class AttributeUpdateValidator
 	public function validate(AttributeUpdateCommand $command)
 	{
 		$params = $command->request->all();
-		$params['id'] = $command->id;
+		// $params['id'] = $command->id;
+		 
+		
+		$idValidator = Validator::make(['id' => $command->id], $this->idRules);
+
+		if($idValidator->fails())
+		{
+			throw new NotFoundException($idValidator->errors()->toArray());
+		}
 
 		$validator = Validator::make($params, $this->rules);
 
@@ -162,7 +181,7 @@ class AttributeUpdateValidator
 
 				if($optionValidator->fails())
 				{
-					$this->exception->setErrorKey('attribute.options.' . $key);
+					$this->exception->setErrorKey('attributes.options.' . $key);
 					$this->exception->addErrors($optionValidator->errors()->toArray());
 				}
 			}
@@ -175,7 +194,7 @@ class AttributeUpdateValidator
 
 				if($translationValidator->fails())
 				{
-					$this->exception->setErrorKey('attribute.translations.' . $key);
+					$this->exception->setErrorKey('attributes.translations.' . $key);
 					$this->exception->addErrors($translationValidator->errors()->toArray());
 				}
 			}
@@ -191,7 +210,7 @@ class AttributeUpdateValidator
 			}
 			catch(ValidationException $e)
 			{
-				$this->exception->setErrorKey('attribute');
+				$this->exception->setErrorKey('attributes');
 				$this->exception->addErrors($e->getErrors());
 			}
 		}

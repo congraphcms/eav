@@ -13,9 +13,9 @@ namespace Cookbook\EAV\Commands;
 use Illuminate\Http\Request;
 
 /**
- * AttributeDeleteCommand class
+ * AttributeFetchCommand class
  * 
- * Command for deleting attribute
+ * Command for fetching attribute by ID
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -23,7 +23,7 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeDeleteCommand
+class AttributeFetchCommand
 {
 
 	/**
@@ -35,7 +35,7 @@ class AttributeDeleteCommand
 
 
 	/**
-	 * Create new AttributeDeleteCommand
+	 * Create new AttributeFetchCommand
 	 *
 	 * @param int 	$id
 	 * 
