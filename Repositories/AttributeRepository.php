@@ -10,14 +10,14 @@
 
 namespace Cookbook\EAV\Repositories;
 
-use Cookbook\Core\Exceptions\Exception;
+
 use Illuminate\Database\Connection;
 
+use Cookbook\Core\Exceptions\Exception;
+use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Repositories\AbstractRepository;
 use Cookbook\Core\Repositories\UsesCache;
-use Cookbook\Core\Traits\ValidatorTrait;
 
-use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
 use Cookbook\Contracts\EAV\FieldHandlerFactoryContract;
 use Cookbook\Contracts\EAV\AttributeRepositoryContract;
 use Cookbook\EAV\Managers\AttributeManager;
@@ -196,7 +196,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		if( ! $attribute )
 		{
-			throw new Exception(['There is no attribute with that ID.'], 400);
+			throw new NotFoundException(['There is no attribute with that ID.']);
 		}
 
 		// extract options from model
@@ -250,7 +250,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$attribute = $this->db->table('attributes')->find($id);
 		if(!$attribute)
 		{
-			throw new Exception(['There is no attribute with that ID.'], 400);
+			throw new NotFoundException(['There is no attribute with that ID.']);
 		}
 
 		// init attribute handler
@@ -501,7 +501,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		
 		if( ! $attribute )
 		{
-			return false;	
+			throw new NotFoundException(['There is no attribute with that ID.']);
 		}
 
 		$options = $this->db->table('attribute_options')
@@ -590,49 +590,6 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		}
 		
 		return $attributes;
-	}
-
-	protected function parseFilters($query, $filters)
-	{
-		return $query;
-	}
-
-	protected function parsePaging($query, $offset, $limit)
-	{
-		$offset = intval($offset);
-		$limit = intval($limit);
-
-		if( ! empty($offset) )
-		{
-			$query->skip($offset);
-		}
-
-		if( ! empty($limit) )
-		{
-			$query->take($limit);
-		}
-
-		return $query;
-	}
-
-	protected function parseSorting($query, $sort)
-	{
-		if( ! empty($sort) )
-		{
-			foreach ($sort as $sortCriteria) {
-				$sortDirection = 'asc';
-
-				if($sortCriteria[0] === '-')
-				{
-					$sortCriteria = substr($sortCriteria, 1);
-					$sortDirection = 'desc';
-				}
-
-				$query = $query->orderBy($sortCriteria, $sortDirection);
-			}
-		}
-
-		return $query;
 	}
 
 	// /**

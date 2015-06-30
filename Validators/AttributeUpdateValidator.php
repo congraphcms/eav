@@ -14,6 +14,7 @@ use Cookbook\EAV\Commands\AttributeUpdateCommand;
 use Cookbook\EAV\Managers\AttributeManager;
 use Cookbook\Contracts\EAV\FieldValidatorFactoryContract;
 use Cookbook\Core\Exceptions\ValidationException;
+use Cookbook\Core\Exceptions\NotFoundException;
 use Illuminate\Support\Facades\Validator;
 
 

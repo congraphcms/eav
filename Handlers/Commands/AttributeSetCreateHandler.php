@@ -1,0 +1,64 @@
+<?php
+/*
+ * This file is part of the cookbook/eav package.
+ *
+ * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Cookbook\EAV\Handlers\Commands;
+
+
+use Cookbook\Contracts\EAV\AttributeSetRepositoryContract;
+use Cookbook\EAV\Commands\AttributeSetCreateCommand;
+
+
+/**
+ * AttributeSetCreateHandler class
+ * 
+ * Handling command for creating attribute set
+ * 
+ * 
+ * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
+ * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
+ * @package 	cookbook/eav
+ * @since 		0.1.0-alpha
+ * @version  	0.1.0-alpha
+ */
+class AttributeSetCreateHandler
+{
+	/**
+	 * Repository for attribute DB operations
+	 * 
+	 * @var Cookbook\Contracts\EAV\AttributeSetRepositoryContract
+	 */
+	protected $attributeSetRepository;
+
+	/**
+	 * Create new AttributeSetCreateHandler
+	 * 
+	 * @param Cookbook\Contracts\EAV\Repositories\AttributeSetRepositoryContract $attributeSetRepository
+	 * 
+	 * @return void
+	 */
+	public function __construct(AttributeSetRepositoryContract $attributeSetRepository)
+	{
+		// inject dependencies
+		$this->attributeSetRepository = $attributeSetRepository;
+	}
+
+
+	/**
+	 * Handle AttributeSetCreateCommand
+	 * 
+	 * @param Cookbook\EAV\Commands\AttributeSetCreateCommand $command
+	 * 
+	 * @return void
+	 */
+	public function handle(AttributeSetCreateCommand $command)
+	{
+		return $this->attributeSetRepository->create($command->request->all());
+	}
+}

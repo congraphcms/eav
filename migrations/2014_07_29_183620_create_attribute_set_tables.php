@@ -41,18 +41,15 @@ class CreateAttributeSetTables extends Migration {
 
 			// primary key, autoincrement
 			$table->increments('id');
-			// Entity type ID
-			$table->integer('entity_type_id');
-			// Parent Set ID
-			$table->integer('parent_id')->nullable()->default(0);
 
 			// Attribute set code for internal use
 			$table->string('code', 100)->unique();
+
+			// Entity type ID
+			$table->integer('entity_type_id');
+			
 			// Attribute set name for internal use
 			$table->string('name', 100)->default('');
-
-			// flag for using this attribute set as default set in entity type
-			$table->boolean('default')->default(0);
 			
 			// created_at and updated_at timestamps
 			$table->timestamps();
@@ -62,53 +59,53 @@ class CreateAttributeSetTables extends Migration {
 		// 2.0 Create attribute_groups table
 		// ---------------------------------------------------
 
-		Schema::create('attribute_groups', function($table) {
+		// Schema::create('attribute_groups', function($table) {
 
-			// primary key, autoincrement
-			$table->increments('id');
+		// 	// primary key, autoincrement
+		// 	$table->increments('id');
 
-			// relations
+		// 	// relations
 
-			// Attribute set ID
-			$table->integer('attribute_set_id');
+		// 	// Attribute set ID
+		// 	$table->integer('attribute_set_id');
 
-			// Group slug for internal use
-			$table->string('code', 50)->default('');
+		// 	// Group slug for internal use
+		// 	$table->string('code', 50)->default('');
 
-			// Group name for use in administration
-			$table->string('admin_label', 250)->default('');
+		// 	// Group name for use in administration
+		// 	$table->string('admin_label', 250)->default('');
 
-			// Order of the group in attribute set
-			$table->integer('sort_order')->default(0);
+		// 	// Order of the group in attribute set
+		// 	$table->integer('sort_order')->default(0);
 			
-			// created_at and updated_at timestamps
-			$table->timestamps();
-		});
+		// 	// created_at and updated_at timestamps
+		// 	$table->timestamps();
+		// });
 
 
 		// 2.1 Create attribute_group_translations table
 		// ---------------------------------------------------
 
-		Schema::create('attribute_group_translations', function($table) {
+		// Schema::create('attribute_group_translations', function($table) {
 
-			// primary key, autoincrement
-			$table->increments('id');
+		// 	// primary key, autoincrement
+		// 	$table->increments('id');
 
-			// relations
+		// 	// relations
 
-			// Attribute group ID
-			$table->integer('attribute_group_id');
-			// Language ID
-			$table->integer('language_id');
+		// 	// Attribute group ID
+		// 	$table->integer('attribute_group_id');
+		// 	// Language ID
+		// 	$table->integer('language_id');
 
-			// translations
+		// 	// translations
 
-			// Name of the group
-			$table->string('name', 250)->default('');
+		// 	// Name of the group
+		// 	$table->string('name', 250)->default('');
 			
-			// created_at and updated_at timestamps
-			$table->timestamps();
-		});
+		// 	// created_at and updated_at timestamps
+		// 	$table->timestamps();
+		// });
 
 
 		// 3.0 Create set_attributes table
@@ -118,13 +115,10 @@ class CreateAttributeSetTables extends Migration {
 
 			// primary key, autoincrement
 			$table->increments('id');
-
-			// relations
-
+			
 			// Attribute set ID
 			$table->integer('attribute_set_id');
-			// Attribute group ID
-			$table->integer('attribute_group_id');
+
 			// Attribute ID
 			$table->integer('attribute_id');
 
@@ -150,11 +144,11 @@ class CreateAttributeSetTables extends Migration {
 
 		// 2.0 Drop table attribute_group_translations
 
-		Schema::drop('attribute_group_translations');
+		// Schema::drop('attribute_group_translations');
 
 		// 2.1 Drop table attribute_groups
 
-		Schema::drop('attribute_groups');
+		// Schema::drop('attribute_groups');
 
 		// 3.0 Drop table attribute_sets
 

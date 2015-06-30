@@ -13,9 +13,9 @@ namespace Cookbook\EAV\Commands;
 use Illuminate\Http\Request;
 
 /**
- * AttributeUpdateCommand class
+ * AttributeSetUpdateCommand class
  * 
- * Command for updating attribute
+ * Command for updating attribute set
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -23,27 +23,27 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeUpdateCommand
+class AttributeSetUpdateCommand
 {
 
 	/**
-	 * Attribute ID
+	 * Attribute Set ID
 	 * 
 	 * @var int
 	 */
 	public $id;
 
 	/**
-	 * Attribute Update Request
+	 * Attribute Set Update Request
 	 * 
 	 * @var Illuminate\Http\Request
 	 */
 	public $request;
 
+
 	/**
-	 * Create new AttributeUpdateCommand
-	 *
-	 * @param int 						$id
+	 * Create new AttributeSetUpdateCommand
+	 * 
 	 * @param Illuminate\Http\Request 	$request
 	 * 
 	 * @return void
@@ -51,7 +51,6 @@ class AttributeUpdateCommand
 	public function __construct($id, Request $request)
 	{
 		$this->id = intval($id);
-		
 		$this->request = $request;
 	}
 }
