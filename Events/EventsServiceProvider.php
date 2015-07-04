@@ -55,48 +55,48 @@ class EventsServiceProvider extends ServiceProvider {
 		
 		$mappings = [
 			// Attributes
-			'Cookbook\Eav\Commands\Attributes\AttributeCreateCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeCreate',
-				'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeCreate'
-			],
-			'Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeUpdate',
-				'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeUpdate'
-			],
-			'Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeDelete',
-				'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeDelete'
-			],
-			'Cookbook\Eav\Commands\Attributes\AttributeFetchCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeFetch',
-				'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeFetch'
-			],
-			'Cookbook\Eav\Commands\Attributes\AttributeGetCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeGet',
-				'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeGet'
-			],
+			// 'Cookbook\Eav\Commands\Attributes\AttributeCreateCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeCreate',
+			// 	'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeCreate'
+			// ],
+			// 'Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeUpdate',
+			// 	'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeUpdate'
+			// ],
+			// 'Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeDelete',
+			// 	'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeDelete'
+			// ],
+			// 'Cookbook\Eav\Commands\Attributes\AttributeFetchCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeFetch',
+			// 	'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeFetch'
+			// ],
+			// 'Cookbook\Eav\Commands\Attributes\AttributeGetCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\Attributes\BeforeAttributeGet',
+			// 	'after' 	=> 'Cookbook\Eav\Events\Attributes\AfterAttributeGet'
+			// ],
 
-			// Attribute sets
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetCreate',
-				'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetCreate'
-			],
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetUpdate',
-				'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetUpdate'
-			],
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetDelete',
-				'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetDelete'
-			],
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetFetch',
-				'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetFetch'
-			],
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand' => [
-				'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetGet',
-				'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetGet'
-			],
+			// // Attribute sets
+			// 'Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetCreate',
+			// 	'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetCreate'
+			// ],
+			// 'Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetUpdate',
+			// 	'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetUpdate'
+			// ],
+			// 'Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetDelete',
+			// 	'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetDelete'
+			// ],
+			// 'Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetFetch',
+			// 	'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetFetch'
+			// ],
+			// 'Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand' => [
+			// 	'before' 	=> 'Cookbook\Eav\Events\AttributeSets\BeforeAttributeSetGet',
+			// 	'after' 	=> 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetGet'
+			// ],
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->mapEvents($mappings);

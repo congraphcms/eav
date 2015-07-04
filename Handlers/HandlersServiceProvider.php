@@ -44,9 +44,9 @@ class HandlersServiceProvider extends ServiceProvider {
 	 * @var array
 	 */
 	protected $listen = [
-		'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetFetch' => [
-			'Cookbook\Eav\Handlers\Events\AttributeSets\AfterAttributeSetFetchHandler',
-		],
+		// 'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetFetch' => [
+		// 	'Cookbook\Eav\Handlers\Events\AttributeSets\AfterAttributeSetFetchHandler',
+		// ],
 	];
 
 
