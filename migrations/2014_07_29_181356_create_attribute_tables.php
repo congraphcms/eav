@@ -45,11 +45,11 @@ class CreateAttributeTables extends Migration {
 			// unique attribute code for internal use
 			$table->string('code', 100)->unique();
 
-			// label for use on administration
-			$table->string('admin_label', 100)->default('');
+			// // label for use on administration
+			// $table->string('admin_label', 100)->default('');
 
-			// instructions for administration
-			$table->string('admin_notice', 1000)->default('');
+			// // instructions for administration
+			// $table->string('admin_notice', 1000)->default('');
 
 			// type of the attribute (text input, wysiwyg editor, number...)
 			$table->string('field_type', 100);
@@ -79,31 +79,28 @@ class CreateAttributeTables extends Migration {
 		});
 
 
-		// 1.1 Create attribute_translations table
-		// ---------------------------------------------------
+		// // 1.1 Create attribute_translations table
+		// // ---------------------------------------------------
 
-		Schema::create('attribute_translations', function($table) {
+		// Schema::create('attribute_translations', function($table) {
 
-			// primary key, autoincrement
-			$table->increments('id');
+		// 	// primary key, autoincrement
+		// 	$table->increments('id');
 
-			// relations
+		// 	// relations
 
-			// Attribute ID
-			$table->integer('attribute_id');
-			// Language ID
-			$table->integer('language_id');
+		// 	// Attribute ID
+		// 	$table->integer('attribute_id');
+		// 	// Language ID
+		// 	$table->integer('locale');
 
-			// translations
+		// 	// translations
 
-			// Attribute name for frontend use
-			$table->string('label', 250)->nullable()->default('');
-			// Note used for help when populating values
-			$table->string('description')->nullable()->default('');
-
-			// created_at and updated_at timestamps
-			$table->timestamps();
-		});
+		// 	// Attribute name for frontend use
+		// 	$table->string('label', 250)->nullable()->default('');
+		// 	// Note used for help when populating values
+		// 	$table->string('description')->nullable()->default('');
+		// });
 
 		// 2.0 Create attribute_options table
 		// ---------------------------------------------------
@@ -118,7 +115,7 @@ class CreateAttributeTables extends Migration {
 			// Attribute ID
 			$table->integer('attribute_id');
 			// Language ID
-			$table->integer('language_id')->default(0);
+			$table->integer('locale')->default(0);
 
 			// values
 
@@ -132,9 +129,6 @@ class CreateAttributeTables extends Migration {
 
 			// order of option in selection
 			$table->integer('sort_order')->default(0);
-
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 
 	}
@@ -153,7 +147,7 @@ class CreateAttributeTables extends Migration {
 
 		// 2.0 Drop table attribute_translations
 
-		Schema::drop('attribute_translations');
+		// Schema::drop('attribute_translations');
 
 		// 2.1 Drop table attributes
 

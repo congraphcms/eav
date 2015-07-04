@@ -74,7 +74,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\EAV\EAVServiceProvider'];
+		return ['Cookbook\Eav\EavServiceProvider'];
 	}
 
 	// public function testCreateAttribute()
@@ -102,7 +102,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 	// 	try
 	// 	{
-	// 		$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeCreateCommand($request));
+	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeCreateCommand($request));
 
 	// 		var_dump($result);
 	// 	}
@@ -130,7 +130,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 	// 	try
 	// 	{
-	// 		$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeUpdateCommand(3, $request));
+	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeUpdateCommand(3, $request));
 
 	// 		var_dump($result);
 	// 	}
@@ -158,7 +158,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 	// 	try
 	// 	{
-	// 		$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeDeleteCommand(3));
+	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeDeleteCommand(3));
 
 	// 		var_dump($result);
 	// 	}
@@ -175,7 +175,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 	// 	try
 	// 	{
-	// 		$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeFetchCommand(2));
+	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeFetchCommand(2));
 
 	// 		var_dump($result);
 	// 	}
@@ -194,7 +194,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 		{
 			$request = \Illuminate\Http\Request::create('/', 'GET', []);
 
-			$result = $this->bus->dispatch( new Cookbook\EAV\Commands\AttributeGetCommand($request));
+			$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeGetCommand($request));
 
 			dd($result);
 		}

@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV;
+namespace Cookbook\Eav;
 
 use Illuminate\Support\ServiceProvider;
 
 /**
- * ManagersServiceProvider service provider for managers
+ * EavServiceProvider service provider for EAV package
  * 
  * It will register all manager to app container
  * 
@@ -25,7 +25,7 @@ use Illuminate\Support\ServiceProvider;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class EAVServiceProvider extends ServiceProvider {
+class EavServiceProvider extends ServiceProvider {
 
 	/**
 	* Register
@@ -55,33 +55,41 @@ class EAVServiceProvider extends ServiceProvider {
 	 */
 	protected function registerServiceProviders(){
 
-		// Managers
-		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\EAV\Managers\ManagersServiceProvider');
-
-		// Fields
-		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\EAV\Fields\FieldsServiceProvider');
-
-		// Commands
-		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\EAV\Commands\CommandsServiceProvider');
-
-		// Handlers
-		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\EAV\Handlers\HandlersServiceProvider');
-
-		// Validators
-		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\EAV\Validators\ValidatorsServiceProvider');
-
-		// Repositories
-		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\EAV\Repositories\RepositoriesServiceProvider');
-
 		// Core
 		// -----------------------------------------------------------------------------
 		$this->app->register('Cookbook\Core\CoreServiceProvider');
+
+		
+
+		// Managers
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\Managers\ManagersServiceProvider');
+
+		// Fields
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\Fields\FieldsServiceProvider');
+
+		// Commands
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\Commands\CommandsServiceProvider');
+
+		// Events
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\Events\EventsServiceProvider');
+
+		// Handlers
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\Handlers\HandlersServiceProvider');
+
+		// Validators
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\Validators\ValidatorsServiceProvider');
+
+		// Repositories
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\Repositories\RepositoriesServiceProvider');
+
+		
 
 		
 	}

@@ -8,15 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Repositories;
+namespace Cookbook\Eav\Repositories;
 
 use Illuminate\Database\Connection;
 
 use Cookbook\Core\Repository\AbstractRepository;
 use Cookbook\Core\Traits\ValidatorTrait;
 
-use Cookbook\Contracts\EAV\AttributeHandlerFactoryContract;
-use Cookbook\EAV\Managers\AttributeManager;
+use Cookbook\Contracts\Eav\AttributeHandlerFactoryContract;
+use Cookbook\Eav\Managers\AttributeManager;
 
 
 /**
@@ -26,8 +26,8 @@ use Cookbook\EAV\Managers\AttributeManager;
  * 
  * @uses   		Illuminate\Database\Connection
  * @uses   		Cookbook\Core\Repository\AbstractRepository
- * @uses   		Cookbook\Contracts\EAV\AttributeHandlerFactoryContract
- * @uses   		Cookbook\EAV\Managers\AttributeManager
+ * @uses   		Cookbook\Contracts\Eav\AttributeHandlerFactoryContract
+ * @uses   		Cookbook\Eav\Managers\AttributeManager
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -58,7 +58,7 @@ class EntityRepository extends AbstractRepository
 	/**
 	 * Repository for handling attribute values
 	 * 
-	 * @var Cookbook\EAV\Repositories\AttributeValueRepository
+	 * @var Cookbook\Eav\Repositories\AttributeValueRepository
 	 */
 	protected $attributeValueRepository;
 	
@@ -76,8 +76,8 @@ class EntityRepository extends AbstractRepository
 	 * Create new EntityRepository
 	 * 
 	 * @param Illuminate\Database\Connection $db
-	 * @param Cookbook\EAV\Handlers\AttributeHandlerFactoryContract $attributeHandlerFactory
-	 * @param Cookbook\EAV\Managers\AttributeManager $attributeManager
+	 * @param Cookbook\Eav\Handlers\AttributeHandlerFactoryContract $attributeHandlerFactory
+	 * @param Cookbook\Eav\Managers\AttributeManager $attributeManager
 	 * 
 	 * @return void
 	 */

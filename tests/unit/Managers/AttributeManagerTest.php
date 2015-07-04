@@ -12,7 +12,7 @@ class AttributeManagerTest extends Orchestra\Testbench\TestCase
 		parent::setUp();
 		
 
-		$this->manager = App::make('Cookbook\EAV\Managers\AttributeManager');
+		$this->manager = App::make('Cookbook\Eav\Managers\AttributeManager');
 	}
 
 	/**
@@ -39,13 +39,13 @@ class AttributeManagerTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\EAV\EAVServiceProvider'
+			'Cookbook\Eav\EavServiceProvider'
 		];
 	}
 
 	public function testConstructor()
 	{
-		$this->assertInstanceOf('Cookbook\EAV\Managers\AttributeManager', $this->manager);
+		$this->assertInstanceOf('Cookbook\Eav\Managers\AttributeManager', $this->manager);
 	}
 
 	public function testGetFieldTypes()

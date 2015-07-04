@@ -20,7 +20,7 @@ class AttributeRepositoryTest extends Orchestra\Testbench\TestCase
 
 		$this->query = $laravelMocker->mockQuery();
 
-		$this->repo = App::make('Cookbook\EAV\Repositories\AttributeRepository');
+		$this->repo = App::make('Cookbook\Eav\Repositories\AttributeRepository');
 
 	}
 
@@ -43,12 +43,12 @@ class AttributeRepositoryTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\EAV\EAVServiceProvider'];
+		return ['Cookbook\Eav\EavServiceProvider'];
 	}
 
 	public function testConstructor()
 	{
-		$this->assertInstanceOf('Cookbook\EAV\Repositories\AttributeRepository', $this->repo);
+		$this->assertInstanceOf('Cookbook\Eav\Repositories\AttributeRepository', $this->repo);
 
 		
 	}

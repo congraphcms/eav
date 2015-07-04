@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Repositories;
+namespace Cookbook\Eav\Repositories;
 
 
 use Illuminate\Database\Connection;
@@ -18,9 +18,9 @@ use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Repositories\AbstractRepository;
 use Cookbook\Core\Repositories\UsesCache;
 
-use Cookbook\Contracts\EAV\FieldHandlerFactoryContract;
-use Cookbook\Contracts\EAV\AttributeRepositoryContract;
-use Cookbook\EAV\Managers\AttributeManager;
+use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
+use Cookbook\Eav\Managers\AttributeManager;
 
 
 /**
@@ -31,8 +31,8 @@ use Cookbook\EAV\Managers\AttributeManager;
  * @uses   		Illuminate\Database\Connection
  * @uses   		Cookbook\Core\Repository\AbstractRepository
  * @uses 		Illuminate\Contracts\Validation\Factory
- * @uses   		Cookbook\Contracts\EAV\FieldHandlerFactoryContract
- * @uses   		Cookbook\EAV\Managers\AttributeManager
+ * @uses   		Cookbook\Contracts\Eav\FieldHandlerFactoryContract
+ * @uses   		Cookbook\Eav\Managers\AttributeManager
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -40,7 +40,7 @@ use Cookbook\EAV\Managers\AttributeManager;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeRepository extends AbstractRepository implements AttributeRepositoryContract, UsesCache
+class AttributeRepository extends AbstractRepository implements AttributeRepositoryContract//, UsesCache
 {
 
 // ----------------------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * Factory for attribute handlers,
 	 * makes appropriate attriubte handler depending on attribute data type
 	 * 
-	 * @var Cookbook\Contracts\EAV\FieldHandlerFactoryContract
+	 * @var Cookbook\Contracts\Eav\FieldHandlerFactoryContract
 	 */
 	protected $fieldHandlerFactory;
 
@@ -98,8 +98,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @param Illuminate\Database\Connection $db
 	 * @param Illuminate\Contracts\Validation\Factory
-	 * @param Cookbook\EAV\Handlers\FieldHandlerFactoryContract $fieldHandlerFactory
-	 * @param Cookbook\EAV\Managers\AttributeManager $attributeManager
+	 * @param Cookbook\Eav\Handlers\FieldHandlerFactoryContract $fieldHandlerFactory
+	 * @param Cookbook\Eav\Managers\AttributeManager $attributeManager
 	 * 
 	 * @return void
 	 */
@@ -495,7 +495,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @return array
 	 */
-	protected function _fetchById($id, $include = [])
+	protected function _fetchById($id)
 	{
 		$attribute = $this->db->table('attributes')->find($id);
 		
@@ -527,7 +527,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @return array
 	 */
-	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [])
+	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [])
 	{
 		$query = $this->db->table('attributes');
 

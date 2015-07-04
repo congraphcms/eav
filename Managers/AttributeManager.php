@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Managers;
+namespace Cookbook\Eav\Managers;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepositoryContract;
 
@@ -16,7 +16,7 @@ use Illuminate\Contracts\Config\Repository as ConfigRepositoryContract;
  * AttributeManager class
  * 
  * It's a helper manager class that provides information
- * from EAV config files
+ * from Eav config files
  * 
  * @uses   		Illuminate\Support\Facades\Config
  * 

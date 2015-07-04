@@ -51,16 +51,13 @@ class CreateAttributeValueTables extends Migration {
 			// Entity type ID
 			$table->integer('entity_type_id');
 			// Language ID
-			$table->integer('language_id');
+			$table->integer('locale');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
 			$table->dateTime('value')->nullable();
-			
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 
 
@@ -81,16 +78,13 @@ class CreateAttributeValueTables extends Migration {
 			// Entity type ID
 			$table->integer('entity_type_id');
 			// Language ID
-			$table->integer('language_id');
+			$table->integer('locale');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
 			$table->integer('value')->nullable();
-			
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 
 
@@ -111,16 +105,13 @@ class CreateAttributeValueTables extends Migration {
 			// Entity type ID
 			$table->integer('entity_type_id');
 			// Language ID
-			$table->integer('language_id');
+			$table->integer('locale');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
 			$table->decimal('value')->nullable();
-			
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 
 
@@ -141,16 +132,13 @@ class CreateAttributeValueTables extends Migration {
 			// Entity type ID
 			$table->integer('entity_type_id');
 			// Language ID
-			$table->integer('language_id');
+			$table->integer('locale');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
 			$table->text('value')->nullable();
-			
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 
 
@@ -171,16 +159,13 @@ class CreateAttributeValueTables extends Migration {
 			// Entity type ID
 			$table->integer('entity_type_id');
 			// Language ID
-			$table->integer('language_id');
+			$table->integer('locale');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
 			$table->string('value')->nullable();
-			
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 
 		// 1.5 Create attribute_values_relations table
@@ -200,16 +185,13 @@ class CreateAttributeValueTables extends Migration {
 			// Entity type ID
 			$table->integer('entity_type_id');
 			// Language ID
-			$table->integer('language_id');
+			$table->integer('locale');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
 			$table->integer('value')->nullable();
-			
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 
 		// 1.6 Create attribute_values_assets table
@@ -229,16 +211,13 @@ class CreateAttributeValueTables extends Migration {
 			// Entity type ID
 			$table->integer('entity_type_id');
 			// Language ID
-			$table->integer('language_id');
+			$table->integer('locale');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
 			$table->integer('value')->nullable();
-			
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 	}
 

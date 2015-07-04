@@ -35,7 +35,7 @@
 
     "autoload": {
         "psr-4": {
-            "Cookbook\\EAV\\": ""
+            "Cookbook\\Eav\\": ""
         },
         "classmap": [
             "migrations"

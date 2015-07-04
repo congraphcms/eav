@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Repositories;
+namespace Cookbook\Eav\Repositories;
 
 use Illuminate\Database\Connection;
 
@@ -36,7 +36,7 @@ class EntityTypeRepository extends AbstractRepository
 	/**
 	 * Repository for handling attribute sets
 	 * 
-	 * @var Cookbook\EAV\Repositories\AttributeSetRepository
+	 * @var Cookbook\Eav\Repositories\AttributeSetRepository
 	 */
 	protected $attributeSetRepository;
 

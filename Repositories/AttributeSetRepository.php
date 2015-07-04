@@ -8,17 +8,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Repositories;
+namespace Cookbook\Eav\Repositories;
 
 use Illuminate\Database\Connection;
 
 use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Exceptions\BadRequestException;
-use Cookbook\Core\Repository\AbstractRepository;
+use Cookbook\Core\Repositories\AbstractRepository;
 
-use Cookbook\Contracts\EAV\AttributeHandlerFactoryContract;
-use Cookbook\EAV\Managers\AttributeManager;
+use Cookbook\Contracts\Eav\AttributeHandlerFactoryContract;
+use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
+use Cookbook\Eav\Managers\AttributeManager;
 
 
 /**
@@ -28,9 +29,9 @@ use Cookbook\EAV\Managers\AttributeManager;
  * 
  * @uses   		Illuminate\Database\Connection
  * @uses   		Cookbook\Core\Repository\AbstractRepository
- * @uses   		Cookbook\Contracts\EAV\AttributeHandlerFactoryContract
- * @uses   		Cookbook\EAV\Managers\AttributeManager
- * @uses   		Cookbook\EAV\Repositories\EntityRepository
+ * @uses   		Cookbook\Contracts\Eav\AttributeHandlerFactoryContract
+ * @uses   		Cookbook\Eav\Managers\AttributeManager
+ * @uses   		Cookbook\Eav\Repositories\EntityRepository
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -38,7 +39,7 @@ use Cookbook\EAV\Managers\AttributeManager;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetRepository extends AbstractRepository
+class AttributeSetRepository extends AbstractRepository implements AttributeSetRepositoryContract
 {
 	/**
 	 * Create new AttributeSetRepository
@@ -85,12 +86,15 @@ class AttributeSetRepository extends AbstractRepository
 		// set relation to attribute set in all groups
 		for($i = 0; $i < count($attributes); $i++)
 		{
+			$attributes[$i]['attribute_id'] = $attributes[$i]['id'];
+			unset($attributes[$i]['id']);
 			$attributes[$i]['attribute_set_id'] = $attributeSetId;
+			$attributes[$i]['sort_order'] = $i;
 		}
 
 		$this->insertSetAttributes($attributes);
 
-		$attributeSet = $this->fetchById($attributeSetId, [], true);
+		$attributeSet = $this->fetchById($attributeSetId, true);
 
 		return $attributeSet;
 		
@@ -116,7 +120,7 @@ class AttributeSetRepository extends AbstractRepository
 		}
 
 		// insert attribute set
-		$attributeSetId = $this->updateAttributeSet($model);
+		$attributeSetId = $this->updateAttributeSet($id, $model);
 
 		if(!$attributeSetId)
 		{
@@ -128,6 +132,8 @@ class AttributeSetRepository extends AbstractRepository
 			// set relation to attribute set in all attributes
 			for($i = 0; $i < count($attributes); $i++)
 			{
+				$attributes[$i]['attribute_id'] = $attributes[$i]['id'];
+				unset($attributes[$i]['id']);
 				$attributes[$i]['attribute_set_id'] = $attributeSetId;
 				$attributes[$i]['sort_order'] = $i;
 			}
@@ -281,12 +287,14 @@ class AttributeSetRepository extends AbstractRepository
 		}
 
 		$setAttributes = $this->db->table('set_attributes')
-								  ->select('attribute_id')
+								  ->select($this->db->raw('attribute_id as id, "attributes" as type'))
 								  ->where('attribute_set_id', '=', $id)
 								  ->orderBy('sort_order')
 								  ->get();
 
 		$attributeSet->attributes = $setAttributes;
+
+		return $attributeSet;
 	}
 
 	/**

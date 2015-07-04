@@ -124,9 +124,6 @@ class CreateAttributeSetTables extends Migration {
 
 			// Order of the attribute in group
 			$table->integer('sort_order')->default(0);
-			
-			// created_at and updated_at timestamps
-			$table->timestamps();
 		});
 	}
 

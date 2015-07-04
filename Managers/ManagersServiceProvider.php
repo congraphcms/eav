@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Managers;
+namespace Cookbook\Eav\Managers;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -50,7 +50,7 @@ class ManagersServiceProvider extends ServiceProvider {
 	* @return void
 	*/
 	public function registerManagers() {
-		$this->app->singleton('Cookbook\EAV\Managers\AttributeManager', function($app) {
+		$this->app->singleton('Cookbook\Eav\Managers\AttributeManager', function($app) {
 			return new AttributeManager($this->app['config']);
 		});
 	}
@@ -62,6 +62,6 @@ class ManagersServiceProvider extends ServiceProvider {
      */
 	public function provides()
 	{
-		return ['Cookbook\EAV\Managers\AttributeManager'];
+		return ['Cookbook\Eav\Managers\AttributeManager'];
 	}
 }

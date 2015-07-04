@@ -13,14 +13,14 @@ class AttributeHandlerFactoryTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 
 		$app->bind(
-			'Cookbook\EAV\Handlers\TextInputAttributeHandler', 
+			'Cookbook\Eav\Handlers\TextInputAttributeHandler', 
 			function($app)
 			{
 				return new AttributeHandlerMock();
 			}
 		);
 
-		$this->factory = $app->make('Cookbook\EAV\Handlers\AttributeHandlerFactory');
+		$this->factory = $app->make('Cookbook\Eav\Handlers\AttributeHandlerFactory');
 	}
 
 	/**
@@ -35,7 +35,7 @@ class AttributeHandlerFactoryTest extends Orchestra\Testbench\TestCase
 		$textInput = [
 			'label'						=> 'Text Input',
 			'table' 					=> 'attribute_values_varchar',
-			'handler'					=> 'Cookbook\EAV\Handlers\TextInputAttributeHandler',
+			'handler'					=> 'Cookbook\Eav\Handlers\TextInputAttributeHandler',
 			'can_have_default_value'	=> true,
 			'can_be_required' 			=> true,
 			'can_be_unique'				=> true,
@@ -72,13 +72,13 @@ class AttributeHandlerFactoryTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\EAV\EAVServiceProvider'
+			'Cookbook\Eav\EavServiceProvider'
 		];
 	}
 
 	public function testConstructor()
 	{
-		$this->assertInstanceOf('Cookbook\EAV\Handlers\AttributeHandlerFactory', $this->factory);
+		$this->assertInstanceOf('Cookbook\Eav\Handlers\AttributeHandlerFactory', $this->factory);
 	}
 
 	/**

@@ -8,16 +8,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Handlers;
+namespace Cookbook\Eav\Handlers;
 
 use Illuminate\Support\ServiceProvider;
 
-use Cookbook\EAV\Handlers\Commands\AttributeCreateHandler;
-use Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler;
-use Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler;
-use Cookbook\EAV\Handlers\Commands\AttributeFetchHandler;
-use Cookbook\EAV\Handlers\Commands\AttributeGetHandler;
-use Cookbook\EAV\Handlers\Commands\AttributeSetCreateHandler;
+use Cookbook\Eav\Handlers\Commands\Attributes\AttributeCreateHandler;
+use Cookbook\Eav\Handlers\Commands\Attributes\AttributeUpdateHandler;
+use Cookbook\Eav\Handlers\Commands\Attributes\AttributeDeleteHandler;
+use Cookbook\Eav\Handlers\Commands\Attributes\AttributeFetchHandler;
+use Cookbook\Eav\Handlers\Commands\Attributes\AttributeGetHandler;
+use Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetCreateHandler;
+use Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetUpdateHandler;
+use Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetDeleteHandler;
+use Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetFetchHandler;
+use Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetGetHandler;
 
 /**
  * HandlersServiceProvider service provider for handlers
@@ -33,6 +37,18 @@ use Cookbook\EAV\Handlers\Commands\AttributeSetCreateHandler;
  * @version  	0.1.0-alpha
  */
 class HandlersServiceProvider extends ServiceProvider {
+
+	/**
+	 * The event listener mappings for package.
+	 *
+	 * @var array
+	 */
+	protected $listen = [
+		'Cookbook\Eav\Events\AttributeSets\AfterAttributeSetFetch' => [
+			'Cookbook\Eav\Handlers\Events\AttributeSets\AfterAttributeSetFetchHandler',
+		],
+	];
+
 
 	/**
 	 * Boot
@@ -61,13 +77,29 @@ class HandlersServiceProvider extends ServiceProvider {
 	public function mapCommandHandlers() {
 		
 		$mappings = [
-			'Cookbook\EAV\Commands\AttributeCreateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeCreateHandler@handle',
-			'Cookbook\EAV\Commands\AttributeUpdateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler@handle',
-			'Cookbook\EAV\Commands\AttributeDeleteCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler@handle',
-			'Cookbook\EAV\Commands\AttributeFetchCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeFetchHandler@handle',
-			'Cookbook\EAV\Commands\AttributeGetCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeGetHandler@handle',
-			'Cookbook\EAV\Commands\AttributeSetCreateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeSetCreateHandler@handle',
-			'Cookbook\EAV\Commands\AttributeSetUpdateCommand' => 'Cookbook\EAV\Handlers\Commands\AttributeSetUpdateHandler@handle',
+			// Attributes
+			'Cookbook\Eav\Commands\Attributes\AttributeCreateCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Attributes\AttributeCreateHandler@handle',
+			'Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Attributes\AttributeUpdateHandler@handle',
+			'Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Attributes\AttributeDeleteHandler@handle',
+			'Cookbook\Eav\Commands\Attributes\AttributeFetchCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Attributes\AttributeFetchHandler@handle',
+			'Cookbook\Eav\Commands\Attributes\AttributeGetCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Attributes\AttributeGetHandler@handle',
+
+			// Attribute sets
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand' => 
+				'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetCreateHandler@handle',
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand' => 
+				'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetUpdateHandler@handle',
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand' => 
+				'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetDeleteHandler@handle',
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand' => 
+				'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetFetchHandler@handle',
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand' => 
+				'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetGetHandler@handle',
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->maps($mappings);
@@ -80,51 +112,66 @@ class HandlersServiceProvider extends ServiceProvider {
 	 */
 	public function registerCommandHandlers() {
 		
-		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeCreateHandler', function($app){
-			return new AttributeCreateHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Attributes\AttributeCreateHandler', function($app){
+			return new AttributeCreateHandler($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler', function($app){
-			return new AttributeUpdateHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Attributes\AttributeUpdateHandler', function($app){
+			return new AttributeUpdateHandler($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler', function($app){
-			return new AttributeDeleteHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Attributes\AttributeDeleteHandler', function($app){
+			return new AttributeDeleteHandler($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeFetchHandler', function($app){
-			return new AttributeFetchHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Attributes\AttributeFetchHandler', function($app){
+			return new AttributeFetchHandler($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeGetHandler', function($app){
-			return new AttributeGetHandler($app->make('Cookbook\Contracts\EAV\AttributeRepositoryContract'));
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Attributes\AttributeGetHandler', function($app){
+			return new AttributeGetHandler($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeSetCreateHandler', function($app){
-			return new AttributeSetCreateHandler($app->make('Cookbook\Contracts\EAV\AttributeSetRepositoryContract'));
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetCreateHandler', function($app){
+			return new AttributeSetCreateHandler($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\EAV\Handlers\Commands\AttributeSetUpdateHandler', function($app){
-			return new AttributeSetUpdateHandler($app->make('Cookbook\Contracts\EAV\AttributeSetRepositoryContract'));
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetUpdateHandler', function($app){
+			return new AttributeSetUpdateHandler($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
+		});
+
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetDeleteHandler', function($app){
+			return new AttributeSetDeleteHandler($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
+		});
+
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetFetchHandler', function($app){
+			return new AttributeSetFetchHandler($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
+		});
+
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetGetHandler', function($app){
+			return new AttributeSetGetHandler($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
 		});
 	}
 
 
 	/**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
+	 * Get the services provided by the provider.
+	 *
+	 * @return array
+	 */
 	public function provides()
 	{
 		return [
-			'Cookbook\EAV\Handlers\Commands\AttributeCreateHandler',
-			'Cookbook\EAV\Handlers\Commands\AttributeUpdateHandler',
-			'Cookbook\EAV\Handlers\Commands\AttributeDeleteHandler',
-			'Cookbook\EAV\Handlers\Commands\AttributeFetchHandler',
-			'Cookbook\EAV\Handlers\Commands\AttributeGetHandler',
-			'Cookbook\EAV\Handlers\Commands\AttributeSetCreateHandler',
-			'Cookbook\EAV\Handlers\Commands\AttributeSetUpdateHandler'
+			'Cookbook\Eav\Handlers\Commands\Attributes\AttributeCreateHandler',
+			'Cookbook\Eav\Handlers\Commands\Attributes\AttributeUpdateHandler',
+			'Cookbook\Eav\Handlers\Commands\Attributes\AttributeDeleteHandler',
+			'Cookbook\Eav\Handlers\Commands\Attributes\AttributeFetchHandler',
+			'Cookbook\Eav\Handlers\Commands\Attributes\AttributeGetHandler',
+			'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetCreateHandler',
+			'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetUpdateHandler',
+			'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetDeleteHandler',
+			'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetFetchHandler',
+			'Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetGetHandler'
 		];
 	}
 }

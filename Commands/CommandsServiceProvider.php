@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Commands;
+namespace Cookbook\Eav\Commands;
 
 use Illuminate\Support\ServiceProvider;
 

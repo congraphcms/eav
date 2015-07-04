@@ -63,15 +63,19 @@ class CreateEntityTables extends Migration {
 			$table->increments('id');
 			
 			// Entity type code for internal use
-			$table->string('code', 100);
+			$table->string('code', 100)->unique();
+
 			// Entity type name
 			$table->string('name', 250)->default('');
+
 			// Entity type plural name
 			$table->string('plural_name', 250)->default('');
-			// Type of parentig (none, paren-child, archive...)
-			$table->string('parent_type', 50)->default('default');
+
+			// // Type of parentig (none, paren-child, archive...)
+			// $table->string('parent_type', 50)->default('default');
+			
 			// flag for ability of multiple sets
-			$table->boolean('multiple_sets')->default(0);
+			$table->boolean('multiple_sets')->default(1);
 			
 			// created_at and updated_at timestamps
 			$table->timestamps();

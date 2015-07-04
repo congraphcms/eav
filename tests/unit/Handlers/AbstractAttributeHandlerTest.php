@@ -18,10 +18,10 @@ class AbstractAttributeHandlerTest extends Orchestra\Testbench\TestCase
 
 		$this->query = $laravelMocker->mockQuery();
 
-		$this->attributeManager = App::make('Cookbook\EAV\Managers\AttributeManager');
+		$this->attributeManager = App::make('Cookbook\Eav\Managers\AttributeManager');
 
 		// create stub for Abstract Repository
-		$this->handler = $this	->getMockBuilder('Cookbook\EAV\Handlers\AbstractAttributeHandler')
+		$this->handler = $this	->getMockBuilder('Cookbook\Eav\Handlers\AbstractAttributeHandler')
 								->setConstructorArgs(
 									[
 										$this->db,
@@ -45,13 +45,13 @@ class AbstractAttributeHandlerTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\EAV\EAVServiceProvider'
+			'Cookbook\Eav\EavServiceProvider'
 		];
 	}
 
 	public function testConstructor()
 	{
-		$this->assertInstanceOf('Cookbook\EAV\Handlers\AbstractAttributeHandler', $this->handler);
+		$this->assertInstanceOf('Cookbook\Eav\Handlers\AbstractAttributeHandler', $this->handler);
 
 		$bag = $this->handler->getErrorBag();
 

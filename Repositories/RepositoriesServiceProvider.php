@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Repositories;
+namespace Cookbook\Eav\Repositories;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -50,17 +50,28 @@ class RepositoriesServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function registerRepositories() {
-		$this->app->bind('Cookbook\EAV\Repositories\AttributeRepository', function($app) {
+		$this->app->bind('Cookbook\Eav\Repositories\AttributeRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
 			return new AttributeRepository(
 				$app['db']->connection(),
-				$app->make('Cookbook\Contracts\EAV\FieldHandlerFactoryContract'),
-				$app->make('Cookbook\EAV\Managers\AttributeManager')
+				$app->make('Cookbook\Contracts\Eav\FieldHandlerFactoryContract'),
+				$app->make('Cookbook\Eav\Managers\AttributeManager')
 			);
 		});
 
 		$this->app->alias(
-			'Cookbook\EAV\Repositories\AttributeRepository', 'Cookbook\Contracts\EAV\AttributeRepositoryContract'
+			'Cookbook\Eav\Repositories\AttributeRepository', 'Cookbook\Contracts\Eav\AttributeRepositoryContract'
+		);
+
+
+
+		$this->app->bind('Cookbook\Eav\Repositories\AttributeSetRepository', function($app) {
+			// var_dump('Contract for attribute repository resolving...');
+			return new AttributeSetRepository( $app['db']->connection() );
+		});
+
+		$this->app->alias(
+			'Cookbook\Eav\Repositories\AttributeSetRepository', 'Cookbook\Contracts\Eav\AttributeSetRepositoryContract'
 		);
 	}
 
@@ -72,8 +83,10 @@ class RepositoriesServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'Cookbook\EAV\Repositories\AttributeRepository',
-			'Cookbook\Contracts\EAV\AttributeRepositoryContract'
+			'Cookbook\Eav\Repositories\AttributeRepository',
+			'Cookbook\Contracts\Eav\AttributeRepositoryContract',
+			'Cookbook\Eav\Repositories\AttributeSetRepository',
+			'Cookbook\Contracts\Eav\AttributeSetRepositoryContract'
 		];
 	}
 
