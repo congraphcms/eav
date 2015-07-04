@@ -60,10 +60,10 @@ class AttributeGetHandler
 	public function handle(AttributeGetCommand $command)
 	{
 		return $this->attributeRepository->get(
-			$command->request->input('filter'), 
-			$command->request->input('offset'), 
-			$command->request->input('limit'), 
-			$command->request->input('sort')
+			$command->request->input('filter')?$command->request->input('filter'):[],
+			$command->request->input('offset')?$command->request->input('offset'):0,
+			$command->request->input('limit')?$command->request->input('limit'):0,
+			$command->request->input('sort')?$command->request->input('sort'):[]
 		);
 	}
 }
