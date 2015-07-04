@@ -328,7 +328,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		}
 
 		$setAttributes = $this->db->table('set_attributes')
-								  ->select('attribute_id')
+								  ->select('attribute_id', 'attribute_set_id')
 								  ->whereIn('attribute_set_id', $ids)
 								  ->orderBy('sort_order')
 								  ->get();
@@ -339,7 +339,11 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			{
 				if($attributeSet->id == $setAttribute->attribute_set_id)
 				{
-					$attributeSet->attributes[] = $setAttribute;
+					$attribute = new stdClass();
+					$attribute->id = $setAttribute->attribute_id;
+					$attribute->type = 'attribute';
+
+					$attributeSet->attributes[] = $attribute;
 					break;
 				}
 			}
