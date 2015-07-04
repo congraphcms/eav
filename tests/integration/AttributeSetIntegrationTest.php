@@ -172,33 +172,14 @@ class AttributeSetIntegrationTest extends Orchestra\Testbench\TestCase
 
 	// }
 	
-	public function testFetchAttribute()
-	{
-
-		try
-		{
-			$request = \Illuminate\Http\Request::create('/', 'GET', []);
-
-			$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand(17, $request));
-
-			dd($result);
-		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
-		{
-			dd($e->toArray());
-		}
-		
-
-	}
-
-	// public function testGetAttributes()
+	// public function testFetchAttribute()
 	// {
 
 	// 	try
 	// 	{
 	// 		$request = \Illuminate\Http\Request::create('/', 'GET', []);
 
-	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeGetCommand($request));
+	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand(17, $request));
 
 	// 		dd($result);
 	// 	}
@@ -209,4 +190,23 @@ class AttributeSetIntegrationTest extends Orchestra\Testbench\TestCase
 		
 
 	// }
+
+	public function testGetAttributeSets()
+	{
+
+		try
+		{
+			$request = \Illuminate\Http\Request::create('/', 'GET', []);
+
+			$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand($request));
+
+			dd($result);
+		}
+		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		{
+			dd($e->toArray());
+		}
+		
+
+	}
 }

@@ -10,6 +10,8 @@
 
 namespace Cookbook\Eav\Repositories;
 
+use stdClass;
+
 use Illuminate\Database\Connection;
 
 use Cookbook\Core\Exceptions\Exception;
@@ -349,7 +351,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			}
 		}
 		
-		return $attributes;
+		return $attributeSets;
 	}
 
 	
