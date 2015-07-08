@@ -17,21 +17,10 @@ class AttributeSetIntegrationTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../migrations'),
 		]);
 
-
-		$this->app = $this->createApplication();
+		// $this->app = $this->createApplication();
 
 		$this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	}
-
-	public function tearDown()
-	{
-		parent::tearDown();
-
-		// $this->artisan('migrate:reset', [
-		// 	'--database' => 'testbench',
-		// 	// '--realpath' => realpath(__DIR__.'/../../migrations'),
-		// ]);
 	}
 
 	/**
@@ -74,6 +63,7 @@ class AttributeSetIntegrationTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
+		var_dump('getPackageProviders');
 		return ['Cookbook\Eav\EavServiceProvider'];
 	}
 

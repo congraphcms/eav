@@ -75,7 +75,7 @@ class HandlersServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function mapCommandHandlers() {
-		
+		var_dump('Registering command handlers');
 		$mappings = [
 			// Attributes
 			'Cookbook\Eav\Commands\Attributes\AttributeCreateCommand' => 

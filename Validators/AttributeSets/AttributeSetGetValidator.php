@@ -89,7 +89,6 @@ class AttributeSetGetValidator
 		$this->validateFilters($params['filter']);
 		$this->validatePaging($params['offset'], $params['limit']);
 		$this->validateSorting($params['sort']);
-		$this->validateInclude($params['include']);
 	}
 
 	protected function validateFilters(&$filters)
@@ -136,13 +135,4 @@ class AttributeSetGetValidator
 		}
 	}
 
-	protected function validateInclude(&$include)
-	{
-		if( ! empty($include) )
-		{
-			throw new BadRequestException('There are no available includes for attributes.');
-		}
-
-		$include = [];
-	}
 }
