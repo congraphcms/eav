@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Fields;
+namespace Cookbook\Eav\Fields;
 
-use Cookbook\Contracts\EAV\FieldHandlerContract;
+use Cookbook\Contracts\Eav\FieldHandlerContract;
 use Cookbook\Core\Traits\ErrorManagerTrait;
-use Cookbook\EAV\Managers\AttributeManager;
+use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 
 /**
@@ -21,7 +21,7 @@ use Illuminate\Database\Connection;
  * Base class for all feild handlers
  * 
  * @uses  		Cookbook\Core\Traits\ErrorManagerTrait
- * @uses  		Cookbook\EAV\Managers\AttributeManager
+ * @uses  		Cookbook\Eav\Managers\AttributeManager
  * @uses 		Illuminate\Database\Connection
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -60,7 +60,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Create new AbstractAttributeHandler
 	 * 
 	 * @param Illuminate\Database\Connection 			$db
-	 * @param Cookbook\EAV\Managers\AttributeManager 	$attributeManager
+	 * @param Cookbook\Eav\Managers\AttributeManager 	$attributeManager
 	 * @param string 									$table
 	 *  
 	 * @return void

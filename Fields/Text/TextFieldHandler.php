@@ -1,8 +1,8 @@
-<?php namespace Cookbook\EAV\Fields\Text;
+<?php namespace Cookbook\Eav\Fields\Text;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\Config;
-use Cookbook\EAV\Fields\AbstractFieldHandler;
+use Cookbook\Eav\Fields\AbstractFieldHandler;
 
 class TextFieldHandler extends AbstractFieldHandler {
 

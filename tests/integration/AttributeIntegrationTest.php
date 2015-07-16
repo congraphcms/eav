@@ -194,7 +194,7 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 		{
 			$request = \Illuminate\Http\Request::create('/', 'GET', []);
 
-			$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeGetCommand($request));
+			$result = $this->bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
 
 			dd($result);
 		}

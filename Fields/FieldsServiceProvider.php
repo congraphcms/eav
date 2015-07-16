@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Fields;
+namespace Cookbook\Eav\Fields;
 
 use Illuminate\Support\ServiceProvider;
 
-use Cookbook\EAV\Fields\Text\TextFieldHandler;
+use Cookbook\Eav\Fields\Text\TextFieldHandler;
 
 /**
  * FieldsServiceProvider service provider for handlers
@@ -55,27 +55,27 @@ class FieldsServiceProvider extends ServiceProvider {
 	*/
 	public function registerFactories() {
 		$this 	->app
-				->singleton('Cookbook\EAV\Fields\FieldHandlerFactory', function($app){
+				->singleton('Cookbook\Eav\Fields\FieldHandlerFactory', function($app){
 					return new FieldHandlerFactory(
 						$app['app'],
-						$app->make('Cookbook\EAV\Managers\AttributeManager')
+						$app->make('Cookbook\Eav\Managers\AttributeManager')
 					);
 				});
 
 		$this->app->alias(
-			'Cookbook\EAV\Fields\FieldHandlerFactory', 'Cookbook\Contracts\EAV\FieldHandlerFactoryContract'
+			'Cookbook\Eav\Fields\FieldHandlerFactory', 'Cookbook\Contracts\Eav\FieldHandlerFactoryContract'
 		);
 
 		$this 	->app
-				->singleton('Cookbook\EAV\Fields\FieldValidatorFactory', function($app){
+				->singleton('Cookbook\Eav\Fields\FieldValidatorFactory', function($app){
 					return new FieldValidatorFactory(
 						$app['app'],
-						$app->make('Cookbook\EAV\Managers\AttributeManager')
+						$app->make('Cookbook\Eav\Managers\AttributeManager')
 					);
 				});
 
 		$this->app->alias(
-			'Cookbook\EAV\Fields\FieldValidatorFactory', 'Cookbook\Contracts\EAV\FieldValidatorFactoryContract'
+			'Cookbook\Eav\Fields\FieldValidatorFactory', 'Cookbook\Contracts\Eav\FieldValidatorFactoryContract'
 		);
 	}
 
@@ -100,7 +100,7 @@ class FieldsServiceProvider extends ServiceProvider {
 
 					return new $settings['handler'](
 						$app['db']->connection(),
-						$app->make('Cookbook\EAV\Managers\AttributeManager'),
+						$app->make('Cookbook\Eav\Managers\AttributeManager'),
 						$settings['table']
 					);
 				});
@@ -128,7 +128,7 @@ class FieldsServiceProvider extends ServiceProvider {
 			{
 				$this->app->bind($settings['validator'], function($app) use($settings){
 
-					return new $settings['validator']( $app->make('Cookbook\EAV\Managers\AttributeManager') );
+					return new $settings['validator']( $app->make('Cookbook\Eav\Managers\AttributeManager') );
 				});
 			}
 			
@@ -144,8 +144,8 @@ class FieldsServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		$provides = [
-			'Cookbook\EAV\Fields\FieldHandlerFactory',
-			'Cookbook\Contracts\EAV\FieldHandlerFactoryContract'
+			'Cookbook\Eav\Fields\FieldHandlerFactory',
+			'Cookbook\Contracts\Eav\FieldHandlerFactoryContract'
 		];
 
 		$field_types = $this->app['config']->get('eav');

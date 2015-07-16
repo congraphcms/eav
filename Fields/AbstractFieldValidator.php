@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Fields;
+namespace Cookbook\Eav\Fields;
 
-use Cookbook\Contracts\EAV\FieldValidatorContract;
-use Cookbook\EAV\Managers\AttributeManager;
+use Cookbook\Contracts\Eav\FieldValidatorContract;
+use Cookbook\Eav\Managers\AttributeManager;
 use Cookbook\Core\Exceptions\ValidationException;
 
 /**
@@ -19,8 +19,8 @@ use Cookbook\Core\Exceptions\ValidationException;
  * 
  * Base class for all feild validators
  * 
- * @uses  		Cookbook\Contracts\EAV\FieldValidatorContract
- * @uses  		Cookbook\EAV\Managers\AttributeManager
+ * @uses  		Cookbook\Contracts\Eav\FieldValidatorContract
+ * @uses  		Cookbook\Eav\Managers\AttributeManager
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -49,7 +49,7 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * Create new AbstractAttributeValidator
 	 * 
 	 * @param Illuminate\Database\Connection 			$db
-	 * @param Cookbook\EAV\Managers\AttributeManager 	$attributeManager
+	 * @param Cookbook\Eav\Managers\AttributeManager 	$attributeManager
 	 * @param string 									$table
 	 *  
 	 * @return void

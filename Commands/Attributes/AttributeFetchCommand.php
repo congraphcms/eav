@@ -10,12 +10,12 @@
 
 namespace Cookbook\Eav\Commands\Attributes;
 
-use Illuminate\Http\Request;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeFetchCommand class
  * 
- * Command for fetching attribute by ID
+ * Command for fetching attribute
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -23,26 +23,8 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeFetchCommand
+class AttributeFetchCommand extends RepositoryCommand
 {
 
-	/**
-	 * Attribute ID
-	 * 
-	 * @var int
-	 */
-	public $id;
-
-
-	/**
-	 * Create new AttributeFetchCommand
-	 *
-	 * @param int 	$id
-	 * 
-	 * @return void
-	 */
-	public function __construct($id)
-	{
-		$this->id = intval($id);
-	}
 }
+

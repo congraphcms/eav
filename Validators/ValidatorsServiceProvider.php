@@ -64,16 +64,27 @@ class ValidatorsServiceProvider extends ServiceProvider {
 	public function mapValidators() {
 		
 		$mappings = [
-			'Cookbook\Eav\Commands\Attributes\AttributeCreateCommand' => 'Cookbook\Eav\Validators\Attributes\AttributeCreateValidator@validate',
-			'Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand' => 'Cookbook\Eav\Validators\Attributes\AttributeUpdateValidator@validate',
-			'Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand' => 'Cookbook\Eav\Validators\Attributes\AttributeDeleteValidator@validate',
-			'Cookbook\Eav\Commands\Attributes\AttributeFetchCommand' => 'Cookbook\Eav\Validators\Attributes\AttributeFetchValidator@validate',
-			'Cookbook\Eav\Commands\Attributes\AttributeGetCommand' => 'Cookbook\Eav\Validators\Attributes\AttributeGetValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand' => 'Cookbook\Eav\Validators\AttributeSets\AttributeSetCreateValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand' => 'Cookbook\Eav\Validators\AttributeSets\AttributeSetUpdateValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand' => 'Cookbook\Eav\Validators\AttributeSets\AttributeSetDeleteValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand' => 'Cookbook\Eav\Validators\AttributeSets\AttributeSetFetchValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand' => 'Cookbook\Eav\Validators\AttributeSets\AttributeSetGetValidator@validate'
+			'Cookbook\Eav\Commands\Attributes\AttributeCreateCommand' => 
+				'Cookbook\Eav\Validators\Attributes\AttributeCreateValidator@validate',
+			'Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand' => 
+				'Cookbook\Eav\Validators\Attributes\AttributeUpdateValidator@validate',
+			'Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand' => 
+				'Cookbook\Eav\Validators\Attributes\AttributeDeleteValidator@validate',
+			'Cookbook\Eav\Commands\Attributes\AttributeFetchCommand' => 
+				'Cookbook\Eav\Validators\Attributes\AttributeFetchValidator@validate',
+			'Cookbook\Eav\Commands\Attributes\AttributeGetCommand' => 
+				'Cookbook\Eav\Validators\Attributes\AttributeGetValidator@validate',
+
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand' => 
+				'Cookbook\Eav\Validators\AttributeSets\AttributeSetCreateValidator@validate',
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand' => 
+				'Cookbook\Eav\Validators\AttributeSets\AttributeSetUpdateValidator@validate',
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand' => 
+				'Cookbook\Eav\Validators\AttributeSets\AttributeSetDeleteValidator@validate',
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand' => 
+				'Cookbook\Eav\Validators\AttributeSets\AttributeSetFetchValidator@validate',
+			'Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand' => 
+				'Cookbook\Eav\Validators\AttributeSets\AttributeSetGetValidator@validate'
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->mapValidators($mappings);

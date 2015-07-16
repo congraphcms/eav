@@ -263,8 +263,10 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$this->db->table('set_attributes')->where('attribute_id', '=', $attribute->id)->delete();
 		// delete all related options for this attribute
 		$this->db->table('attribute_options')->where('attribute_id', '=', $attribute->id)->delete();
-		// delete attribute translations
-		$this->db->table('attribute_translations')->where('attribute_id', '=', $attribute->id)->delete();
+		
+		// // delete attribute translations
+		// $this->db->table('attribute_translations')->where('attribute_id', '=', $attribute->id)->delete();
+		
 		// delete the attribute
 		$this->db->table('attributes')->where('id', '=', $attribute->id)->delete();
 
@@ -285,23 +287,21 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * @return boolean
 	 * 
 	 * @throws InvalidArgumentException
-	 * 
-	 * @todo translations timestamps are not entered because of mass insert
 	 */
 	protected function insertAttribute($params)
 	{
 
-		// separate params array in attribute and attribute translations params
-		if(!empty($params['translations']))
-		{
-			$attributeTranslations = $params['translations'];
-		}
-		else
-		{
-			$attributeTranslations = [];
-		}
+		// // separate params array in attribute and attribute translations params
+		// if(!empty($params['translations']))
+		// {
+		// 	$attributeTranslations = $params['translations'];
+		// }
+		// else
+		// {
+		// 	$attributeTranslations = [];
+		// }
 		
-		unset($params['translations']);
+		// unset($params['translations']);
 
 		if(isset($params['data']))
 		{
@@ -313,17 +313,17 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// insert attribute in database
 		$attribute_id = $this->db->table('attributes')->insertGetId($params);
 
-		// populate translations with attribute data
-		for($i = 0; $i < count($attributeTranslations); $i++)
-		{
-			$attributeTranslations[$i]['attribute_id'] = $attribute_id;
-		}
+		// // populate translations with attribute data
+		// for($i = 0; $i < count($attributeTranslations); $i++)
+		// {
+		// 	$attributeTranslations[$i]['attribute_id'] = $attribute_id;
+		// }
 
-		if(!empty($attributeTranslations))
-		{
-			// insert new translations in database
-			$this->db->table('attribute_translations')->insert($attributeTranslations);
-		}
+		// if(!empty($attributeTranslations))
+		// {
+		// 	// insert new translations in database
+		// 	$this->db->table('attribute_translations')->insert($attributeTranslations);
+		// }
 
 		return $this->fetchById($attribute_id, [], true);
 	}
@@ -336,29 +336,27 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * @return boolean
 	 * 
 	 * @throws InvalidArgumentException
-	 * 
-	 * @todo translations timestamps are not entered because of mass insert
 	 */
 	protected function updateAttribute($id, $params, $attribute)
 	{
 
-		// separate params array in attribute and attribute translations params
-		if( ! empty($params['translations']) )
-		{
-			$attributeTranslations = $params['translations'];
-		}
-		else
-		{
-			$attributeTranslations = [];
-		}
+		// // separate params array in attribute and attribute translations params
+		// if( ! empty($params['translations']) )
+		// {
+		// 	$attributeTranslations = $params['translations'];
+		// }
+		// else
+		// {
+		// 	$attributeTranslations = [];
+		// }
 
-		unset($params['translations']);
+		// unset($params['translations']);
 
-		// validate attribute translations
-		for( $i = 0; $i < count($attributeTranslations); $i++ )
-		{
-			$attributeTranslations[$i]['attribute_id'] = $id;
-		}
+		// // validate attribute translations
+		// for( $i = 0; $i < count($attributeTranslations); $i++ )
+		// {
+		// 	$attributeTranslations[$i]['attribute_id'] = $id;
+		// }
 
 		if( isset($params['data']) )
 		{
@@ -376,14 +374,14 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		$this->db->table('attributes')->where('id', '=', $id)->update($attributeParams);
 
-		// delete all existing translations from database
-		$this->db->table('attribute_translations')->where('attribute_id', '=', $id)->delete();
+		// // delete all existing translations from database
+		// $this->db->table('attribute_translations')->where('attribute_id', '=', $id)->delete();
 		
-		if( ! empty($attributeTranslations) )
-		{
-			// insert new translations in database
-			$this->db->table('attribute_translations')->insert($attributeTranslations);
-		}
+		// if( ! empty($attributeTranslations) )
+		// {
+		// 	// insert new translations in database
+		// 	$this->db->table('attribute_translations')->insert($attributeTranslations);
+		// }
 
 		return $this->fetchById($id, [], true);
 	}
@@ -510,11 +508,11 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		
 		$attribute->options = $options;
 
-		$translations = $this->db->table('attribute_translations')
-								 ->where('attribute_id', '=', $id)
-								 ->get();
+		// $translations = $this->db->table('attribute_translations')
+		// 						 ->where('attribute_id', '=', $id)
+		// 						 ->get();
 
-		$attribute->translations = $translations;
+		// $attribute->translations = $translations;
 
 		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
 		$attribute = $fieldHandler->transformAttribute($attribute);
@@ -553,7 +551,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 			$ids[] = $attribute->id;
 			$attribute->options = [];
-			$attribute->translations = [];
+			// $attribute->translations = [];
 		}
 
 		$options = $this->db->table('attribute_options')
@@ -573,21 +571,21 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			}
 		}
 
-		$translations = $this->db->table('attribute_translations')
-								 ->whereIn('attribute_id', $ids)
-								 ->get();
+		// $translations = $this->db->table('attribute_translations')
+		// 						 ->whereIn('attribute_id', $ids)
+		// 						 ->get();
 
-		foreach ($translations as $translation) 
-		{
-			foreach ($attributes as &$attribute)
-			{
-				if($attribute->id == $translation->attribute_id)
-				{
-					$attribute->translations[] = $translation;
-					break;
-				}
-			}
-		}
+		// foreach ($translations as $translation) 
+		// {
+		// 	foreach ($attributes as &$attribute)
+		// 	{
+		// 		if($attribute->id == $translation->attribute_id)
+		// 		{
+		// 			$attribute->translations[] = $translation;
+		// 			break;
+		// 		}
+		// 	}
+		// }
 		
 		return $attributes;
 	}

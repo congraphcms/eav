@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Fields;
+namespace Cookbook\Eav\Fields;
 
-use Cookbook\Contracts\EAV\FieldHandlerFactoryContract;
-use Cookbook\EAV\Managers\AttributeManager;
+use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
+use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Contracts\Container\Container;
 
 /**
@@ -19,8 +19,8 @@ use Illuminate\Contracts\Container\Container;
  * 
  * Used to create suitable handler for different field types
  *
- * @uses  		Cookbook\Contracts\EAV\FieldHandlerFactoryContract
- * @uses  		Cookbook\EAV\Managers\AttributeManager
+ * @uses  		Cookbook\Contracts\Eav\FieldHandlerFactoryContract
+ * @uses  		Cookbook\Eav\Managers\AttributeManager
  * @uses 		Illuminate\Container\Container
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -42,7 +42,7 @@ class FieldHandlerFactory implements FieldHandlerFactoryContract
 	/**
 	 * AttributeManager
 	 * 
-	 * @var Cookbook\EAV\Managers\AttributeManager
+	 * @var Cookbook\Eav\Managers\AttributeManager
 	 */
 	public $attributeManager;
 
@@ -67,7 +67,7 @@ class FieldHandlerFactory implements FieldHandlerFactoryContract
 	 * 
 	 * @param string $attributeFieldType - field type of attribute
 	 * 
-	 * @return Cookbook\EAV\Fields\AbstractFieldHandler
+	 * @return Cookbook\Eav\Fields\AbstractFieldHandler
 	 * 
 	 * @throws InvalidArgumentException
 	 */

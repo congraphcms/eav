@@ -54,8 +54,8 @@ return array(
 		'text' => array(
 			'label'						=> 'Text',
 			'table' 					=> 'attribute_values_varchar',
-			'handler'					=> 'Cookbook\EAV\Fields\Text\TextFieldHandler',
-			'validator'					=> 'Cookbook\EAV\Fields\Text\TextFieldValidator',
+			'handler'					=> 'Cookbook\Eav\Fields\Text\TextFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Text\TextFieldValidator',
 			'handler_name'				=> 'TextFieldHandler',
 			'can_have_default_value'	=> true,
 			'can_be_required' 			=> true,

@@ -10,7 +10,7 @@
 
 namespace Cookbook\Eav\Commands\Attributes;
 
-use Illuminate\Http\Request;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeCreateCommand class
@@ -23,26 +23,7 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeCreateCommand
+class AttributeCreateCommand extends RepositoryCommand
 {
 
-	/**
-	 * Attribute Create Request
-	 * 
-	 * @var Illuminate\Http\Request
-	 */
-	public $request;
-
-
-	/**
-	 * Create new AttributeCreateCommand
-	 * 
-	 * @param Illuminate\Http\Request 	$request
-	 * 
-	 * @return void
-	 */
-	public function __construct(Request $request)
-	{
-		$this->request = $request;
-	}
 }

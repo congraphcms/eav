@@ -10,12 +10,12 @@
 
 namespace Cookbook\Eav\Commands\Attributes;
 
-use Illuminate\Http\Request;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeGetCommand class
  * 
- * Command for fetching attributes
+ * Command for getting attributes
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -23,26 +23,9 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeGetCommand
+class AttributeGetCommand extends RepositoryCommand
 {
 
-	/**
-	 * Get Attributes request
-	 * 
-	 * @var int
-	 */
-	public $request;
-
-
-	/**
-	 * Create new AttributeGetCommand
-	 *
-	 * @param Illuminate\Http\Request 	$request
-	 * 
-	 * @return void
-	 */
-	public function __construct(Request $request)
-	{
-		$this->request = $request;
-	}
 }
+
+

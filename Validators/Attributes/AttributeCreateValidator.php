@@ -69,13 +69,6 @@ class AttributeCreateValidator
 	protected $optionRules;
 
 	/**
-	 * Set of rules for validating translations
-	 *
-	 * @var array
-	 */
-	protected $translationRules;
-
-	/**
 	 * validation exception that will be thrown if validation fails
 	 *
 	 * @var Cookbook\Core\Exceptions\ValidationException
@@ -119,13 +112,6 @@ class AttributeCreateValidator
 			'sort_order' 			=> 'integer'
 		];
 
-		$this->translationRules = 
-		[
-			'locale' 				=> 'required|integer',
-			'label'					=> 'required|max:250',
-			'description'			=> 'required|max:1000',
-		];
-
 		$this->exception = new ValidationException();
 
 		$this->exception->setErrorKey('attributes');
@@ -144,7 +130,7 @@ class AttributeCreateValidator
 	 */
 	public function validate(AttributeCreateCommand $command)
 	{
-		$params = $command->request->all();
+		$params = $command->params;
 
 		$validator = Validator::make($params, $this->rules);
 
@@ -162,19 +148,6 @@ class AttributeCreateValidator
 				{
 					$this->exception->setErrorKey('attribute.options.' . $key);
 					$this->exception->addErrors($optionValidator->errors()->toArray());
-				}
-			}
-		}
-
-		if( isset($params['translations']) )
-		{
-			foreach ($params['translations'] as $key => $translation) {
-				$translationValidator = Validator::make($option, $this->translationRules);
-
-				if($translationValidator->fails())
-				{
-					$this->exception->setErrorKey('attribute.translations.' . $key);
-					$this->exception->addErrors($translationValidator->errors()->toArray());
 				}
 			}
 		}

@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Fields;
+namespace Cookbook\Eav\Fields;
 
-use Cookbook\Contracts\EAV\FieldValidatorFactoryContract;
-use Cookbook\EAV\Managers\AttributeManager;
+use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
+use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Contracts\Container\Container;
 
 /**
@@ -19,8 +19,8 @@ use Illuminate\Contracts\Container\Container;
  * 
  * Used to create suitable validator for different field types
  *
- * @uses  		Cookbook\Contracts\EAV\FieldValidatorFactoryContract
- * @uses  		Cookbook\EAV\Managers\AttributeManager
+ * @uses  		Cookbook\Contracts\Eav\FieldValidatorFactoryContract
+ * @uses  		Cookbook\Eav\Managers\AttributeManager
  * @uses 		Illuminate\Container\Container
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -42,7 +42,7 @@ class FieldValidatorFactory implements FieldValidatorFactoryContract
 	/**
 	 * AttributeManager
 	 * 
-	 * @var Cookbook\EAV\Fields\AttributeManager
+	 * @var Cookbook\Eav\Fields\AttributeManager
 	 */
 	public $attributeManager;
 
@@ -67,7 +67,7 @@ class FieldValidatorFactory implements FieldValidatorFactoryContract
 	 * 
 	 * @param string $attributeFieldType - field type of attribute
 	 * 
-	 * @return Cookbook\EAV\Fields\AbstractFieldValidator
+	 * @return Cookbook\Eav\Fields\AbstractFieldValidator
 	 * 
 	 * @throws InvalidArgumentException
 	 */

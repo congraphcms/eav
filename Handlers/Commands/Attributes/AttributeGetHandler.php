@@ -12,8 +12,8 @@ namespace Cookbook\Eav\Handlers\Commands\Attributes;
 
 
 use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Eav\Commands\Attributes\AttributeGetCommand;
-
+use Cookbook\Core\Bus\RepositoryCommandHandler;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeGetHandler class
@@ -27,43 +27,35 @@ use Cookbook\Eav\Commands\Attributes\AttributeGetCommand;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeGetHandler
+class AttributeGetHandler extends RepositoryCommandHandler
 {
-	/**
-	 * Repository for attribute DB operations
-	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
-	 */
-	protected $attributeRepository;
 
 	/**
 	 * Create new AttributeGetHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\Repositories\AttributeRepositoryContract $attributeRepository
+	 * @param Cookbook\Contracts\Eav\Repositories\AttributeRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
-	public function __construct(AttributeRepositoryContract $attributeRepository)
+	public function __construct(AttributeRepositoryContract $repository)
 	{
-		// inject dependencies
-		$this->attributeRepository = $attributeRepository;
+		parent::__construct($repository);
 	}
 
-
 	/**
-	 * Handle AttributeGetCommand
+	 * Handle RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\Attributes\AttributeGetCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @return void
 	 */
-	public function handle(AttributeGetCommand $command)
+	public function handle(RepositoryCommand $command)
 	{
-		return $this->attributeRepository->get(
-			$command->request->input('filter')?$command->request->input('filter'):[],
-			$command->request->input('offset')?$command->request->input('offset'):0,
-			$command->request->input('limit')?$command->request->input('limit'):0,
-			$command->request->input('sort')?$command->request->input('sort'):[]
+		return $this->repository->get(
+			(!empty($command->params['filter']))?$command->params['filter']:[],
+			(!empty($command->params['offset']))?$command->params['offset']:0,
+			(!empty($command->params['limit']))?$command->params['limit']:0,
+			(!empty($command->params['sort']))?$command->params['sort']:[]
 		);
 	}
 }

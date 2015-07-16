@@ -8,18 +8,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\EAV\Fields\Text;
+namespace Cookbook\Eav\Fields\Text;
 
-use Cookbook\EAV\Fields\AbstractFieldValidator;
-use Cookbook\EAV\Managers\AttributeManager;
+use Cookbook\Eav\Fields\AbstractFieldValidator;
+use Cookbook\Eav\Managers\AttributeManager;
 
 /**
  * Abstract Field Validator class
  * 
  * Base class for all feild validators
  * 
- * @uses  		Cookbook\Contracts\EAV\FieldValidatorContract
- * @uses  		Cookbook\EAV\Managers\AttributeManager
+ * @uses  		Cookbook\Contracts\Eav\FieldValidatorContract
+ * @uses  		Cookbook\Eav\Managers\AttributeManager
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>

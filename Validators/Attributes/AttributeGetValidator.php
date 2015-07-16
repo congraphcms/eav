@@ -84,15 +84,35 @@ class AttributeGetValidator
 	 */
 	public function validate(AttributeGetCommand $command)
 	{
-		$params = $command->request->all();
+		$params = $command->params;
 
-		$this->validateFilters($params['filter']);
+		if( ! empty($params['filter']) )
+		{
+			$this->validateFilters($params['filter']);
+		}
+
+		if( empty($params['offset']) )
+		{
+			$params['offset'] = 0;
+		}
+		if( empty($params['limit']) )
+		{
+			$params['limit'] = 0;
+		}
 		$this->validatePaging($params['offset'], $params['limit']);
-		$this->validateSorting($params['sort']);
-		$this->validateInclude($params['include']);
+		
+		if( ! empty($params['sort']) )
+		{
+			$this->validateSorting($params['sort']);
+		}
+		
+		if( ! empty($params['include']) )
+		{
+			$this->validateInclude($params['include']);
+		}
 	}
 
-	protected function validateFilters(&$filters)
+	protected function validateFilters($filters)
 	{
 		if( ! empty($filters) )
 		{
@@ -106,13 +126,13 @@ class AttributeGetValidator
 		$filters = [];
 	}
 
-	protected function validatePaging(&$offset, &$limit)
+	protected function validatePaging($offset = 0, $limit = 0)
 	{
 		$offset = intval($offset);
 		$limit = intval($limit);
 	}
 
-	protected function validateSorting(&$sort)
+	protected function validateSorting($sort)
 	{
 		if( empty($sort) )
 		{
@@ -143,7 +163,7 @@ class AttributeGetValidator
 		}
 	}
 
-	protected function validateInclude(&$include)
+	protected function validateInclude($include)
 	{
 		if( ! empty($include) )
 		{
