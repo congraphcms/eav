@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Handlers\Commands\AttributeSets;
+namespace Cookbook\Eav\Handlers\Commands\Attributes;
 
 
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand;
-
+use Cookbook\Core\Bus\RepositoryCommandHandler;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetDeleteHandler class
@@ -27,38 +27,30 @@ use Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetDeleteHandler
+class AttributeSetDeleteHandler extends RepositoryCommandHandler
 {
-	/**
-	 * Repository for attribute DB operations
-	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
-	 */
-	protected $attributeSetRepository;
 
 	/**
-	 * Create new AttributeDeleteHandler
+	 * Create new AttributeSetDeleteHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $attributeSetRepository
+	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
-	public function __construct(AttributeSetRepositoryContract $attributeSetRepository)
+	public function __construct(AttributeSetRepositoryContract $repository)
 	{
-		// inject dependencies
-		$this->attributeSetRepository = $attributeSetRepository;
+		parent::__construct($repository);
 	}
 
-
 	/**
-	 * Handle AttributeSetDeleteCommand
+	 * Handle RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @return void
 	 */
-	public function handle(AttributeSetDeleteCommand $command)
+	public function handle(RepositoryCommand $command)
 	{
-		return $this->attributeSetRepository->delete($command->id);
+		return $this->repository->delete($command->id);
 	}
 }

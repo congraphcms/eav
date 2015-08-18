@@ -13,9 +13,11 @@ namespace Cookbook\Eav\Validators\Attributes;
 use Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand;
 use Cookbook\Eav\Managers\AttributeManager;
 use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Core\Exceptions\ValidationException;
 use Cookbook\Core\Exceptions\NotFoundException;
-use Illuminate\Support\Facades\Validator;
+use Cookbook\Core\Bus\RepositoryCommand;
+use Cookbook\Core\Validation\Validator;
 
 
 /**
@@ -30,7 +32,7 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeUpdateValidator
+class AttributeUpdateValidator extends Validator
 {
 
 	/**
@@ -56,18 +58,18 @@ class AttributeUpdateValidator
 	protected $fieldValidatorFactory;
 
 	/**
+	 * Repository for attributes
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 */
+	protected $attributeRepository;
+
+	/**
 	 * Set of rules for validating attribute
 	 *
 	 * @var array
 	 */
 	protected $rules;
-
-	/**
-	 * Set of rules for validating attribute ID
-	 *
-	 * @var array
-	 */
-	protected $idRules;
 
 	/**
 	 * Set of rules for validating options
@@ -77,29 +79,23 @@ class AttributeUpdateValidator
 	protected $optionRules;
 
 	/**
-	 * validation exception that will be thrown if validation fails
-	 *
-	 * @var Cookbook\Core\Exceptions\ValidationException
-	 */
-	protected $exception;
-
-	/**
 	 * Create new AttributeUpdateValidator
 	 * 
 	 * @return void
 	 */
-	public function __construct(AttributeManager $attributeManager, FieldValidatorFactoryContract $fieldValidatorFactory)
+	public function __construct(AttributeManager $attributeManager, FieldValidatorFactoryContract $fieldValidatorFactory, AttributeRepositoryContract $attributeRepository)
 	{
 		$this->attributeManager = $attributeManager;
 		$this->fieldValidatorFactory = $fieldValidatorFactory;
+		$this->attributeRepository = $attributeRepository;
 
 		$this->availableFieldTypes = $this->attributeManager->getFieldTypes();
 
 		$this->rules = [
 			// 'id'					=> 'required|exists:attributes,id',
 			// 'code'					=> ['required', 'unique:attributes,code', 'regex:/^[0-9a-zA-Z-_]*$/'],
-			'admin_label'			=> 'sometimes|required|between:3,100',
-			'admin_notice'			=> 'max:1000',
+			// 'admin_label'			=> 'sometimes|required|between:3,100',
+			// 'admin_notice'			=> 'max:1000',
 			// 'field_type' 			=> 'required|in:' . implode(array_keys($this->availableFieldTypes), ','),
 			'default_value'			=> '',
 			// 'localized'				=> 'boolean',
@@ -112,10 +108,6 @@ class AttributeUpdateValidator
 			'translations'			=> 'sometimes|array'
 		];
 
-		$this->rules = [
-			'id'					=> 'required|exists:attributes,id'
-		];
-
 		$this->optionRules = 
 		[
 			'locale' 				=> 'required|integer',
@@ -125,68 +117,53 @@ class AttributeUpdateValidator
 			'sort_order' 			=> 'integer'
 		];
 
-		$this->exception = new ValidationException();
+		parent::__construct();
 
 		$this->exception->setErrorKey('attributes');
 	}
 
 
 	/**
-	 * Validate AttributeUpdateCommand
+	 * Validate RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(AttributeUpdateCommand $command)
+	public function validate(RepositoryCommand $command)
 	{
-		$params = $command->params;
-		// $params['id'] = $command->id;
-		 
+		$attribute = $this->attributeRepository->fetch($command->id);
 		
-		$idValidator = Validator::make(['id' => $command->id], $this->idRules);
-
-		if($idValidator->fails())
+		if( ! $attribute )
 		{
-			throw new NotFoundException($idValidator->errors()->toArray());
+			throw new NotFoundException('No attribute with that ID.');
 		}
 
-		$validator = Validator::make($params, $this->rules);
+		$this->validateParams($command->params, $this->rules, true);
 
-		if($validator->fails())
+		if( isset($command->params['options']) )
 		{
-			$this->exception->addErrors($validator->errors()->toArray());
-		}
+			$this->exception->setErrorKey('attribute.options.' . $key);
 
-		if( isset($params['options']) )
-		{
-			foreach ($params['options'] as $key => $option) {
-				$optionValidator = Validator::make($option, $this->optionRules);
-
-				if($optionValidator->fails())
-				{
-					$this->exception->setErrorKey('attributes.options.' . $key);
-					$this->exception->addErrors($optionValidator->errors()->toArray());
-				}
+			foreach ($command->params['options'] as $key => &$option)
+			{
+				$this->validateParams($option, $this->optionRules, true);
 			}
 		}
 		
-		if( ! empty($params['field_type']) )
-		{
-			$fieldValidator = $this->fieldValidatorFactory->make($params['field_type']);
+		$fieldValidator = $this->fieldValidatorFactory->make($attribute->field_type);
 
-			try
-			{
-				$fieldValidator->validateAttributeForUpdate($params);
-			}
-			catch(ValidationException $e)
-			{
-				$this->exception->setErrorKey('attributes');
-				$this->exception->addErrors($e->getErrors());
-			}
+		try
+		{
+			$fieldValidator->validateAttributeForUpdate($params);
+		}
+		catch(ValidationException $e)
+		{
+			$this->exception->setErrorKey('attributes');
+			$this->exception->addErrors($e->getErrors());
 		}
 		
 

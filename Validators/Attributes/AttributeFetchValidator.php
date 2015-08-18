@@ -12,7 +12,8 @@ namespace Cookbook\Eav\Validators\Attributes;
 
 use Cookbook\Eav\Commands\Attributes\AttributeFetchCommand;
 use Cookbook\Core\Exceptions\NotFoundException;
-use Illuminate\Support\Facades\Validator;
+use Cookbook\Core\Bus\RepositoryCommand;
+use Cookbook\Core\Validation\Validator;
 
 
 /**
@@ -27,7 +28,7 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeFetchValidator
+class AttributeFetchValidator extends Validator
 {
 
 	/**
@@ -36,13 +37,6 @@ class AttributeFetchValidator
 	 * @var array
 	 */
 	protected $rules;
-
-	/**
-	 * validation exception that will be thrown if validation fails
-	 *
-	 * @var Cookbook\Core\Exceptions\ValidationException
-	 */
-	protected $exception;
 
 	/**
 	 * Create new AttributeFetchValidator
@@ -55,31 +49,26 @@ class AttributeFetchValidator
 			'id' => 'required|exists:attributes,id'
 		];
 
-		$this->exception = new NotFoundException();
+		parent::__construct();
 	}
 
 
 	/**
-	 * Validate AttributeFetchCommand
+	 * Validate RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\Attributes\AttributeFetchCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(AttributeFetchCommand $command)
+	public function validate(RepositoryCommand $command)
 	{
 		
 		$params = ['id' => $command->id];
 
-		$validator = Validator::make($params, $this->rules);
-
-		if($validator->fails())
-		{
-			$this->exception->addErrors($validator->errors()->toArray());
-		}
+		$this->validateParams($params, $this->rules);
 
 		if( $this->exception->hasErrors() )
 		{

@@ -10,7 +10,7 @@
 
 namespace Cookbook\Eav\Commands\AttributeSets;
 
-use Illuminate\Http\Request;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetDeleteCommand class
@@ -23,26 +23,7 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetDeleteCommand
+class AttributeSetDeleteCommand extends RepositoryCommand
 {
 
-	/**
-	 * Attribute set ID
-	 * 
-	 * @var int
-	 */
-	public $id;
-
-
-	/**
-	 * Create new AttributeSetDeleteCommand
-	 *
-	 * @param int 	$id
-	 * 
-	 * @return void
-	 */
-	public function __construct($id)
-	{
-		$this->id = intval($id);
-	}
 }

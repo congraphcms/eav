@@ -10,7 +10,7 @@
 
 namespace Cookbook\Eav\Commands\AttributeSets;
 
-use Illuminate\Http\Request;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetFetchCommand class
@@ -23,36 +23,7 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetFetchCommand
+class AttributeSetFetchCommand extends RepositoryCommand
 {
 
-	/**
-	 * Attribute set ID
-	 * 
-	 * @var int
-	 */
-	public $id;
-
-	/**
-	 * Fetch Attribute set request
-	 * 
-	 * @var Illuminate\Http\Request
-	 */
-	public $request;
-
-
-	/**
-	 * Create new AttributeSetFetchCommand
-	 *
-	 * @param int 						$id
-	 * @param Illuminate\Http\Request 	$request
-	 * 
-	 * @return void
-	 */
-	public function __construct($id, Request $request)
-	{
-		$this->id = intval($id);
-
-		$this->request = $request;
-	}
 }

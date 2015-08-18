@@ -89,7 +89,7 @@ class AttributeSetCreateValidator
 	 */
 	public function validate(AttributeSetCreateCommand $command)
 	{
-		$params = $command->request->all();
+		$params = $command->params;
 
 		$validator = Validator::make($params, $this->rules);
 

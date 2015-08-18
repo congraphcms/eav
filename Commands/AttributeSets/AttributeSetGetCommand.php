@@ -10,12 +10,12 @@
 
 namespace Cookbook\Eav\Commands\AttributeSets;
 
-use Illuminate\Http\Request;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetGetCommand class
  * 
- * Command for fetching attribute sets
+ * Command for getting attribute sets
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -23,26 +23,7 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetGetCommand
+class AttributeSetGetCommand extends RepositoryCommand
 {
 
-	/**
-	 * Get Attribute sets request
-	 * 
-	 * @var Illuminate\Http\Request
-	 */
-	public $request;
-
-
-	/**
-	 * Create new AttributeSetGetCommand
-	 *
-	 * @param Illuminate\Http\Request 	$request
-	 * 
-	 * @return void
-	 */
-	public function __construct(Request $request)
-	{
-		$this->request = $request;
-	}
 }

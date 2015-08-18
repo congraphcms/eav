@@ -2,13 +2,16 @@
 
 // include_once(realpath(__DIR__.'/../LaravelMocks.php'));
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Debug\Dumper;
+
 class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 {
 
 	public function setUp()
 	{
+		// fwrite(STDOUT, __METHOD__ . "\n");
 		parent::setUp();
-
+		// unset($this->app);
 		// call migrations specific to our tests, e.g. to seed the db
 		// the path option should be relative to the 'path.database'
 		// path unless `--path` option is available.
@@ -17,21 +20,22 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../migrations'),
 		]);
 
+		$this->d = new Dumper();
 
-		$this->app = $this->createApplication();
 
-		$this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
+		// $this->app = $this->createApplication();
+
+		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 	}
 
 	public function tearDown()
 	{
+		// fwrite(STDOUT, __METHOD__ . "\n");
 		// parent::tearDown();
-
-		// $this->artisan('migrate:reset', [
-		// 	'--database' => 'testbench',
-		// 	// '--realpath' => realpath(__DIR__.'/../../migrations'),
-		// ]);
+		
+		$this->artisan('migrate:reset');
+		unset($this->app);
 	}
 
 	/**
@@ -77,12 +81,102 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 		return ['Cookbook\Eav\EavServiceProvider'];
 	}
 
-	// public function testCreateAttribute()
+	public function testCreateAttribute()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$params = [
+			'code' => 'code',
+			// 'admin_label' => '123',
+			// 'admin_notice' => 'admin notice',
+			'field_type' => 'text',
+			'localized' => false,
+			'default_value' => '',
+			'unique' => false,
+			'required' => false,
+			'filterable' => false,
+			'status' => 'user_defined'
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+
+		$this->assertTrue(is_object($result));
+		$this->assertTrue(is_int($result->id));
+		$this->d->dump($result);
+	}
+
+	/**
+	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
+	 */
+	public function testCreateException()
+	{
+		$params = [
+			// 'admin_label' => '123',
+			// 'admin_notice' => 'admin notice',
+			'field_type' => 'text',
+			'localized' => false,
+			'default_value' => '',
+			'unique' => false,
+			'required' => false,
+			'filterable' => false,
+			'status' => 'user_defined'
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
+	}
+
+	public function testUpdateAttribute()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$params = [
+			'code' => 'code',
+			// 'admin_label' => '123',
+			// 'admin_notice' => 'admin notice',
+			'field_type' => 'text',
+			'localized' => false,
+			'default_value' => '',
+			'unique' => false,
+			'required' => false,
+			'filterable' => false,
+			'status' => 'user_defined'
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
+
+
+		$params = [
+			'code' => 'code2',
+		];
+		
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, $attribute->id) );
+		
+		$this->assertTrue(is_object($result));
+		$this->assertTrue(is_int($result->id));
+		$this->assertEquals($result->code, 'code2');
+		$this->d->dump($result);
+	}
+
+	/**
+	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
+	 */
+	// public function testUpdateException()
 	// {
+	// 	fwrite(STDOUT, __METHOD__ . "\n");
+
 	// 	$params = [
 	// 		'code' => 'code',
-	// 		'admin_label' => '123',
-	// 		'admin_notice' => 'admin notice',
+	// 		// 'admin_label' => '123',
+	// 		// 'admin_notice' => 'admin notice',
 	// 		'field_type' => 'text',
 	// 		'localized' => false,
 	// 		'default_value' => '',
@@ -92,54 +186,16 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 	// 		'status' => 'user_defined'
 	// 	];
 
-	// 	// $response = $this->call('POST', '/attribute', $params);
+	// 	$app = $this->createApplication();
+	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	// $this->assertResponseOk();
+	// 	$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
 
-	// 	// $this->assertEquals('test', $response->getContent());
-		
-	// 	$request = \Illuminate\Http\Request::create('/', 'POST', $params);
-
-	// 	try
-	// 	{
-	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeCreateCommand($request));
-
-	// 		var_dump($result);
-	// 	}
-	// 	catch(\Cookbook\Core\Exceptions\ValidationException $e)
-	// 	{
-	// 		var_dump($e->toArray());
-	// 	}
-		
-
-	// }
-
-	// public function testUpdateAttribute()
-	// {
 	// 	$params = [
-	// 		'admin_notice' => 'admin notice 2',
+	// 		'field_type' => 'text123'
 	// 	];
 
-	// 	// $response = $this->call('POST', '/attribute', $params);
-
-	// 	// $this->assertResponseOk();
-
-	// 	// $this->assertEquals('test', $response->getContent());
-		
-	// 	$request = \Illuminate\Http\Request::create('/', 'PUT', $params);
-
-	// 	try
-	// 	{
-	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeUpdateCommand(3, $request));
-
-	// 		var_dump($result);
-	// 	}
-	// 	catch(\Cookbook\Core\Exceptions\ValidationException $e)
-	// 	{
-	// 		var_dump($e->toArray());
-	// 	}
-		
-
+	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, $attribute->id) );
 	// }
 
 	// public function testDeleteAttribute()
@@ -187,22 +243,27 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 	// }
 
+	
 	public function testGetAttributes()
 	{
+		fwrite(STDOUT, __METHOD__ . "\n");
 
 		try
 		{
-			$request = \Illuminate\Http\Request::create('/', 'GET', []);
+			// $request = \Illuminate\Http\Request::create('/', 'GET', []);
 
-			$result = $this->bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
+			$app = $this->createApplication();
+			$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
 
-			dd($result);
+			$this->d->dump($result);
 		}
 		catch(\Cookbook\Core\Exceptions\ValidationException $e)
 		{
-			dd($e->toArray());
+			$this->d->dump($e->toArray());
 		}
 		
 
 	}
+
 }

@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Handlers\Commands\AttributeSets;
+namespace Cookbook\Eav\Handlers\Commands\Attributes;
 
 
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand;
-
+use Cookbook\Core\Bus\RepositoryCommandHandler;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetFetchHandler class
@@ -27,38 +27,30 @@ use Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetFetchHandler
+class AttributeSetFetchHandler extends RepositoryCommandHandler
 {
-	/**
-	 * Repository for attribute DB operations
-	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
-	 */
-	protected $attributeSetRepository;
 
 	/**
 	 * Create new AttributeSetFetchHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $attributeSetRepository
+	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
-	public function __construct(AttributeSetRepositoryContract $attributeSetRepository)
+	public function __construct(AttributeSetRepositoryContract $repository)
 	{
-		// inject dependencies
-		$this->attributeSetRepository = $attributeSetRepository;
+		parent::__construct($repository);
 	}
 
-
 	/**
-	 * Handle AttributeSetFetchCommand
+	 * Handle RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @return void
 	 */
-	public function handle(AttributeSetFetchCommand $command)
+	public function handle(RepositoryCommand $command)
 	{
-		return $this->attributeSetRepository->fetchById($command->id);
+		return $this->repository->fetch($command->id);
 	}
 }

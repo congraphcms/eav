@@ -10,7 +10,7 @@
 
 namespace Cookbook\Eav\Commands\AttributeSets;
 
-use Illuminate\Http\Request;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetUpdateCommand class
@@ -23,34 +23,7 @@ use Illuminate\Http\Request;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetUpdateCommand
+class AttributeSetUpdateCommand extends RepositoryCommand
 {
 
-	/**
-	 * Attribute Set ID
-	 * 
-	 * @var int
-	 */
-	public $id;
-
-	/**
-	 * Attribute Set Update Request
-	 * 
-	 * @var Illuminate\Http\Request
-	 */
-	public $request;
-
-
-	/**
-	 * Create new AttributeSetUpdateCommand
-	 * 
-	 * @param Illuminate\Http\Request 	$request
-	 * 
-	 * @return void
-	 */
-	public function __construct($id, Request $request)
-	{
-		$this->id = intval($id);
-		$this->request = $request;
-	}
 }

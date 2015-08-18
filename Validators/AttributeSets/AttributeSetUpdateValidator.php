@@ -106,7 +106,7 @@ class AttributeSetUpdateValidator
 			throw new NotFoundException($idValidator->errors()->toArray());
 		}
 
-		$params = $command->request->all();
+		$params = $command->params;
 
 		$validator = Validator::make($params, $this->rules);
 

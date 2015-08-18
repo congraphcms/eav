@@ -171,7 +171,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// update all options for attribute
 		$this->updateOptions($options, null, $attribute);
 
-		$attribute = $this->fetchById($attribute->id, [], true);
+		$attribute = $this->fetch($attribute->id, [], true);
 
 		// and return newly created attribute
 		return $attribute;
@@ -325,7 +325,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// 	$this->db->table('attribute_translations')->insert($attributeTranslations);
 		// }
 
-		return $this->fetchById($attribute_id, [], true);
+		return $this->fetch($attribute_id, [], true);
 	}
 
 	/**
@@ -383,7 +383,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// 	$this->db->table('attribute_translations')->insert($attributeTranslations);
 		// }
 
-		return $this->fetchById($id, [], true);
+		return $this->fetch($id, [], true);
 	}
 
 	/**
@@ -493,7 +493,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @return array
 	 */
-	protected function _fetchById($id)
+	protected function _fetch($id)
 	{
 		$attribute = $this->db->table('attributes')->find($id);
 		

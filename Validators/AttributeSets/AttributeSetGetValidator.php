@@ -86,33 +86,57 @@ class AttributeSetGetValidator
 	{
 		$params = $command->request->all();
 
-		$this->validateFilters($params['filter']);
+		if( ! empty($params['filter']) )
+		{
+			$this->validateFilters($params['filter']);
+		}
+
+		if( empty($params['offset']) )
+		{
+			$params['offset'] = 0;
+		}
+		if( empty($params['limit']) )
+		{
+			$params['limit'] = 0;
+		}
 		$this->validatePaging($params['offset'], $params['limit']);
-		$this->validateSorting($params['sort']);
+		
+		if( ! empty($params['sort']) )
+		{
+			$this->validateSorting($params['sort']);
+		}
+		
+		if( ! empty($params['include']) )
+		{
+			$this->validateInclude($params['include']);
+		}
 	}
 
-	protected function validateFilters(&$filters)
+	protected function validateFilters($filters)
 	{
 		if( ! empty($filters) )
 		{
-			throw new BadRequestException(['There are no available filters for attributes.']);
+			$e = new BadRequestException();
+			$e->setErrorKey('attributes.filter');
+			$e->addErrors('There are no available filters for attributes.');
+
+			throw $e;
 		}
 
 		$filters = [];
 	}
 
-	protected function validatePaging(&$offset, &$limit)
+	protected function validatePaging($offset = 0, $limit = 0)
 	{
 		$offset = intval($offset);
 		$limit = intval($limit);
 	}
 
-	protected function validateSorting(&$sort)
+	protected function validateSorting($sort)
 	{
 		if( empty($sort) )
 		{
 			$sort = $this->defaultSorting;
-			return;
 		}
 
 		if( ! is_array($sort) )
@@ -130,7 +154,11 @@ class AttributeSetGetValidator
 
 			if( ! in_array($criteria, $this->availableSorting) )
 			{
-				throw new BadRequestException(['Sorting by \'' . $criteria . '\' is not allowed.']);
+				$e = new BadRequestException();
+				$e->setErrorKey('attributes.sort');
+				$e->addErrors('Sorting by \'' . $criteria . '\' is not allowed.');
+
+				throw $e;
 			}
 		}
 	}

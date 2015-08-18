@@ -63,7 +63,6 @@ class AttributeSetIntegrationTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		var_dump('getPackageProviders');
 		return ['Cookbook\Eav\EavServiceProvider'];
 	}
 
@@ -186,9 +185,9 @@ class AttributeSetIntegrationTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$request = \Illuminate\Http\Request::create('/', 'GET', []);
+			// $request = \Illuminate\Http\Request::create('/', 'GET', []);
 
-			$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand($request));
+			$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand([]));
 
 			dd($result);
 		}

@@ -13,7 +13,8 @@ namespace Cookbook\Eav\Validators\Attributes;
 use Cookbook\Eav\Commands\Attributes\AttributeGetCommand;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Exceptions\BadRequestException;
-use Illuminate\Support\Facades\Validator;
+use Cookbook\Core\Bus\RepositoryCommand;
+use Cookbook\Core\Validation\Validator;
 
 
 /**
@@ -28,15 +29,8 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeGetValidator
+class AttributeGetValidator extends Validator
 {
-
-	/**
-	 * validation exception that will be thrown if validation fails
-	 *
-	 * @var Cookbook\Core\Exceptions\ValidationException
-	 */
-	protected $exception;
 
 	/**
 	 * Available fields for sorting
@@ -69,20 +63,22 @@ class AttributeGetValidator
 		];
 
 		$this->defaultSorting = ['-created_at'];
+
+		parent::__construct();
 	}
 
 
 	/**
-	 * Validate AttributeGetCommand
+	 * Validate RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\Attributes\AttributeGetCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(AttributeGetCommand $command)
+	public function validate(RepositoryCommand $command)
 	{
 		$params = $command->params;
 

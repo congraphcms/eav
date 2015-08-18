@@ -106,7 +106,8 @@ class ValidatorsServiceProvider extends ServiceProvider {
 		$this->app->bind('Cookbook\Eav\Validators\Attributes\AttributeUpdateValidator', function($app){
 			return new AttributeUpdateValidator(
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract')
+				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
 

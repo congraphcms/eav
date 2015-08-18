@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Handlers\Commands\AttributeSets;
+namespace Cookbook\Eav\Handlers\Commands\Attributes;
 
 
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand;
-
+use Cookbook\Core\Bus\RepositoryCommandHandler;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetGetHandler class
@@ -27,43 +27,35 @@ use Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetGetHandler
+class AttributeSetGetHandler extends RepositoryCommandHandler
 {
-	/**
-	 * Repository for attribute set DB operations
-	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
-	 */
-	protected $attributeSetRepository;
 
 	/**
 	 * Create new AttributeSetGetHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $attributeSetRepository
+	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
-	public function __construct(AttributeSetRepositoryContract $attributeSetRepository)
+	public function __construct(AttributeSetRepositoryContract $repository)
 	{
-		// inject dependencies
-		$this->attributeSetRepository = $attributeSetRepository;
+		parent::__construct($repository);
 	}
 
-
 	/**
-	 * Handle AttributeSetGetCommand
+	 * Handle RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @return void
 	 */
-	public function handle(AttributeSetGetCommand $command)
+	public function handle(RepositoryCommand $command)
 	{
-		return $this->attributeSetRepository->get(
-			$command->request->input('filter')?$command->request->input('filter'):[],
-			$command->request->input('offset')?$command->request->input('offset'):0,
-			$command->request->input('limit')?$command->request->input('limit'):0,
-			$command->request->input('sort')?$command->request->input('sort'):[]
+		return $this->repository->get(
+			(!empty($command->params['filter']))?$command->params['filter']:[],
+			(!empty($command->params['offset']))?$command->params['offset']:0,
+			(!empty($command->params['limit']))?$command->params['limit']:0,
+			(!empty($command->params['sort']))?$command->params['sort']:[]
 		);
 	}
 }
