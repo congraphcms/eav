@@ -10,7 +10,8 @@
 
 namespace Cookbook\Eav\Validators\Attributes;
 
-use Cookbook\Eav\Commands\Attributes\AttributeFetchCommand;
+use Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand;
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Validation\Validator;
@@ -32,19 +33,29 @@ class AttributeFetchValidator extends Validator
 {
 
 	/**
-	 * Set of rules for validating attribute fetch
+	 * Set of rules for validating attribute
 	 *
 	 * @var array
 	 */
 	protected $rules;
 
 	/**
-	 * Create new AttributeFetchValidator
+	 * Repository for attributes
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 */
+	protected $attributeRepository;
+
+	/**
+	 * Create new AttributeDeleteValidator
 	 * 
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct(AttributeRepositoryContract $attributeRepository)
 	{
+
+		$this->attributeRepository = $attributeRepository;
+
 		$this->rules = [
 			'id' => 'required|exists:attributes,id'
 		];
@@ -65,14 +76,11 @@ class AttributeFetchValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
+		$attribute = $this->attributeRepository->fetch($command->id);
 		
-		$params = ['id' => $command->id];
-
-		$this->validateParams($params, $this->rules);
-
-		if( $this->exception->hasErrors() )
+		if( ! $attribute )
 		{
-			throw $this->exception;
+			throw new NotFoundException('No attribute with that ID.');
 		}
 	}
 }
