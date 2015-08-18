@@ -136,11 +136,11 @@ class AttributeCreateValidator extends Validator
 			}
 		}
 
-		$fieldValidator = $this->fieldValidatorFactory->make($params['field_type']);
+		$fieldValidator = $this->fieldValidatorFactory->make($command->params['field_type']);
 
 		try
 		{
-			$fieldValidator->validateAttributeForInsert($params);
+			$fieldValidator->validateAttributeForInsert($command->params);
 		}
 		catch(ValidationException $e)
 		{

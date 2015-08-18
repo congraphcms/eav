@@ -169,79 +169,95 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 	/**
 	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
 	 */
-	// public function testUpdateException()
-	// {
-	// 	fwrite(STDOUT, __METHOD__ . "\n");
+	public function testUpdateException()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
 
-	// 	$params = [
-	// 		'code' => 'code',
-	// 		// 'admin_label' => '123',
-	// 		// 'admin_notice' => 'admin notice',
-	// 		'field_type' => 'text',
-	// 		'localized' => false,
-	// 		'default_value' => '',
-	// 		'unique' => false,
-	// 		'required' => false,
-	// 		'filterable' => false,
-	// 		'status' => 'user_defined'
-	// 	];
+		$params = [
+			'code' => 'code',
+			// 'admin_label' => '123',
+			// 'admin_notice' => 'admin notice',
+			'field_type' => 'text',
+			'localized' => false,
+			'default_value' => '',
+			'unique' => false,
+			'required' => false,
+			'filterable' => false,
+			'status' => 'user_defined'
+		];
 
-	// 	$app = $this->createApplication();
-	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
+		$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
 
-	// 	$params = [
-	// 		'field_type' => 'text123'
-	// 	];
+		$params = [
+			'code' => ''
+		];
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, $attribute->id) );
-	// }
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, $attribute->id) );
+	}
 
-	// public function testDeleteAttribute()
-	// {
-	// 	// $params = [
-	// 	// 	'admin_notice' => 'admin notice 2',
-	// 	// ];
+	public function testDeleteAttribute()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
 
-	// 	// $response = $this->call('POST', '/attribute', $params);
+		$params = [
+			'code' => 'code',
+			'field_type' => 'text',
+			'localized' => false,
+			'default_value' => '',
+			'unique' => false,
+			'required' => false,
+			'filterable' => false,
+			'status' => 'user_defined'
+		];
 
-	// 	// $this->assertResponseOk();
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	// $this->assertEquals('test', $response->getContent());
+		$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand([], $attribute->id));
+
+		$this->assertEquals($result, $attribute->id);
+		$this->d->dump($result);
 		
-	// 	$request = \Illuminate\Http\Request::create('/', 'DELETE', []);
 
-	// 	try
-	// 	{
-	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeDeleteCommand(3));
-
-	// 		var_dump($result);
-	// 	}
-	// 	catch(\Cookbook\Core\Exceptions\ValidationException $e)
-	// 	{
-	// 		var_dump($e->toArray());
-	// 	}
-		
-
-	// }
+	}
 	
-	// public function testFetchAttribute()
-	// {
+	public function testFetchAttribute()
+	{
 
-	// 	try
-	// 	{
-	// 		$result = $this->bus->dispatch( new Cookbook\Eav\Commands\AttributeFetchCommand(2));
+		fwrite(STDOUT, __METHOD__ . "\n");
 
-	// 		var_dump($result);
-	// 	}
-	// 	catch(\Cookbook\Core\Exceptions\ValidationException $e)
-	// 	{
-	// 		var_dump($e->toArray());
-	// 	}
+		$params = [
+			'code' => 'code',
+			// 'admin_label' => '123',
+			// 'admin_notice' => 'admin notice',
+			'field_type' => 'text',
+			'localized' => false,
+			'default_value' => '',
+			'unique' => false,
+			'required' => false,
+			'filterable' => false,
+			'status' => 'user_defined'
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeFetchCommand([], $attribute->id));
+
+		$this->assertTrue(is_object($result));
+		$this->assertTrue(is_int($result->id));
+		$this->assertEquals($result->code, 'code');
+		$this->d->dump($result);
 		
 
-	// }
+	}
 
 	
 	public function testGetAttributes()
