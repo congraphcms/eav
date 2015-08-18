@@ -11,6 +11,7 @@
 namespace Cookbook\Eav\Validators\Attributes;
 
 use Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand;
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Validation\Validator;
@@ -39,12 +40,21 @@ class AttributeDeleteValidator extends Validator
 	protected $rules;
 
 	/**
+	 * Repository for attributes
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 */
+	protected $attributeRepository;
+
+	/**
 	 * Create new AttributeDeleteValidator
 	 * 
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct(AttributeRepositoryContract $attributeRepository)
 	{
+
+		$this->attributeRepository = $attributeRepository;
 
 		$this->rules = [
 			'id' => 'required|exists:attributes,id'
@@ -66,13 +76,11 @@ class AttributeDeleteValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
-		$params = ['id' => $command->id];
-
-		$this->validateParams($params, $this->rules);
-
-		if( $this->exception->hasErrors() )
+		$attribute = $this->attributeRepository->fetch($command->id);
+		
+		if( ! $attribute )
 		{
-			throw $this->exception;
+			throw new NotFoundException('No attribute with that ID.');
 		}
 	}
 }
