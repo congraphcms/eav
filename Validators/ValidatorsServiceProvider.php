@@ -112,7 +112,7 @@ class ValidatorsServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->bind('Cookbook\Eav\Validators\Attributes\AttributeDeleteValidator', function($app){
-			return new AttributeDeleteValidator();
+			return new AttributeDeleteValidator($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
 		});
 
 		$this->app->bind('Cookbook\Eav\Validators\Attributes\AttributeFetchValidator', function($app){
