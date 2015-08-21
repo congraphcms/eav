@@ -128,15 +128,15 @@ class ValidatorsServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetUpdateValidator', function($app){
-			return new AttributeSetUpdateValidator();
+			return new AttributeSetUpdateValidator($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
 		});
 
 		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetDeleteValidator', function($app){
-			return new AttributeSetDeleteValidator();
+			return new AttributeSetDeleteValidator($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
 		});
 
 		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetFetchValidator', function($app){
-			return new AttributeSetFetchValidator();
+			return new AttributeSetFetchValidator($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
 		});
 
 		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetGetValidator', function($app){

@@ -96,7 +96,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		$this->insertSetAttributes($attributes);
 
-		$attributeSet = $this->fetchById($attributeSetId, true);
+		$attributeSet = $this->fetch($attributeSetId, true);
 
 		return $attributeSet;
 		
@@ -145,7 +145,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		}
 		
 
-		$attributeSet = $this->fetchById($attributeSetId, [], true);
+		$attributeSet = $this->fetch($attributeSetId, [], true);
 
 		return $attributeSet;
 	}
@@ -191,6 +191,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	{
 
 		// insert attribute set in database
+		$params['created_at'] = $params['updated_at'] = date('Y-m-d H:i:s');
 		$attributeSetId = $this->db->table('attribute_sets')->insertGetId($params);
 
 		return $attributeSetId;
@@ -280,7 +281,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	 * 
 	 * @return Model
 	 */
-	protected function _fetchById($id){
+	protected function _fetch($id){
 		$attributeSet = $this->db->table('attribute_sets')->find($id);
 
 		if( empty($attributeSet) )

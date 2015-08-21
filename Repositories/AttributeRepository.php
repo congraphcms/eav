@@ -504,6 +504,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		$options = $this->db->table('attribute_options')
 							->where('attribute_id', '=', $id)
+							->orderBy('sort_order', 'created_at')
 							->get();
 		
 		$attribute->options = $options;

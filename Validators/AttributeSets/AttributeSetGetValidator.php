@@ -10,10 +10,10 @@
 
 namespace Cookbook\Eav\Validators\AttributeSets;
 
-use Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Exceptions\BadRequestException;
-use Illuminate\Support\Facades\Validator;
+use Cookbook\Core\Bus\RepositoryCommand;
+use Cookbook\Core\Validation\Validator;
 
 
 /**
@@ -28,15 +28,8 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetGetValidator
+class AttributeSetGetValidator extends Validator
 {
-
-	/**
-	 * validation exception that will be thrown if validation fails
-	 *
-	 * @var Cookbook\Core\Exceptions\ValidationException
-	 */
-	protected $exception;
 
 	/**
 	 * Available fields for sorting
@@ -69,46 +62,47 @@ class AttributeSetGetValidator
 		];
 
 		$this->defaultSorting = ['-created_at'];
+
+		parent::__construct();
 	}
 
 
 	/**
-	 * Validate AttributeSetGetCommand
+	 * Validate RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(AttributeSetGetCommand $command)
+	public function validate(RepositoryCommand $command)
 	{
-		$params = $command->request->all();
 
-		if( ! empty($params['filter']) )
+		if( ! empty($command->params['filter']) )
 		{
-			$this->validateFilters($params['filter']);
+			$this->validateFilters($command->params['filter']);
 		}
 
-		if( empty($params['offset']) )
+		if( empty($command->params['offset']) )
 		{
-			$params['offset'] = 0;
+			$command->params['offset'] = 0;
 		}
-		if( empty($params['limit']) )
+		if( empty($command->params['limit']) )
 		{
-			$params['limit'] = 0;
+			$command->params['limit'] = 0;
 		}
-		$this->validatePaging($params['offset'], $params['limit']);
+		$this->validatePaging($command->params['offset'], $command->params['limit']);
 		
-		if( ! empty($params['sort']) )
+		if( ! empty($command->params['sort']) )
 		{
-			$this->validateSorting($params['sort']);
+			$this->validateSorting($command->params['sort']);
 		}
 		
-		if( ! empty($params['include']) )
+		if( ! empty($command->params['include']) )
 		{
-			$this->validateInclude($params['include']);
+			$this->validateInclude($command->params['include']);
 		}
 	}
 
@@ -117,8 +111,8 @@ class AttributeSetGetValidator
 		if( ! empty($filters) )
 		{
 			$e = new BadRequestException();
-			$e->setErrorKey('attributes.filter');
-			$e->addErrors('There are no available filters for attributes.');
+			$e->setErrorKey('attribute-sets.filter');
+			$e->addErrors('There are no available filters for attribute sets.');
 
 			throw $e;
 		}
@@ -126,13 +120,13 @@ class AttributeSetGetValidator
 		$filters = [];
 	}
 
-	protected function validatePaging($offset = 0, $limit = 0)
+	protected function validatePaging(&$offset = 0, &$limit = 0)
 	{
 		$offset = intval($offset);
 		$limit = intval($limit);
 	}
 
-	protected function validateSorting($sort)
+	protected function validateSorting(&$sort)
 	{
 		if( empty($sort) )
 		{
@@ -155,7 +149,7 @@ class AttributeSetGetValidator
 			if( ! in_array($criteria, $this->availableSorting) )
 			{
 				$e = new BadRequestException();
-				$e->setErrorKey('attributes.sort');
+				$e->setErrorKey('attribute-sets.sort');
 				$e->addErrors('Sorting by \'' . $criteria . '\' is not allowed.');
 
 				throw $e;

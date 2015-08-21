@@ -57,7 +57,6 @@ class AttributeGetValidator extends Validator
 		$this->availableSorting = [
 			'id',
 			'code',
-			'admin_label',
 			'field_type',
 			'created_at'
 		];
@@ -142,7 +141,11 @@ class AttributeGetValidator extends Validator
 
 		foreach ($sort as $criteria)
 		{
-			
+			if( empty($criteria) )
+			{
+				continue;
+			}
+
 			if( $criteria[0] === '-' )
 			{
 				$criteria = substr($criteria, 1);

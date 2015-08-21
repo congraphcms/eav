@@ -4,7 +4,7 @@
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Debug\Dumper;
 
-class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
+class AttributeTest extends Orchestra\Testbench\TestCase
 {
 
 	public function setUp()
@@ -18,6 +18,10 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
 			'--realpath' => realpath(__DIR__.'/../../migrations'),
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'Cookbook\Eav\Seeders\TestDbSeeder'
 		]);
 
 		$this->d = new Dumper();
@@ -35,7 +39,9 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 		// parent::tearDown();
 		
 		$this->artisan('migrate:reset');
-		unset($this->app);
+		// unset($this->app);
+
+		parent::tearDown();
 	}
 
 	/**
@@ -87,8 +93,6 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 		$params = [
 			'code' => 'code',
-			// 'admin_label' => '123',
-			// 'admin_notice' => 'admin notice',
 			'field_type' => 'text',
 			'localized' => false,
 			'default_value' => '',
@@ -108,14 +112,59 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 		$this->d->dump($result);
 	}
 
+	public function testCreateWithOptions()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$params = [
+			'code' => 'code',
+			'field_type' => 'text',
+			'localized' => false,
+			'default_value' => '',
+			'unique' => false,
+			'required' => false,
+			'filterable' => false,
+			'status' => 'user_defined',
+			'options' => [
+				[
+					'value' => 'option1',
+					'label' => 'Option 1',
+					'default' => true,
+					'sort_order' => 0
+				],
+				[
+					'value' => 'option2',
+					'label' => 'Option 2',
+					'default' => 0,
+					'sort_order' => 2
+				],
+				[
+					'value' => 'option3',
+					'label' => 'Option 3',
+					'default' => 0,
+					'sort_order' => 1
+				]
+			]
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+
+		$this->assertTrue(is_object($result));
+		$this->assertTrue(is_int($result->id));
+		$this->assertTrue(is_array($result->options));
+		$this->assertFalse(empty($result->options));
+		$this->d->dump($result);
+	}
+
 	/**
 	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
 	 */
 	public function testCreateException()
 	{
 		$params = [
-			// 'admin_label' => '123',
-			// 'admin_notice' => 'admin notice',
 			'field_type' => 'text',
 			'localized' => false,
 			'default_value' => '',
@@ -135,34 +184,18 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$params = [
-			'code' => 'code',
-			// 'admin_label' => '123',
-			// 'admin_notice' => 'admin notice',
-			'field_type' => 'text',
-			'localized' => false,
-			'default_value' => '',
-			'unique' => false,
-			'required' => false,
-			'filterable' => false,
-			'status' => 'user_defined'
-		];
-
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
-
-
 		$params = [
-			'code' => 'code2',
+			'code' => 'attribute_updated',
 		];
 		
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, $attribute->id) );
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 1) );
 		
 		$this->assertTrue(is_object($result));
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'code2');
+		$this->assertEquals($result->code, 'attribute_updated');
 		$this->d->dump($result);
 	}
 
@@ -173,57 +206,42 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$params = [
-			'code' => 'code',
-			// 'admin_label' => '123',
-			// 'admin_notice' => 'admin notice',
-			'field_type' => 'text',
-			'localized' => false,
-			'default_value' => '',
-			'unique' => false,
-			'required' => false,
-			'filterable' => false,
-			'status' => 'user_defined'
-		];
-
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
 
 		$params = [
 			'code' => ''
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, $attribute->id) );
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 1) );
 	}
 
 	public function testDeleteAttribute()
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$params = [
-			'code' => 'code',
-			'field_type' => 'text',
-			'localized' => false,
-			'default_value' => '',
-			'unique' => false,
-			'required' => false,
-			'filterable' => false,
-			'status' => 'user_defined'
-		];
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand([], 1));
+
+		$this->assertEquals($result, 1);
+		$this->d->dump($result);
+		
+
+	}
+
+	/**
+	 * @expectedException \Cookbook\Core\Exceptions\NotFoundException
+	 */
+	public function testDeleteException()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
-
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand([], $attribute->id));
-
-		$this->assertEquals($result, $attribute->id);
-		$this->d->dump($result);
-		
-
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand([], 133));
 	}
 	
 	public function testFetchAttribute()
@@ -231,29 +249,14 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$params = [
-			'code' => 'code',
-			// 'admin_label' => '123',
-			// 'admin_notice' => 'admin notice',
-			'field_type' => 'text',
-			'localized' => false,
-			'default_value' => '',
-			'unique' => false,
-			'required' => false,
-			'filterable' => false,
-			'status' => 'user_defined'
-		];
-
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$attribute = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params) );
-
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeFetchCommand([], $attribute->id));
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeFetchCommand([], 1));
 
 		$this->assertTrue(is_object($result));
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'code');
+		$this->assertEquals($result->code, 'attribute1');
 		$this->d->dump($result);
 		
 
@@ -264,22 +267,29 @@ class AttributeIntegrationTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		try
-		{
-			// $request = \Illuminate\Http\Request::create('/', 'GET', []);
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
 
-			$app = $this->createApplication();
-			$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
+		$this->assertTrue(is_array($result));
+		$this->assertEquals(count($result), 7);
+		$this->d->dump($result);
 
-			$this->d->dump($result);
-		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
-		{
-			$this->d->dump($e->toArray());
-		}
-		
+	}
 
+	public function testGetParams()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['sort' => ['-code'], 'limit' => 3, 'offset' => 1]));
+
+		$this->assertTrue(is_array($result));
+		$this->assertEquals(count($result), 3);
+
+		$this->d->dump($result);
 	}
 
 }

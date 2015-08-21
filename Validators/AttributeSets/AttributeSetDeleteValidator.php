@@ -10,15 +10,16 @@
 
 namespace Cookbook\Eav\Validators\AttributeSets;
 
-use Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand;
+use Cookbook\Core\Bus\RepositoryCommand;
+use Cookbook\Core\Validation\Validator;
+use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
 use Cookbook\Core\Exceptions\NotFoundException;
-use Illuminate\Support\Facades\Validator;
 
 
 /**
  * AttributeSetDeleteValidator class
  * 
- * Validating command for deleting attribute
+ * Validating command for deleting attribute set
  * 
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -27,7 +28,7 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetDeleteValidator
+class AttributeSetDeleteValidator extends Validator
 {
 
 	/**
@@ -38,52 +39,47 @@ class AttributeSetDeleteValidator
 	protected $rules;
 
 	/**
-	 * validation exception that will be thrown if validation fails
-	 *
-	 * @var Cookbook\Core\Exceptions\ValidationException
+	 * Repository for attribute sets
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
 	 */
-	protected $exception;
+	protected $attributeSetRepository;
 
 	/**
 	 * Create new AttributeSetDeleteValidator
 	 * 
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct(AttributeSetRepositoryContract $attributeSetRepository)
 	{
+
+		$this->attributeSetRepository = $attributeSetRepository;
 
 		$this->rules = [
 			'id' => 'required|exists:attribute_sets,id'
 		];
 
-		$this->exception = new NotFoundException();
+		parent::__construct();
 	}
 
 
 	/**
-	 * Validate AttributeSetDeleteCommand
+	 * Validate RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand $command
+	 * @param  Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(AttributeSetDeleteCommand $command)
+	public function validate(RepositoryCommand $command)
 	{
-		$params = ['id' => $command->id];
+		$attributeSet = $this->attributeSetRepository->fetch($command->id);
 
-		$validator = Validator::make($params, $this->rules);
-
-		if($validator->fails())
+		if( ! $attributeSet )
 		{
-			$this->exception->addErrors($validator->errors()->toArray());
-		}
-
-		if( $this->exception->hasErrors() )
-		{
-			throw $this->exception;
+			throw new NotFoundException('No attribute set with that ID.');
 		}
 	}
 }

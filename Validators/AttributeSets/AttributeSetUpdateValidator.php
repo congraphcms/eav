@@ -10,16 +10,16 @@
 
 namespace Cookbook\Eav\Validators\AttributeSets;
 
-use Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand;
-use Cookbook\Core\Exceptions\ValidationException;
+use Cookbook\Core\Bus\RepositoryCommand;
+use Cookbook\Core\Validation\Validator;
+use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
 use Cookbook\Core\Exceptions\NotFoundException;
-use Illuminate\Support\Facades\Validator;
 
 
 /**
  * AttributeSetUpdateValidator class
  * 
- * Validating command for creating attribute set
+ * Validating command for updating attribute set
  * 
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Validator;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetUpdateValidator
+class AttributeSetUpdateValidator extends Validator
 {
 
 
@@ -40,13 +40,6 @@ class AttributeSetUpdateValidator
 	protected $rules;
 
 	/**
-	 * Set of rules for validating attribute set ID
-	 *
-	 * @var array
-	 */
-	protected $idRules;
-
-	/**
 	 * Set of rules for validating set attributes
 	 *
 	 * @var array
@@ -54,26 +47,26 @@ class AttributeSetUpdateValidator
 	protected $attributeRules;
 
 	/**
-	 * validation exception that will be thrown if validation fails
-	 *
-	 * @var Cookbook\Core\Exceptions\ValidationException
+	 * Repository for attribute sets
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
 	 */
-	protected $exception;
+	protected $attributeSetRepository;
 
 	/**
-	 * Create new AttributeSetUpdateValidator
+	 * Create new AttributeSetCreateValidator
 	 * 
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct(AttributeSetRepositoryContract $attributeSetRepository)
 	{
-		$this->idRules = [
-			'id'					=> 'required|exists:attribute_sets,id'
-		];
+
+		$this->attributeSetRepository = $attributeSetRepository;
 
 		$this->rules = [
 			'code'					=> 'sometimes|required|unique:attribute_sets,code',
-			'name'					=> 'sometimes|required',
+			'name'					=> '',
+			'attributes'			=> 'sometimes|array'
 		];
 
 		$this->attributeRules = 
@@ -81,50 +74,40 @@ class AttributeSetUpdateValidator
 			'id'			=> 'required|integer|exists:attributes,id'
 		];
 
-		$this->exception = new ValidationException();
+		parent::__construct();
 
 		$this->exception->setErrorKey('attribute-sets');
 	}
 
 
 	/**
-	 * Validate AttributeSetUpdateCommand
+	 * Validate RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories
 	 * 
 	 * @return void
 	 */
-	public function validate(AttributeSetUpdateCommand $command)
+	public function validate(RepositoryCommand $command)
 	{
-		$idValidator = Validator::make(['id' => $command->id], $this->idRules);
-
-		if($idValidator->fails())
+		$attributeSet = $this->attributeSetRepository->fetch($command->id);
+		
+		if( ! $attributeSet )
 		{
-			throw new NotFoundException($idValidator->errors()->toArray());
+			throw new NotFoundException('No attribute set with that ID.');
 		}
 
-		$params = $command->params;
+		$this->validateParams($command->params, $this->rules, true);
 
-		$validator = Validator::make($params, $this->rules);
-
-		if($validator->fails())
+		if( isset($command->params['attributes']) )
 		{
-			$this->exception->addErrors($validator->errors()->toArray());
-		}
+			foreach ($command->params['attributes'] as $key => &$attribute) {
 
-		if( isset($params['attributes']) )
-		{
-			foreach ($params['attributes'] as $key => $attribute) {
-				$attributeValidator = Validator::make($attribute, $this->attributeRules);
+				$this->exception->setErrorKey('attribute-sets.attributes.' . $key);
 
-				if($attributeValidator->fails())
-				{
-					$this->exception->setErrorKey('attribute-sets.attributes.' . $key);
-					$this->exception->addErrors($attributeValidator->errors()->toArray());
-				}
+				$this->validateParams($attribute, $this->attributeRules, true);
 			}
 		}
 

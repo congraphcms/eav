@@ -98,10 +98,10 @@ class AttributeCreateValidator extends Validator
 
 		$this->optionRules = 
 		[
-			'locale' 				=> 'required|integer',
+			'locale' 				=> 'sometimes|integer',
 			'label'					=> 'required|max:250',
 			'value'					=> 'required|max:250',
-			'is_default'			=> 'boolean',
+			'default'				=> 'boolean',
 			'sort_order' 			=> 'integer'
 		];
 
@@ -128,10 +128,9 @@ class AttributeCreateValidator extends Validator
 
 		if( isset($command->params['options']) )
 		{
-			$this->exception->setErrorKey('attribute.options.' . $key);
-
 			foreach ($command->params['options'] as $key => &$option)
 			{
+				$this->exception->setErrorKey('attribute.options.' . $key);
 				$this->validateParams($option, $this->optionRules, true);
 			}
 		}

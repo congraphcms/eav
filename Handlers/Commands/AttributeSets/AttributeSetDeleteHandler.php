@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Handlers\Commands\Attributes;
+namespace Cookbook\Eav\Handlers\Commands\AttributeSets;
 
 
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
