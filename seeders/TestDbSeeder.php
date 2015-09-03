@@ -174,7 +174,7 @@ class TestDbSeeder extends Seeder {
 			[
 				'attribute_set_id' => 1,
 				'attribute_id' => 3,
-				'sort_order' => 0
+				'sort_order' => 2
 			],
 			[
 				'attribute_set_id' => 2,

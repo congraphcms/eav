@@ -61,6 +61,18 @@ class AttributeGetValidator extends Validator
 			'created_at'
 		];
 
+		$this->availableFilters = [
+			'id' 			=> ['e', 'ne', 'lt', 'lte', 'gt', 'gte', 'in', 'nin'],
+			'code'			=> ['e', 'ne', 'in', 'nin'],
+			'field_type'	=> ['e', 'ne', 'in', 'nin'],
+			'localized'		=> ['e', 'ne'],
+			'unique'		=> ['e', 'ne'],
+			'required'		=> ['e', 'ne'],
+			'filterable'	=> ['e', 'ne'],
+			'status'		=> ['e', 'ne', 'in', 'nin'],
+			'created_at'	=> ['lt', 'lte', 'gt', 'gte']
+		];
+
 		$this->defaultSorting = ['-created_at'];
 
 		parent::__construct();
@@ -79,55 +91,93 @@ class AttributeGetValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
-		$params = $command->params;
 
-		if( ! empty($params['filter']) )
+		if( ! empty($command->params['filter']) )
 		{
-			$this->validateFilters($params['filter']);
+			$this->validateFilters($command->params['filter']);
 		}
 
-		if( empty($params['offset']) )
+		if( empty($command->params['offset']) )
 		{
-			$params['offset'] = 0;
+			$command->params['offset'] = 0;
 		}
-		if( empty($params['limit']) )
+		if( empty($command->params['limit']) )
 		{
-			$params['limit'] = 0;
+			$command->params['limit'] = 0;
 		}
-		$this->validatePaging($params['offset'], $params['limit']);
+		$this->validatePaging($command->params['offset'], $command->params['limit']);
 		
-		if( ! empty($params['sort']) )
+		if( ! empty($command->params['sort']) )
 		{
-			$this->validateSorting($params['sort']);
+			$this->validateSorting($command->params['sort']);
 		}
 		
-		if( ! empty($params['include']) )
+		if( ! empty($command->params['include']) )
 		{
-			$this->validateInclude($params['include']);
+			$this->validateInclude($command->params['include']);
 		}
 	}
 
-	protected function validateFilters($filters)
+	protected function validateFilters(&$filters)
 	{
 		if( ! empty($filters) )
 		{
-			$e = new BadRequestException();
-			$e->setErrorKey('attributes.filter');
-			$e->addErrors('There are no available filters for attributes.');
+			foreach ($filters as $field => &$filter) {
+				if( ! array_key_exists($field, $this->availableFilters) )
+				{
+					$e = new BadRequestException();
+					$e->setErrorKey('attributes.filter');
+					$e->addErrors('Filtering by \'' . $field . '\' is not allowed.');
 
-			throw $e;
+					throw $e;
+				}
+				if( ! is_array($filter) )
+				{
+					if( ! in_array('e', $this->availableFilters[$field]) )
+					{
+						$e = new BadRequestException();
+						$e->setErrorKey('attributes.filter');
+						$e->addErrors('Filter operation is not allowed.');
+
+						throw $e;
+					}
+
+					continue;
+				}
+
+				foreach ($filter as $operation => &$value) {
+					if( ! in_array($operation, $this->availableFilters[$field]) )
+					{
+						$e = new BadRequestException();
+						$e->setErrorKey('attributes.filter');
+						$e->addErrors('Filter operation is not allowed.');
+
+						throw $e;
+					}
+
+					if($operation == 'in' || $operation == 'nin')
+					{
+						if( ! is_array($value) )
+						{
+							$value = explode(',', strval($value));
+						}
+					}
+				}
+			}
+
+			return;
 		}
 
 		$filters = [];
 	}
 
-	protected function validatePaging($offset = 0, $limit = 0)
+	protected function validatePaging(&$offset = 0, &$limit = 0)
 	{
 		$offset = intval($offset);
 		$limit = intval($limit);
 	}
 
-	protected function validateSorting($sort)
+	protected function validateSorting(&$sort)
 	{
 		if( empty($sort) )
 		{
@@ -160,19 +210,5 @@ class AttributeGetValidator extends Validator
 				throw $e;
 			}
 		}
-	}
-
-	protected function validateInclude($include)
-	{
-		if( ! empty($include) )
-		{
-			$e = new BadRequestException();
-			$e->setErrorKey('attributes.include');
-			$e->addErrors('There are no available includes for attributes.');
-
-			throw $e;
-		}
-
-		$include = [];
 	}
 }

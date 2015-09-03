@@ -517,6 +517,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
 		$attribute = $fieldHandler->transformAttribute($attribute);
+
+		$attribute->type = 'attribute';
 		
 		return $attribute;
 	}
@@ -587,6 +589,10 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// 		}
 		// 	}
 		// }
+		
+		foreach ($attributes as &$attribute) {
+			$attribute->type = 'attribute';
+		}
 		
 		return $attributes;
 	}

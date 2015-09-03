@@ -297,6 +297,8 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		$attributeSet->attributes = $setAttributes;
 
+		$attributeSet->type = 'attribute-set';
+
 		return $attributeSet;
 	}
 
@@ -328,6 +330,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		{
 			$ids[] = $attributeSet->id;
 			$attributeSet->attributes = [];
+			$attributeSet->type = 'attribute-set';
 		}
 
 		$setAttributes = $this->db->table('set_attributes')

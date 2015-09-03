@@ -292,4 +292,68 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->d->dump($result);
 	}
 
+	public function testGetFilters()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$filter = [ 'id' => 5 ];
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+
+		$this->d->dump($result);
+		
+		$this->assertTrue(is_array($result));
+		$this->assertEquals(1, count($result));
+
+		
+
+		$filter = [ 'id' => ['in'=>'5,6,7'] ];
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+
+		$this->assertTrue(is_array($result));
+		$this->assertEquals(3, count($result));
+
+		$this->d->dump($result);
+
+		$filter = [ 'id' => ['nin'=>[5,6,7,1]] ];
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+
+		$this->assertTrue(is_array($result));
+		$this->assertEquals(3, count($result));
+
+		$this->d->dump($result);
+
+		$filter = [ 'id' => ['lt'=>3] ];
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+
+		$this->assertTrue(is_array($result));
+		$this->assertEquals(2, count($result));
+
+		$this->d->dump($result);
+
+		$filter = [ 'id' => ['lte'=>3] ];
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+
+		$this->assertTrue(is_array($result));
+		$this->assertEquals(3, count($result));
+
+		$this->d->dump($result);
+
+		$filter = [ 'id' => ['ne'=>3] ];
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+
+		$this->assertTrue(is_array($result));
+		$this->assertEquals(6, count($result));
+
+		$this->d->dump($result);
+	}
+
 }
