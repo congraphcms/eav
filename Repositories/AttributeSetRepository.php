@@ -332,6 +332,12 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		$attributeSet->type = 'attribute-set';
 
+		$attributeSet->entity_type = new stdClass();
+
+		$attributeSet->entity_type->id = $attributeSet->entity_type_id;
+
+		$attributeSet->entity_type->type = 'entity-type';
+
 		return $attributeSet;
 	}
 
@@ -364,6 +370,9 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			$ids[] = $attributeSet->id;
 			$attributeSet->attributes = [];
 			$attributeSet->type = 'attribute-set';
+			$attributeSet->entity_type = new stdClass();
+			$attributeSet->entity_type->id = $attributeSet->entity_type_id;
+			$attributeSet->entity_type->type = 'entity-type';
 		}
 
 		$setAttributes = $this->db->table('set_attributes')
