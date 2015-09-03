@@ -152,9 +152,9 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 
 	/**
-	 * Delete attribute set and its groups
+	 * Delete attribute set and its set attributes
 	 * 
-	 * @param integer $id - ID of attribute set that will be deleted
+	 * @param int $id - ID of attribute set that will be deleted
 	 * 
 	 * @return boolean
 	 * 
@@ -172,9 +172,37 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		$this->deleteSetAttributes($id);
 
 		// delete the attribute set
-		$this->db ->table('attribute_sets')->where('id', '=', $id)->delete();
+		$this->db->table('attribute_sets')->where('id', '=', $id)->delete();
 
 		return $id;
+	}
+
+	/**
+	 * Delete attribute sets vy entity type ID and its set attributes
+	 * 
+	 * @param int $entityTypeID - ID of entity type
+	 * 
+	 * @return int
+	 * 
+	 * @throws InvalidArgumentException, Exception
+	 */
+	public function deleteByEntityType($entityTypeID)
+	{
+		// get the sets
+		$setIDs = $this->db ->table('attribute_sets')
+							->where('entity_type_id', '=', $entityTypeID)
+							->lists('id');
+
+		if( ! empty($setIDs) )
+		{
+			$this->deleteSetAttributes($setIDs);
+
+			// delete the attribute set
+			$this->db->table('attribute_sets')->where('entity_type_id', '=', $entityTypeID)->delete();
+		}
+		
+
+		return true;
 	}
 
 
@@ -261,10 +289,15 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	 * 
 	 * @throws InvalidArgumentException
 	 */
-	protected function deleteSetAttributes($attributeSetId)
+	protected function deleteSetAttributes($attributeSetIds)
 	{
+		if( ! is_array($attributeSetIds) )
+		{
+			$attributeSetIds = [$attributeSetIds];
+		}
+
 		$this->db->table('set_attributes')
-				 ->where('attribute_set_id', '=', $attributeSetId)
+				 ->whereIn('attribute_set_id', $attributeSetIds)
 				 ->delete();
 	}
 
@@ -290,7 +323,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		}
 
 		$setAttributes = $this->db->table('set_attributes')
-								  ->select($this->db->raw('attribute_id as id, "attributes" as type'))
+								  ->select($this->db->raw('attribute_id as id, "attribute" as type'))
 								  ->where('attribute_set_id', '=', $id)
 								  ->orderBy('sort_order')
 								  ->get();

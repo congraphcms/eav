@@ -12,8 +12,8 @@ namespace Cookbook\Eav\Handlers\Commands\AttributeSets;
 
 
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand;
-
+use Cookbook\Core\Bus\RepositoryCommandHandler;
+use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetUpdateHandler class
@@ -27,38 +27,30 @@ use Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetUpdateHandler
+class AttributeSetUpdateHandler extends RepositoryCommandHandler
 {
-	/**
-	 * Repository for attribute DB operations
-	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
-	 */
-	protected $attributeSetRepository;
 
 	/**
 	 * Create new AttributeSetUpdateHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $attributeSetRepository
+	 * @param Cookbook\Contracts\Eav\AttributeSetRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
-	public function __construct(AttributeSetRepositoryContract $attributeSetRepository)
+	public function __construct(AttributeSetRepositoryContract $repository)
 	{
-		// inject dependencies
-		$this->attributeSetRepository = $attributeSetRepository;
+		parent::__construct($repository);
 	}
 
-
 	/**
-	 * Handle AttributeSetUpdateCommand
+	 * Handle RepositoryCommand
 	 * 
-	 * @param Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand $command
+	 * @param Cookbook\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @return void
 	 */
-	public function handle(AttributeSetUpdateCommand $command)
+	public function handle(RepositoryCommand $command)
 	{
-		return $this->attributeSetRepository->update($command->id, $command->params);
+		return $this->repository->update($command->id, $command->params);
 	}
 }

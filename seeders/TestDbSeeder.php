@@ -41,6 +41,22 @@ class TestDbSeeder extends Seeder {
 				'multiple_sets' => 1,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'tests2',
+				'name' => 'Test2',
+				'plural_name' => 'Tests2',
+				'multiple_sets' => 0,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'tests3',
+				'name' => 'Test3',
+				'plural_name' => 'Tests3',
+				'multiple_sets' => 1,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
 			]
 		]);
 

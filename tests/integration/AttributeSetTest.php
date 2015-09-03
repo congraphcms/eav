@@ -219,7 +219,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand([], 133));
 	}
 
-	public function testFetchAttribute()
+	public function testFetchAttributeSet()
 	{
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');

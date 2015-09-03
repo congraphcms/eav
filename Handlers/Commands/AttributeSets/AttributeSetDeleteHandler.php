@@ -33,7 +33,7 @@ class AttributeSetDeleteHandler extends RepositoryCommandHandler
 	/**
 	 * Create new AttributeSetDeleteHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $repository
+	 * @param Cookbook\Contracts\Eav\AttributeSetRepositoryContract $repository
 	 * 
 	 * @return void
 	 */

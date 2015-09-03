@@ -33,7 +33,7 @@ class AttributeSetGetHandler extends RepositoryCommandHandler
 	/**
 	 * Create new AttributeSetGetHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\Repositories\AttributeSetRepositoryContract $repository
+	 * @param Cookbook\Contracts\Eav\AttributeSetRepositoryContract $repository
 	 * 
 	 * @return void
 	 */

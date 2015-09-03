@@ -8,17 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Handlers\Commands\AttributeSets;
+namespace Cookbook\Eav\Handlers\Commands\EntityTypes;
 
 
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
+use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
 use Cookbook\Core\Bus\RepositoryCommandHandler;
 use Cookbook\Core\Bus\RepositoryCommand;
 
 /**
- * AttributeSetFetchHandler class
+ * EntityTypeDeleteHandler class
  * 
- * Handling command for fetching attribute set by ID
+ * Handling command for deleting entity type
  * 
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -27,17 +27,17 @@ use Cookbook\Core\Bus\RepositoryCommand;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class AttributeSetFetchHandler extends RepositoryCommandHandler
+class EntityTypeDeleteHandler extends RepositoryCommandHandler
 {
 
 	/**
-	 * Create new AttributeSetFetchHandler
+	 * Create new EntityTypeDeleteHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\AttributeSetRepositoryContract $repository
+	 * @param ookbook\Contracts\Eav\EntityTypeRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
-	public function __construct(AttributeSetRepositoryContract $repository)
+	public function __construct(EntityTypeRepositoryContract $repository)
 	{
 		parent::__construct($repository);
 	}
@@ -51,6 +51,6 @@ class AttributeSetFetchHandler extends RepositoryCommandHandler
 	 */
 	public function handle(RepositoryCommand $command)
 	{
-		return $this->repository->fetch($command->id);
+		return $this->repository->delete($command->id);
 	}
 }

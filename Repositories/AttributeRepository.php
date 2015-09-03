@@ -109,7 +109,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	{
 		$this->type = 'attributes';
 
-		$this->cacheDuration = 60;
+		// $this->cacheDuration = 60;
 
 		// AbstractRepository constructor
 		parent::__construct($db);
@@ -171,7 +171,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// update all options for attribute
 		$this->updateOptions($options, null, $attribute);
 
-		$attribute = $this->fetch($attribute->id, [], true);
+		$attribute = $this->fetch($attribute->id);
 
 		// and return newly created attribute
 		return $attribute;
@@ -325,7 +325,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// 	$this->db->table('attribute_translations')->insert($attributeTranslations);
 		// }
 
-		return $this->fetch($attribute_id, [], true);
+		return $this->fetch($attribute_id);
 	}
 
 	/**
@@ -383,7 +383,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// 	$this->db->table('attribute_translations')->insert($attributeTranslations);
 		// }
 
-		return $this->fetch($id, [], true);
+		return $this->fetch($id);
 	}
 
 	/**
