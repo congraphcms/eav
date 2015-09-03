@@ -83,7 +83,8 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 	protected function _create($model)
 	{
 
-
+		$model['created_at'] = $model['updated_at'] = date('Y-m-d H:i:s');
+		
 		// insert entity type in database
 		$entityTypeID = $this->db->table('entity_types')->insertGetId($model);
 
