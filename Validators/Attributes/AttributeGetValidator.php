@@ -112,10 +112,10 @@ class AttributeGetValidator extends Validator
 			$this->validateSorting($command->params['sort']);
 		}
 		
-		if( ! empty($command->params['include']) )
-		{
-			$this->validateInclude($command->params['include']);
-		}
+		// if( ! empty($command->params['include']) )
+		// {
+		// 	$this->validateInclude($command->params['include']);
+		// }
 	}
 
 	protected function validateFilters(&$filters)
