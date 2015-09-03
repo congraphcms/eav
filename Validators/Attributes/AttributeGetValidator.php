@@ -40,6 +40,13 @@ class AttributeGetValidator extends Validator
 	protected $availableSorting;
 
 	/**
+	 * Available fields for filtering
+	 *
+	 * @var array
+	 */
+	protected $availableFilters;
+
+	/**
 	 * Default sorting criteria
 	 *
 	 * @var array

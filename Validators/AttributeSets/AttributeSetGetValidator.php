@@ -39,6 +39,13 @@ class AttributeSetGetValidator extends Validator
 	protected $availableSorting;
 
 	/**
+	 * Available fields for filtering
+	 *
+	 * @var array
+	 */
+	protected $availableFilters;
+
+	/**
 	 * Default sorting criteria
 	 *
 	 * @var array
@@ -59,6 +66,14 @@ class AttributeSetGetValidator extends Validator
 			'name',
 			'entity_type_id',
 			'created_at'
+		];
+
+		$this->availableFilters = [
+			'id' 				=> ['e', 'ne', 'lt', 'lte', 'gt', 'gte', 'in', 'nin'],
+			'code'				=> ['e', 'ne', 'in', 'nin'],
+			'name'				=> ['e', 'ne', 'in', 'nin'],
+			'entity_type_id'	=> ['e', 'ne', 'in', 'nin'],
+			'created_at'		=> ['lt', 'lte', 'gt', 'gte']
 		];
 
 		$this->defaultSorting = ['-created_at'];
@@ -106,15 +121,54 @@ class AttributeSetGetValidator extends Validator
 		// }
 	}
 
-	protected function validateFilters($filters)
+	protected function validateFilters(&$filters)
 	{
 		if( ! empty($filters) )
 		{
-			$e = new BadRequestException();
-			$e->setErrorKey('attribute-sets.filter');
-			$e->addErrors('There are no available filters for attribute sets.');
+			foreach ($filters as $field => &$filter) {
+				if( ! array_key_exists($field, $this->availableFilters) )
+				{
+					$e = new BadRequestException();
+					$e->setErrorKey('attribute-sets.filter');
+					$e->addErrors('Filtering by \'' . $field . '\' is not allowed.');
 
-			throw $e;
+					throw $e;
+				}
+				if( ! is_array($filter) )
+				{
+					if( ! in_array('e', $this->availableFilters[$field]) )
+					{
+						$e = new BadRequestException();
+						$e->setErrorKey('attribute-sets.filter');
+						$e->addErrors('Filter operation is not allowed.');
+
+						throw $e;
+					}
+
+					continue;
+				}
+
+				foreach ($filter as $operation => &$value) {
+					if( ! in_array($operation, $this->availableFilters[$field]) )
+					{
+						$e = new BadRequestException();
+						$e->setErrorKey('attribute-sets.filter');
+						$e->addErrors('Filter operation is not allowed.');
+
+						throw $e;
+					}
+
+					if($operation == 'in' || $operation == 'nin')
+					{
+						if( ! is_array($value) )
+						{
+							$value = explode(',', strval($value));
+						}
+					}
+				}
+			}
+
+			return;
 		}
 
 		$filters = [];
