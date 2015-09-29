@@ -50,7 +50,7 @@ class RepositoriesServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function registerRepositories() {
-		$this->app->bind('Cookbook\Eav\Repositories\AttributeRepository', function($app) {
+		$this->app->singleton('Cookbook\Eav\Repositories\AttributeRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
 			return new AttributeRepository(
 				$app['db']->connection(),
@@ -65,25 +65,41 @@ class RepositoriesServiceProvider extends ServiceProvider {
 
 
 
-		$this->app->bind('Cookbook\Eav\Repositories\AttributeSetRepository', function($app) {
+		$this->app->singleton('Cookbook\Eav\Repositories\AttributeSetRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
-			return new AttributeSetRepository( $app['db']->connection() );
+			return new AttributeSetRepository( 
+				$app['db']->connection()
+			);
 		});
 
 		$this->app->alias(
 			'Cookbook\Eav\Repositories\AttributeSetRepository', 'Cookbook\Contracts\Eav\AttributeSetRepositoryContract'
 		);
 
-		$this->app->bind('Cookbook\Eav\Repositories\EntityTypeRepository', function($app) {
+		$this->app->singleton('Cookbook\Eav\Repositories\EntityTypeRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
 			return new EntityTypeRepository(
-				$app['db']->connection(),
-				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract')
+				$app['db']->connection()
 			);
 		});
 
 		$this->app->alias(
 			'Cookbook\Eav\Repositories\EntityTypeRepository', 'Cookbook\Contracts\Eav\EntityTypeRepositoryContract'
+		);
+
+		$this->app->singleton('Cookbook\Eav\Repositories\EntityRepository', function($app) {
+			// var_dump('Contract for attribute repository resolving...');
+			return new EntityRepository(
+				$app['db']->connection(),
+				$app->make('Cookbook\Contracts\Eav\FieldHandlerFactoryContract'),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+
+		$this->app->alias(
+			'Cookbook\Eav\Repositories\EntityRepository', 'Cookbook\Contracts\Eav\EntityRepositoryContract'
 		);
 	}
 
@@ -100,7 +116,9 @@ class RepositoriesServiceProvider extends ServiceProvider {
 			'Cookbook\Eav\Repositories\AttributeSetRepository',
 			'Cookbook\Contracts\Eav\AttributeSetRepositoryContract',
 			'Cookbook\Eav\Repositories\EntityTypeRepository',
-			'Cookbook\Contracts\Eav\EntityTypeRepositoryContract'
+			'Cookbook\Contracts\Eav\EntityTypeRepositoryContract',
+			'Cookbook\Eav\Repositories\EntityRepository',
+			'Cookbook\Contracts\Eav\EntityRepositoryContract'
 		];
 	}
 

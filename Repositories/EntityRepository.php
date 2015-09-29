@@ -10,13 +10,17 @@
 
 namespace Cookbook\Eav\Repositories;
 
-use Illuminate\Database\Connection;
-
-use Cookbook\Core\Repository\AbstractRepository;
-use Cookbook\Core\Traits\ValidatorTrait;
-
-use Cookbook\Contracts\Eav\AttributeHandlerFactoryContract;
+use stdClass;
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
+use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
+use Cookbook\Contracts\Eav\EntityRepositoryContract;
+use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
+use Cookbook\Core\Exceptions\Exception;
+use Cookbook\Core\Exceptions\NotFoundException;
+use Cookbook\Core\Repositories\AbstractRepository;
+use Cookbook\Core\Repositories\UsesCache;
 use Cookbook\Eav\Managers\AttributeManager;
+use Illuminate\Database\Connection;
 
 
 /**
@@ -35,17 +39,15 @@ use Cookbook\Eav\Managers\AttributeManager;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class EntityRepository extends AbstractRepository
+class EntityRepository extends AbstractRepository implements EntityRepositoryContract//, UsesCache
 {
-	use ValidatorTrait;
-
 	/**
-	 * Factory for attribute handlers,
-	 * makes appropriate attriubte handler depending on attribute data type
+	 * Factory for field handlers,
+	 * makes appropriate field handler depending on attribute data type
 	 * 
-	 * @var AttributeHandlerFactoryInterface
+	 * @var Cookbook\Contracts\Eav\FieldHandlerFactoryContract
 	 */
-	protected $attributeHandlerFactory;
+	protected $fieldHandlerFactory;
 
 
 	/**
@@ -54,21 +56,20 @@ class EntityRepository extends AbstractRepository
 	 * @var Vizioart/Attributes/Manager/AttributeManager
 	 */
 	protected $attributeManager;
-
-	/**
-	 * Repository for handling attribute values
-	 * 
-	 * @var Cookbook\Eav\Repositories\AttributeValueRepository
-	 */
-	protected $attributeValueRepository;
 	
+	/**
+	 * Repository for handling attribute sets
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
+	 */
+	protected $attributeSetRepository;
 
 	/**
-	 * Array used to create rules for validation for INSERT entity
+	 * Repository for handling attributes
 	 * 
-	 * @var array
+	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
 	 */
-	protected $entityInsertParamRules;
+	protected $attributeRepository;
 
 
 
@@ -82,21 +83,20 @@ class EntityRepository extends AbstractRepository
 	 * @return void
 	 */
 	public function __construct(Connection $db,
-								AttributeHandlerFactoryContract $attributeHandlerFactory,
-								AttributeManager $attributeManager,
-								AttributeValueRepository $attributeValueRepository)
+								FieldHandlerFactoryContract $fieldHandlerFactory,
+								AttributeManager $attributeManager, 
+								AttributeSetRepositoryContract $attributeSetRepository, 
+								AttributeRepositoryContract $attributeRepository)
 	{
 
 		// AbstractRepository constructor
 		parent::__construct($db);
 
 		// Inject dependencies
-		$this->attributeValueVarchar = $attributeValueVarchar;
+		$this->fieldHandlerFactory = $fieldHandlerFactory;
 		$this->attributeManager = $attributeManager;
-		$this->attributeValueRepository = $attributeValueRepository;
-
-		// set default key for errors
-		$this->setErrorKey('attribute_set.errors');
+		$this->attributeSetRepository = $attributeSetRepository;
+		$this->attributeRepository = $attributeRepository;
 
 		// Validation Rules for entity insert
 		$this->entityInsertParamRules = array(
@@ -105,6 +105,7 @@ class EntityRepository extends AbstractRepository
 			'attribute_set_id'		=> 'required|exists:attribute_sets,id',
 		);
 
+		
 		
 	}
 
@@ -120,82 +121,55 @@ class EntityRepository extends AbstractRepository
 	 */
 	protected function _create($model)
 	{
-
-		try 
+		
+		$fields = array();
+		if( ! empty( $model['fields'] ) && is_array( $model['fields'] ) )
 		{
-
-			$attributes = array();
-			if( ! empty( $model['attribute_values'] ) && is_array( $model['attribute_values'] ) )
-			{
-				$attributes = $model['attribute_values'];
-			}
-
-			unset($model['attribute_values']);
-
-			if( ! empty( $model['entity_type'] ) )
-			{
-				$entity_type = $this->db->table('entity_types')
-										->where('slug', '=', $model['entity_type'])
-										->first();
-				
-				if($entity_type)
-				{
-					$model['entity_type_id'] = $entity_type->id;
-					
-					if( ! $entity_type->multiple_sets && $entity_type->default_attribute_set_id )
-					{
-						$model['attribute_set_id'] = $entity_type->default_attribute_set_id;
-					}
-				}
-			}
-
-			// insert entity
-			$entityID = $this->insertEntity($model);
-
-			if( ! $entityID || $this->hasErrors() )
-			{
-				return false;
-			}
-
-			// set relations to entity in all attributes
-			if($entityID)
-			{
-				if( ! empty($attributes) && is_array($attributes) )
-				{
-					foreach ($attributes as $attribute_id => &$languages)
-					{
-						if( ! empty($languages) && is_array($languages) )
-						{
-							foreach ($languages as $language_id => &$attribute)
-							{
-								$attribute['entity_id'] = $entityID;
-								$attribute['entity_type_id'] = $model['entity_type_id'];
-							}
-						}
-					}
-				}
-			}
-
-			if( ! $this->updateAttributes($attributes) || $this->hasErrors() )
-			{
-				return false;
-			}
-
-			return $entityID;
-
+			$fields = $model['fields'];
 		}
-		catch(Exception $e)
+
+		$locale_id = $model['locale_id'];
+
+		$fieldsForInsert = [];
+		$attributes = [];
+
+		if( ! empty($fields) )
 		{
-			$this->addErrors('There was an error, couldn\'t insert entity.');
-			return false;
+			$attributes = $this->attributeRepository->get(['code' => ['in' => array_keys($fields)]]);
 		}
+
+		unset($model['fields']);
+		unset($model['locale_id']);
+
+		// insert entity
+		$entityID = $this->insertEntity($model);
+
+		foreach ($attributes as $attribute)
+		{
+			$fieldForInsert = [];
+			$fieldForInsert['entity_id'] = $entityID;
+			$fieldForInsert['entity_type_id'] = $model['entity_type_id'];
+			$fieldForInsert['attribute_set_id'] = $model['attribute_set_id'];
+			$fieldForInsert['attribute_id'] = $attribute->id;
+			$fieldForInsert['locale_id'] = ($attribute->localized)?$locale_id:0;
+			$fieldForInsert['value'] = (isset($fields[$attribute->code]))?$fields[$attribute->code]:$attribute->default_value;
+
+			$fieldsForInsert[] = $fieldForInsert;
+		}
+
+		$this->insertFields($fieldsForInsert, $attributes);
+
+		$entity = $this->fetch($entityID);
+
+		return $entity;
 		
 	}
 
 
 	/**
-	 * Update entity and its attributes
-	 * 
+	 * Update entity and its fields
+	 *
+	 * @param int $id - entity ID
 	 * @param array $model - entity params
 	 * 
 	 * @return mixed
@@ -204,70 +178,47 @@ class EntityRepository extends AbstractRepository
 	 * 
 	 * @todo enable attribute set change for entity
 	 */
-	protected function _update($model)
+	protected function _update($id, $model)
 	{
 
-		try
+		$entity = $this->fetch($id);
+
+		$fields = array();
+		
+		if( ! empty( $model['fields'] ) && is_array( $model['fields'] ) )
 		{
-
-			// check for ID
-			if( empty( $model['id'] ) )
-			{
-				$this->addErrors('ID must be provided for entity.');
-				return false;
-			}
-
-			$entity = $this->db->table('entities')->find($model['id']);
-
-			if( ! $entity )
-			{
-				$this->addErrors('Invalid entity ID.');
-				return false;
-			}
-
-			$attributes = array();
-			
-			if( ! empty( $params['attribute_values'] ) && is_array( $params['attribute_values'] ) )
-			{
-				$attributes = $params['attribute_values'];
-			}
-
-			unset($params['attribute_values']);
-
-			$entityID = $entity->id;
-
-			// set relation to attribute in all options
-			if($entityID)
-			{
-				if( ! empty($attributes) && is_array($attributes) )
-				{
-					foreach ($attributes as $attribute_code => &$languages)
-					{
-						if( ! empty($languages) && is_array($languages) )
-						{
-							foreach ($languages as $language_id => &$attribute)
-							{
-								$attribute['entity_id'] = $entityID;
-								$attribute['entity_type_id'] = $params['entity_type_id'];
-							}
-						}
-					}
-				}
-			}
-
-			if( ! $this->updateAttributes($attributes) || $this->hasErrors() )
-			{
-				return false;
-			}
-
-			return $entityID;
-
+			$fields = $model['fields'];
 		}
-		catch(\Exception $e)
+
+		$fieldsForUpdate = [];
+		$attributes = [];
+
+		if( ! empty($fields) )
 		{
-			$this->addErrors('There was an error, couldn\'t update entity');
-			return false;
+			$attributes = $this->attributeRepository->get(['code' => ['in' => array_keys($fields)]]);
 		}
+
+		foreach ($attributes as $attribute)
+		{
+			$fieldForUpdate = [];
+			$fieldForUpdate['entity_id'] = $id;
+			$fieldForUpdate['entity_type_id'] = $model['entity_type_id'];
+			$fieldForUpdate['attribute_id'] = $attribute->id;
+			$fieldForUpdate['locale_id'] = ($attribute->localized)?$model['locale_id']:0;
+			$fieldForUpdate['value'] = $fields[$attribute->code];
+
+			$fieldsForUpdate[] = $fieldForUpdate;
+		}
+
+		
+
+		$this->updateFields($fieldsForUpdate, $attributes);
+
+		$this->updateEntity($id);
+
+		$entity = $this->fetch($id);
+
+		return $entity;
 		
 	}
 
@@ -280,71 +231,65 @@ class EntityRepository extends AbstractRepository
 	 * 
 	 * @throws InvalidArgumentException, Exception
 	 */
-	protected function _delete($ids)
+	protected function _delete($id)
 	{
-		if( ! is_array($ids) )
-		{
-			$ids = array( intval($ids) );
-		}
+		// get the entity
+		$entity = $this->fetch($id);
 
-		try
-		{
-			// get the entity
-			$entities = $this->db 	->table('entities')
-									->whereIn('id', $ids)
-									->get();
-			if( empty($entities) )
-			{
-				$this->addErrors('Invalid entity ID.');
-				return false;
-			}
-			
-			$this->attributeValueRepository->deleteByEntity($ids);
+		$this->deleteFields($entity);
 
-			// delete entities
-			if( ! $this->db->table('entities')->whereIn('id', $ids)->delete() )
-			{
-				$this->addErrors('Couldn\'t delete entity.');
-				return false;
-			}
+		$this->db->table('entities')->where('id', '=', $id)->delete();
 
-			return true;
-
-		}
-		catch(\Exception $e)
-		{
-			$this->addErrors('There was an error, couldn\'t delete entity');
-			return false;
-		}
+		return $entity;
 	}
 
+	/**
+	 * Delete all entities for attribute set
+	 * 
+	 * @param object $attributeSet
+	 * 
+	 * @return void
+	 */
+	public function deleteByAttribute($attribute)
+	{
+		$this->deleteFieldsByAttribute($attribute);
+	}
 
 	/**
-	 * Delete all entities for attribute set or list of attribute sets
+	 * Delete all entities for attribute set
 	 * 
-	 * @param integer | array $attributeSetIDs
+	 * @param object $attributeSet
 	 * 
-	 * @return boolean
+	 * @return void
 	 */
-	public function deleteByAttributeSet($attributeSetIDs)
+	public function deleteByAttributeSet($attributeSet)
 	{
-		if( ! is_array($attributeSetIDs) )
-		{
-			$attributeSetIDs = array($attributeSetIDs);
-		}
+		$this->deleteFieldsByAttributeSet($attributeSet);
 
 		$entities = $this->db 	->table('entities')
-								->whereIn('attribute_set_id', $attributeSetIDs)
-								->lists('id');
+								->where('attribute_set_id', '=', $attributeSet->id)
+								->delete();
+	}
 
-		$success = $this->delete($entities);
+	/**
+	 * Delete all entities for entity type
+	 * 
+	 * @param object $entityType
+	 * 
+	 * @return void
+	 */
+	public function deleteByEntityType($entityType)
+	{
+		$this->deleteFieldsByEntityType($entityType);
 
-		return $success;
+		$entities = $this->db 	->table('entities')
+								->where('entity_type_id', '=', $entityType->id)
+								->delete();
 	}
 
 
 	/**
-	 * Validate entity params and insert in database
+	 * insert entity in database
 	 * 
 	 * @param array $params = entity params
 	 * 
@@ -353,73 +298,139 @@ class EntityRepository extends AbstractRepository
 	protected function insertEntity($params)
 	{
 
-		// validate entity params
-		$this->validateParams($params, $this->entityInsertParamRules);
-
-		
-		if($this->hasErrors())
-		{
-			return false;
-		}
+		$params['created_at'] = $params['updated_at'] = date('Y-m-d H:i:s');
 
 		// insert entity in database
 		$entityId = $this->db->table('entities')->insertGetId($params);
 
-		// Fail if there were errors in previous validations
-		if( $this->hasErrors() )
+		if( ! $entityId )
 		{
-			return false;
+			throw new \Exception('Failed to insert entity.');
 		}
 
 		return $entityId;
+
+		
 	}
 
 	/**
-	 * Validate and update attribute values in entity
+	 * update entity updated_at in database
 	 * 
-	 * @param Eloquent $attributes
-	 * @param array $params = attribute set params
-	 * 
-	 * @return boolean
-	 * 
-	 * @throws InvalidArgumentException
+	 * @param int $id
 	 */
-	protected function updateAttributes($attributes)
+	protected function updateEntity($id)
 	{
 
-		// check if $attributes is array
-		if( ! is_array($attributes) )
-		{
-			throw new \InvalidArgumentException('Attributes needs to be an array.');
-		}
+		$params['updated_at'] = date('Y-m-d H:i:s');
 
+		$this->db->table('entities')->where('id', '=', $id)->update($params);
+	}
+
+	/**
+	 * Insert attribute values in entity
+	 * 
+	 * @param array $fields - field values
+	 * @param array $attributes - attribute definitions
+	 * 
+	 * @return void
+	 */
+	protected function insertFields(array $fields, array $attributes)
+	{
+		for ($i = 0; $i < count($attributes); $i++)
+		{
+			$fieldHandler = $this->fieldHandlerFactory->make($attributes[$i]->field_type);
+			$fieldHandler->insert($fields[$i], $attributes[$i]);
+		}
+	}
+
+	/**
+	 * Update attribute values in entity
+	 * 
+	 * @param array $fields - field values
+	 * @param array $attributes - attribute definitions
+	 * 
+	 * @return boolean
+	 */
+	protected function updateFields(array $fields, array $attributes)
+	{
+		for ($i = 0; $i < count($attributes); $i++)
+		{
+			$fieldHandler = $this->fieldHandlerFactory->make($attributes[$i]->field_type);
+			$fieldHandler->update($fields[$i], $attributes[$i]);
+		}
+	}
+
+	/**
+	 * Delete attribute values for entity
+	 * 
+	 * @param stdClass $entity
+	 * 
+	 * @return void
+	 */
+	protected function deleteFields($entity)
+	{
+		$attributes = [];
+		if( ! empty($entity->fields) )
+		{
+			$attributes = $this->attributeRepository->get(['code' => ['in' => array_keys(get_object_vars($entity->fields))]]);
+		}
+		foreach ($attributes as $attribute)
+		{
+			$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+			$fieldHandler->deleteByEntity($entity, $attribute);
+		}
 		
-		if( empty($attributes) )
-		{
-			return true;
-		}
+	}
 
-		$success = true;
-		foreach ($attributes as $attribute_code => $languages)
+	/**
+	 * Delete attribute values for attribute 
+	 * 
+	 * @param stdClass $attribute
+	 * 
+	 * @return void
+	 */
+	protected function deleteFieldsByAttribute($attribute)
+	{
+		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+		$fieldHandler->deleteByAttribute($attribute);
+	}
+
+	/**
+	 * Delete attribute values for attribute set
+	 * 
+	 * @param stdClass $attributeSet
+	 * 
+	 * @return void
+	 */
+	protected function deleteFieldsByAttributeSet($attributeSet)
+	{
+		$attributeSettings = $this->attributeManager->getFieldTypes();
+
+		foreach ($attributeSettings as $fieldType => $settings)
 		{
-			if( empty($languages) )
-			{
-				continue;
-			}
-			
-			foreach ($languages as $language_id => $attribute)
-			{
-				$success = $this->attributeValueRepository->createOrUpdate($attribute) && $success;
-			}
+			$fieldHandler = $this->fieldHandlerFactory->make($fieldType);
+			$fieldHandler->deleteByAttributeSet($attributeSet);
 		}
 		
+	}
 
-		if( ! $success )
+	/**
+	 * Delete attribute values for attribute set
+	 * 
+	 * @param stdClass $entityType
+	 * 
+	 * @return void
+	 */
+	protected function deleteFieldsByEntityType($entityType)
+	{
+		$attributeSettings = $this->attributeManager->getFieldTypes();
+
+		foreach ($attributeSettings as $fieldType => $settings)
 		{
-			return false;
+			$fieldHandler = $this->fieldHandlerFactory->make($fieldType);
+			$fieldHandler->deleteByEntityType($entityType);
 		}
-
-		return true;
+		
 	}
 
 
@@ -431,36 +442,398 @@ class EntityRepository extends AbstractRepository
 	// ----------------------------------------------------------------------------------------------
 
 	/**
-	 * Get entity mock for creating new entities
+	 * Get entity by ID
 	 * 
-	 * @param int 		$objectID - ID of a object that is related to this entity
-	 * @param int 		$entityTypeID - entity type id
-	 * @param int 		$attributeSetID - attribute set id
+	 * @param int $id - ID of attribute to be fetched
 	 * 
-	 * @return Model
+	 * @return array
 	 */
-	public function fetchMock($objectID, $entityTypeID, $attributeSetID){
+	protected function _fetch($id, $locale = null)
+	{
+		$entity = $this->db->table('entities')
+						->select(
+							'entities.id',  
+							'entities.entity_type_id', 
+							'entities.attribute_set_id',
+							'entity_types.code as type',
+							'entities.created_at as created_at',
+							'entities.updated_at as updated_at'
+						)
+						->where('entities.id', '=', $id)
+						->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
+						->first();
+		
+		if( ! $entity )
+		{
+			throw new NotFoundException(['There is no entity with that ID.']);
+		}
 
-		$entity = new \stdClass();
-		$entity->id = null;
-		$entity->object_id = $objectID;
-		$entity->entity_type_id = $entityTypeID;
-		$entity->attribute_set_id = $attributeSetID;
+		$fields = $this->getFieldsForEntities($id, $locale);
 
-		$attributeSet = $this->getAttributeSet($attributeSetID);
-
-		// put set in entity
-		$entity->attribute_set = $attributeSet;
-
-		$attributeValues = $this->getDefaultAttributeValues($attributeSet);
-
-		$entity->attribute_values = $attributeValues;
-
-		// use entity transformer to transform all object as wanted
-		$entityTransformer = new EntityTransformer;
-		$entity = $entityTransformer->transform($entity);
+		$entity->fields = $fields[$id];
 
 		return $entity;
+	}
+
+	/**
+	 * Get attributes
+	 * 
+	 * @return array
+	 */
+	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $locale = 0)
+	{
+		$query =  $this->db->table('entities')
+						->select(
+							'entities.id as id',  
+							'entities.entity_type_id as entity_type_id', 
+							'entities.attribute_set_id as attribute_set_id',
+							'entity_types.code as type',
+							'entities.created_at as created_at',
+							'entities.updated_at as updated_at'
+						)
+						->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id');
+
+		$query = $this->parseFilters($query, $filter);
+
+		$query = $this->parsePaging($query, $offset, $limit);
+
+		$query = $this->parseSorting($query, $sort);
+
+		$query->groupBy('entities.id');
+		
+		$entities = $query->get();
+
+		if( ! $entities )
+		{
+			return [];	
+		}
+
+		$ids = [];
+
+		foreach ($entities as &$entity) 
+		{
+			$ids[] = $entity->id;
+		}
+
+		$fields = $this->getFieldsForEntities($ids, $locale);
+
+		foreach ($entities as &$entity) 
+		{
+			$entity->fields = $fields[$entity->id];
+		}
+		
+		
+		return $entities;
+	}
+
+	protected function parseFilters($query, $filters)
+	{
+		$fieldFilters = [];
+		foreach ($filters as $key => $filter)
+		{
+			if(substr( $key, 0, 7 ) === "fields.")
+			{
+				$code = substr($key, 7);
+				$fieldFilters[$code] = $filter;
+				continue;
+			}
+
+			if( ! is_array($filter) )
+			{
+				$query = $query->where('entities.' . $key, '=', $filter);
+				continue;
+			}
+
+			$query = $this->parseFilterOperator($query, 'entities.' . $key, $filter);
+		}
+		if( ! empty($fieldFilters) )
+		{
+			$attributes = $this->attributeRepository->get(['code' => ['in'=>array_keys($fieldFilters)]]);
+
+			foreach ($attributes as $attribute)
+			{
+				$query = $this->parseFieldFilter($query, $attribute, $fieldFilters[$attribute->code]);
+			}
+		}
+		
+
+		
+
+		return $query;
+	}
+
+	protected function parseFilterOperator($query, $key, $filter)
+	{
+		foreach ($filter as $operator => $value) {
+			switch ($operator) 
+			{
+				case 'e':
+					$query = $query->where($key, '=', $value);
+					break;
+				case 'ne':
+					$query = $query->where($key, '!=', $value);
+					break;
+				case 'lt':
+					$query = $query->where($key, '<', $value);
+					break;
+				case 'lte':
+					$query = $query->where($key, '<=', $value);
+					break;
+				case 'gt':
+					$query = $query->where($key, '>', $value);
+					break;
+				case 'gte':
+					$query = $query->where($key, '>=', $value);
+					break;
+				case 'in':
+					$query = $query->whereIn($key, $value);
+					break;
+				case 'nin':
+					$query = $query->whereNotIn($key, $value);
+					break;
+				
+				default:
+					throw new BadRequestException(['Filter operator not supported.']);
+					break;
+			}
+		}
+
+		return $query;
+	}
+
+	protected function parseFieldFilter($query, $attribute, $filter)
+	{
+		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+		$query = $fieldHandler->filterEntities($query, $attribute, $filter);
+
+		return $query;
+	}
+
+	protected function parseSorting($query, $sort)
+	{
+		if( ! empty($sort) )
+		{
+			
+			$sort = (is_array($sort))? $sort: [$sort];
+			$fieldSorting = [];
+			foreach ($sort as $sortCriteria)
+			{
+				if($sortCriteria[0] === '-')
+				{
+					$sortCriteria = substr($sortCriteria, 1);
+				}
+
+				if(substr( $sortCriteria, 0, 7 ) === "fields.")
+				{
+					$code = substr($sortCriteria, 7);
+					$fieldSorting[] = $code;
+				}
+			}
+			$attributes = [];
+			if( ! empty($fieldSorting) )
+			{
+				$attributes = $this->attributeRepository->get(['code' => ['in'=>$fieldSorting]]);
+			}
+
+
+			foreach ($sort as $sortCriteria)
+			{
+
+				$sortDirection = 'asc';
+
+				if($sortCriteria[0] === '-')
+				{
+					$sortCriteria = substr($sortCriteria, 1);
+					$sortDirection = 'desc';
+				}
+
+				if(substr( $sortCriteria, 0, 7 ) === "fields.")
+				{
+					$code = substr($sortCriteria, 7);
+					foreach ($attributes as $attribute)
+					{
+						if($attribute->code == $code)
+						{
+							$query = $this->parseFieldSorting($query, $attribute, $sortDirection);
+						}
+					}
+					continue;
+				}
+
+				$query = $query->orderBy('entities.' . $sortCriteria, $sortDirection);
+			}
+		}
+
+		return $query;
+	}
+
+	protected function parseFieldSorting($query, $attribute, $direction)
+	{
+		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+		$query = $fieldHandler->sortEntities($query, $attribute, $direction);
+
+		return $query;
+	}
+
+	/**
+	 * Get entity fields by entity IDs
+	 * 
+	 * @param $entityIds
+	 */
+	protected function getFieldsForEntities($entityIds, $locale = null){
+		
+		if(!is_array($entityIds)){
+			$entityIds = array($entityIds);
+		}
+
+		$attributeIds = [];
+		$attributes = [];
+
+		$values = $this->getValuesAll($entityIds, $locale);
+
+		// 
+
+		// get distinct attribute ids from values
+		foreach ($values as $value)
+		{
+			if( ! in_array($value->attribute_id, $attributeIds) )
+			{
+				$attributeIds[] = $value->attribute_id;
+			}
+		}
+
+		// get attributes
+		if( ! empty($attributeIds) )
+		{
+			$attributes = $this->attributeRepository->get(['id' => ['in' => $attributeIds]]);
+		}
+
+		$attributesById = [];
+		foreach ($attributes as $attribute)
+		{
+			$attributesById[$attribute->id] = $attribute;
+		}
+
+		$attributeSettings = $this->attributeManager->getFieldTypes();
+		$fieldHandlers = [];
+		$fields = [];
+		foreach ($entityIds as $entityId)
+		{
+			$fields[$entityId] = new stdClass();
+		}
+
+		foreach ($values as $value) {
+
+			$attribute = $attributesById[$value->attribute_id];
+			$handlerName = $attributeSettings[$attribute->field_type]['handler'];
+			$hasMultipleValues = $attributeSettings[$attribute->field_type]['has_multiple_values'];
+			
+			if( ! array_key_exists($handlerName, $fieldHandlers) )
+			{
+				$fieldHandlers[$handlerName] = $this->fieldHandlerFactory->make($attribute->field_type);
+			}
+
+			$fieldHandler = $fieldHandlers[$handlerName];
+
+			$formattedValue = $fieldHandler->formatValue($value->value, $attribute);
+
+			if($hasMultipleValues)
+			{
+				$formattedValue = [$formattedValue];
+			}
+			
+			if( isset($fields[$value->entity_id]->{$attribute->code}) && $hasMultipleValues )
+			{
+				$fields[$value->entity_id]->{$attribute->code} = array_merge($fields[$value->entity_id]->{$attribute->code}, $formattedValue);
+				continue;
+			}
+
+			$fields[$value->entity_id]->{$attribute->code} = $formattedValue;
+		}
+		
+
+
+
+		// finally return all values formatted
+		return $fields;
+	}
+
+	protected function getValuesAll($entityIds, $locale)
+	{
+		// get values from various tables
+		$valuesDatetime = $this->getValuesDatetime($entityIds, $locale);
+		$valuesDecimal = $this->getValuesDecimal($entityIds, $locale);
+		$valuesInteger = $this->getValuesInteger($entityIds, $locale);
+		$valuesText = $this->getValuesText($entityIds, $locale);
+		$valuesVarchar = $this->getValuesVarchar($entityIds, $locale);
+
+		// get all values
+		$values = array_merge(
+			$valuesDatetime, 
+			$valuesDecimal, 
+			$valuesInteger, 
+			$valuesText, 
+			$valuesVarchar
+		);
+
+		return $values;
+	}
+
+	protected function getValuesDatetime($entityIds, $locale)
+	{
+		return $this->getValues('attribute_values_datetime', $entityIds, $locale);
+	}
+
+	protected function getValuesDecimal($entityIds, $locale)
+	{
+		return $this->getValues('attribute_values_decimal', $entityIds, $locale);
+	}
+	
+	protected function getValuesInteger($entityIds, $locale)
+	{
+		return $this->getValues('attribute_values_integer', $entityIds, $locale);
+	}
+	
+	protected function getValuesText($entityIds, $locale)
+	{
+		return $this->getValues('attribute_values_text', $entityIds, $locale);
+	}
+	
+	protected function getValuesVarchar($entityIds, $locale)
+	{
+		return $this->getValues('attribute_values_varchar', $entityIds, $locale);
+	}
+	
+	protected function getValues($table, $entityIds, $locale)
+	{
+		// values query
+		$values = $this->db->table('entities')
+					->select(
+						'entities.id as entity_id',
+						'attributes.id as attribute_id',
+						$table . '.value'
+					)
+					->join('attribute_sets', 'entities.attribute_set_id', '=', 'attribute_sets.id')
+					->leftJoin('set_attributes', 'attribute_sets.id', '=', 'set_attributes.attribute_set_id')
+					->leftJoin('attributes', 'attributes.id', '=', 'set_attributes.attribute_id')
+					->leftJoin($table, function($join) use ($table){
+						$join 	->on($table . '.attribute_id', '=', 'attributes.id')
+								->on($table . '.entity_id', '=', 'entities.id');
+					})
+					->whereIn('entities.id', $entityIds)
+					->where('attributes.table', '=', $table)
+					->where(function($q) use ($locale, $table){
+						$q	->where($table . '.locale_id', '=', 0);
+
+						if( ! empty($locale) )
+						{
+							$q->orWhere($table . '.locale_id', '=', $locale);
+						}
+					})
+					->orderBy('entities.id', 'set_attributes.sort_order', $table . '.sort_order')
+					->get();
+
+		return $values;
 	}
 
 
@@ -693,6 +1066,7 @@ class EntityRepository extends AbstractRepository
 								'attribute_options.id'
 							)
 							->get();
+
 		if(empty($attributeSetData)){
 			return false;
 		}

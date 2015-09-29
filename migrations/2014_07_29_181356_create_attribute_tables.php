@@ -54,6 +54,8 @@ class CreateAttributeTables extends Migration {
 			// type of the attribute (text input, wysiwyg editor, number...)
 			$table->string('field_type', 100);
 
+			$table->string('table', 100);
+
 			// flag for language dependency of attribute
 			$table->boolean('localized')->default(0);
 

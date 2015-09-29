@@ -50,8 +50,10 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('entity_id');
 			// Entity type ID
 			$table->integer('entity_type_id');
+			// Attribute Set ID
+			$table->integer('attribute_set_id');
 			// Language ID
-			$table->integer('locale');
+			$table->integer('locale_id');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
@@ -77,8 +79,10 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('entity_id');
 			// Entity type ID
 			$table->integer('entity_type_id');
+			// Attribute Set ID
+			$table->integer('attribute_set_id');
 			// Language ID
-			$table->integer('locale');
+			$table->integer('locale_id');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
@@ -104,8 +108,10 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('entity_id');
 			// Entity type ID
 			$table->integer('entity_type_id');
+			// Attribute Set ID
+			$table->integer('attribute_set_id');
 			// Language ID
-			$table->integer('locale');
+			$table->integer('locale_id');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
@@ -131,8 +137,10 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('entity_id');
 			// Entity type ID
 			$table->integer('entity_type_id');
+			// Attribute Set ID
+			$table->integer('attribute_set_id');
 			// Language ID
-			$table->integer('locale');
+			$table->integer('locale_id');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
@@ -158,8 +166,10 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('entity_id');
 			// Entity type ID
 			$table->integer('entity_type_id');
+			// Attribute Set ID
+			$table->integer('attribute_set_id');
 			// Language ID
-			$table->integer('locale');
+			$table->integer('locale_id');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
@@ -184,8 +194,10 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('entity_id');
 			// Entity type ID
 			$table->integer('entity_type_id');
+			// Attribute Set ID
+			$table->integer('attribute_set_id');
 			// Language ID
-			$table->integer('locale');
+			$table->integer('locale_id');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);
@@ -210,8 +222,10 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('entity_id');
 			// Entity type ID
 			$table->integer('entity_type_id');
+			// Attribute Set ID
+			$table->integer('attribute_set_id');
 			// Language ID
-			$table->integer('locale');
+			$table->integer('locale_id');
 
 			// Sort order
 			$table->integer('sort_order')->nullable()->default(0);

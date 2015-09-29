@@ -30,6 +30,12 @@ use Cookbook\Eav\Validators\EntityTypes\EntityTypeDeleteValidator;
 use Cookbook\Eav\Validators\EntityTypes\EntityTypeFetchValidator;
 use Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator;
 
+use Cookbook\Eav\Validators\Entities\EntityCreateValidator;
+use Cookbook\Eav\Validators\Entities\EntityUpdateValidator;
+use Cookbook\Eav\Validators\Entities\EntityDeleteValidator;
+use Cookbook\Eav\Validators\Entities\EntityFetchValidator;
+use Cookbook\Eav\Validators\Entities\EntityGetValidator;
+
 /**
  * ValidatorsServiceProvider service provider for validators
  * 
@@ -107,6 +113,19 @@ class ValidatorsServiceProvider extends ServiceProvider {
 				'Cookbook\Eav\Validators\EntityTypes\EntityTypeFetchValidator@validate',
 			'Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand' => 
 				'Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator@validate',
+
+
+			// Entities
+			'Cookbook\Eav\Commands\Entities\EntityCreateCommand' => 
+				'Cookbook\Eav\Validators\Entities\EntityCreateValidator@validate',
+			'Cookbook\Eav\Commands\Entities\EntityUpdateCommand' => 
+				'Cookbook\Eav\Validators\Entities\EntityUpdateValidator@validate',
+			'Cookbook\Eav\Commands\Entities\EntityDeleteCommand' => 
+				'Cookbook\Eav\Validators\Entities\EntityDeleteValidator@validate',
+			'Cookbook\Eav\Commands\Entities\EntityFetchCommand' => 
+				'Cookbook\Eav\Validators\Entities\EntityFetchValidator@validate',
+			'Cookbook\Eav\Commands\Entities\EntityGetCommand' => 
+				'Cookbook\Eav\Validators\Entities\EntityGetValidator@validate',
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->mapValidators($mappings);
@@ -190,6 +209,46 @@ class ValidatorsServiceProvider extends ServiceProvider {
 		$this->app->bind('Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator', function($app){
 			return new EntityTypeGetValidator();
 		});
+
+
+		// Entities
+		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityCreateValidator', function($app){
+			return new EntityCreateValidator(
+				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+
+		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityUpdateValidator', function($app){
+			return new EntityUpdateValidator(
+				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+
+		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityDeleteValidator', function($app){
+			return new EntityDeleteValidator(
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityFetchValidator', function($app){
+			return new EntityFetchValidator(
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityGetValidator', function($app){
+			return new EntityGetValidator(
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
 	}
 
 
@@ -220,7 +279,14 @@ class ValidatorsServiceProvider extends ServiceProvider {
 			'Cookbook\Eav\Validators\EntityTypes\EntityTypeUpdateValidator',
 			'Cookbook\Eav\Validators\EntityTypes\EntityTypeDeleteValidator',
 			'Cookbook\Eav\Validators\EntityTypes\EntityTypeFetchValidator',
-			'Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator'
+			'Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator',
+
+			// Entities
+			'Cookbook\Eav\Validators\Entities\EntityCreateValidator',
+			'Cookbook\Eav\Validators\Entities\EntityUpdateValidator',
+			'Cookbook\Eav\Validators\Entities\EntityDeleteValidator',
+			'Cookbook\Eav\Validators\Entities\EntityFetchValidator',
+			'Cookbook\Eav\Validators\Entities\EntityGetValidator'
 
 		];
 	}

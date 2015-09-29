@@ -46,6 +46,14 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	protected $exception;
 
 	/**
+	 * List of available operations for filtering entities
+	 *
+	 * @var array
+	 */
+	protected $availableFilterOperations;
+	
+
+	/**
 	 * Create new AbstractAttributeValidator
 	 * 
 	 * @param Illuminate\Database\Connection 			$db
@@ -91,21 +99,21 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * 
 	 * This function can be extended by specific attribute handler
 	 * 
-	 * @param array $valueParams
-	 * @param Eloqunt $attributeDefinition
+	 * @param array $value
+	 * @param object $attributeDefinition
 	 * 
 	 * @return boolean
 	 */
-	public function validateField($valueParams, \stdClass $attributeDefinition)
+	public function validateValue($value, $attributeDefinition, $entity_id = 0)
 	{
 
 		// check if this attribute is required
 		if($attributeDefinition->required)
 		{
 			// if it's required and it's empty add an error
-			if(empty($valueParams['value']))
+			if(empty($value))
 			{
-				$this->addErrors('This is a required field.');
+				throw new ValidationException(['This field is required.']);
 			}
 		}
 
@@ -113,63 +121,88 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 		if($attributeDefinition->unique)
 		{
 			// check if this value is unique
-			$unique = $this ->uniqueValue($valueParams, $attributeDefinition);
+			$unique = $this ->uniqueValue($value, $attributeDefinition, $entity_id);
 			
 			// if it's not unique add an error
 			if(!$unique)
 			{
-				$this->addErrors('This needs to be a unique value.');
+				throw new ValidationException(['This needs to be a unique value.']);
 			}
 		}
-
-		// check if attribute is localized
-		if($attributeDefinition->localized)
-		{
-			// if it doesn't have defined language_id add an error
-			if(empty($valueParams['language_id']))
-			{
-				$this->addErrors('You need to specify a language.');
-			}
-		}
-
-		// if there are any errors
-		// return false
-		if($this->hasErrors())
-		{
-			return false;
-		}
-
-		// return success
-		return true;
 	}
 
 
 	/**
-	 * check if attribute value is unique
+	 * Validate attribute filter
 	 * 
-	 * @param array $valueParams
-	 * @param Eloqunt $attributeDefinition
+	 * @param $filter
+	 * @param object $attributeDefinition
 	 * 
 	 * @return boolean
 	 */
-	protected function uniqueValue($valueParams, \stdClass $attributeDefinition)
+	public function validateFilter(&$filter, $attributeDefinition)
+	{
+
+		if( ! is_array($filter) )
+		{
+			if( ! in_array('e', $this->availableFilterOperations) )
+			{
+				$e = new BadRequestException();
+				$e->setErrorKey('entities.filter.fields.' . $attributeDefinition->code);
+				$e->addErrors('Filter operation is not allowed.');
+
+				throw $e;
+			}
+
+			return;
+		}
+
+		foreach ($filter as $operation => &$value) {
+			if( ! in_array($operation, $this->availableFilterOperations) )
+			{
+				$e = new BadRequestException();
+				$e->setErrorKey('entities.filter.fields.' . $attributeDefinition->code);
+				$e->addErrors('Filter operation is not allowed.');
+
+				throw $e;
+			}
+
+			if($operation == 'in' || $operation == 'nin')
+			{
+				if( ! is_array($value) )
+				{
+					$value = explode(',', strval($value));
+				}
+			}
+		}
+	}
+
+	/**
+	 * check if attribute value is unique
+	 * 
+	 * @param array $value
+	 * @param object $attributeDefinition
+	 * 
+	 * @return boolean
+	 */
+	protected function uniqueValue($value, $attributeDefinition, $entity_id)
 	{
 		// check if value is empty and if it is return true
 		// because unique is not checked on empty values 
-		if(empty($valueParams['value']))
+		if(empty($value))
 		{
 			return true;
 		}
 
 		// check database for same values
 		$query = $this 	->db->table( $this->table )
-						->where( 'value', '=', $valueParams['value'] )
+						->where( 'value', '=', $value )
 						->where( 'attribute_id', '=', $attributeDefinition->id );
 
 		// if enitity_id is defined exclude it from query
-		if($valueParams['entity_id'])
+		if($entity_id)
 		{
-			$query = $query->where( 'entity_id', '!=', $valueParams['entity_id'] );
+			$query = $query->where( 'entity_id', '!=', $entity_id );
 		}
 		
 		

@@ -10,18 +10,16 @@
 
 namespace Cookbook\Eav\Repositories;
 
-use stdClass;
-
-use Illuminate\Database\Connection;
-
-use Cookbook\Core\Exceptions\Exception;
-use Cookbook\Core\Exceptions\NotFoundException;
-use Cookbook\Core\Exceptions\BadRequestException;
-use Cookbook\Core\Repositories\AbstractRepository;
-
 use Cookbook\Contracts\Eav\AttributeHandlerFactoryContract;
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
+use Cookbook\Contracts\Eav\EntityRepositoryContract;
+use Cookbook\Core\Exceptions\BadRequestException;
+use Cookbook\Core\Exceptions\Exception;
+use Cookbook\Core\Exceptions\NotFoundException;
+use Cookbook\Core\Repositories\AbstractRepository;
 use Cookbook\Eav\Managers\AttributeManager;
+use Illuminate\Database\Connection;
+use stdClass;
 
 
 /**
@@ -43,6 +41,7 @@ use Cookbook\Eav\Managers\AttributeManager;
  */
 class AttributeSetRepository extends AbstractRepository implements AttributeSetRepositoryContract
 {
+
 	/**
 	 * Create new AttributeSetRepository
 	 * 
@@ -55,7 +54,6 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		// AbstractRepository constructor
 		parent::__construct($db);
-
 	}
 
 
@@ -163,7 +161,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	protected function _delete($id)
 	{
 		// get the attribute set
-		$attributeSet = $this->db->table('attribute_sets')->find($id);
+		$attributeSet = $this->fetch($id);
 		if(!$attributeSet)
 		{
 			throw new NotFoundException(['There is no attribute with that ID.']);
@@ -174,23 +172,21 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		// delete the attribute set
 		$this->db->table('attribute_sets')->where('id', '=', $id)->delete();
 
-		return $id;
+		return $attributeSet;
 	}
 
 	/**
 	 * Delete attribute sets vy entity type ID and its set attributes
 	 * 
-	 * @param int $entityTypeID - ID of entity type
+	 * @param object $entityType
 	 * 
-	 * @return int
-	 * 
-	 * @throws InvalidArgumentException, Exception
+	 * @return void
 	 */
-	public function deleteByEntityType($entityTypeID)
+	public function deleteByEntityType($entityType)
 	{
 		// get the sets
 		$setIDs = $this->db ->table('attribute_sets')
-							->where('entity_type_id', '=', $entityTypeID)
+							->where('entity_type_id', '=', $entityType->id)
 							->lists('id');
 
 		if( ! empty($setIDs) )
@@ -198,11 +194,22 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			$this->deleteSetAttributes($setIDs);
 
 			// delete the attribute set
-			$this->db->table('attribute_sets')->where('entity_type_id', '=', $entityTypeID)->delete();
+			$this->db->table('attribute_sets')->where('entity_type_id', '=', $entityType->id)->delete();
 		}
-		
+	}
 
-		return true;
+	/**
+	 * Delete set attributes by attribute
+	 * 
+	 * @param int $entityTypeID - ID of entity type
+	 * 
+	 * @return int
+	 * 
+	 * @throws InvalidArgumentException, Exception
+	 */
+	public function deleteByAttribute($attribute)
+	{
+		$this->deleteSetAttributesByAttribute($attribute->id);
 	}
 
 
@@ -281,9 +288,9 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	}
 
 	/**
-	 * Update set attributes
+	 * Delete set attributes by set
 	 * 
-	 * @param array 	$attributes
+	 * @param array 	$attributeSetIds
 	 * 
 	 * @return boolean
 	 * 
@@ -298,6 +305,27 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		$this->db->table('set_attributes')
 				 ->whereIn('attribute_set_id', $attributeSetIds)
+				 ->delete();
+	}
+
+	/**
+	 * Delete set attributes by attributes
+	 * 
+	 * @param array 	$attributeIds
+	 * 
+	 * @return boolean
+	 * 
+	 * @throws InvalidArgumentException
+	 */
+	protected function deleteSetAttributesByAttribute($attributeIds)
+	{
+		if( ! is_array($attributeIds) )
+		{
+			$attributeIds = [$attributeIds];
+		}
+
+		$this->db->table('set_attributes')
+				 ->whereIn('attribute_id', $attributeIds)
 				 ->delete();
 	}
 

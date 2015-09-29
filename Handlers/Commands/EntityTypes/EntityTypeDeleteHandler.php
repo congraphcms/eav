@@ -11,9 +11,11 @@
 namespace Cookbook\Eav\Handlers\Commands\EntityTypes;
 
 
+use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
+use Cookbook\Contracts\Eav\EntityRepositoryContract;
 use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
-use Cookbook\Core\Bus\RepositoryCommandHandler;
 use Cookbook\Core\Bus\RepositoryCommand;
+use Cookbook\Core\Bus\RepositoryCommandHandler;
 
 /**
  * EntityTypeDeleteHandler class
@@ -31,15 +33,31 @@ class EntityTypeDeleteHandler extends RepositoryCommandHandler
 {
 
 	/**
+	 * Repository for handling attribute sets
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
+	 */
+	protected $attributeSetRepository;
+
+	/**
+	 * Repository for handling entities
+	 * 
+	 * @var Cookbook\Contracts\Eav\EntityRepositoryContract
+	 */
+	protected $entityRepository;
+
+	/**
 	 * Create new EntityTypeDeleteHandler
 	 * 
 	 * @param ookbook\Contracts\Eav\EntityTypeRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
-	public function __construct(EntityTypeRepositoryContract $repository)
+	public function __construct(EntityTypeRepositoryContract $repository, AttributeSetRepositoryContract $attributeSetRepository, EntityRepositoryContract $entityRepository)
 	{
 		parent::__construct($repository);
+		$this->attributeSetRepository = $attributeSetRepository;
+		$this->entityRepository = $entityRepository;
 	}
 
 	/**
@@ -51,6 +69,12 @@ class EntityTypeDeleteHandler extends RepositoryCommandHandler
 	 */
 	public function handle(RepositoryCommand $command)
 	{
-		return $this->repository->delete($command->id);
+		$entityType = $this->repository->delete($command->id);
+
+		$this->attributeSetRepository->deleteByEntityType($entityType);
+
+		$this->entityRepository->deleteByEntityType($entityType);
+
+		return $entityType->id;
 	}
 }

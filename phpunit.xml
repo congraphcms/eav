@@ -1,7 +1,10 @@
 <phpunit bootstrap="vendor/autoload.php">
   <testsuites>
-    <testsuite name="EAV Test Suite">
+    <testsuite name="eav">
       <directory>./tests/</directory>
+    </testsuite>
+    <testsuite name="integration">
+      <directory>./tests/integration/</directory>
     </testsuite>
   </testsuites>
 </phpunit>

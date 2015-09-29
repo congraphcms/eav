@@ -66,6 +66,7 @@ class TestDbSeeder extends Seeder {
 			[
 				'code' => 'attribute1',
 				'field_type' => 'text',
+				'table' => 'attribute_values_varchar',
 				'localized' => false,
 				'default_value' => '',
 				'unique' => false,
@@ -78,6 +79,7 @@ class TestDbSeeder extends Seeder {
 			[
 				'code' => 'attribute2',
 				'field_type' => 'text',
+				'table' => 'attribute_values_varchar',
 				'localized' => false,
 				'default_value' => '',
 				'unique' => false,
@@ -90,6 +92,7 @@ class TestDbSeeder extends Seeder {
 			[
 				'code' => 'attribute3',
 				'field_type' => 'text',
+				'table' => 'attribute_values_varchar',
 				'localized' => false,
 				'default_value' => '',
 				'unique' => true,
@@ -102,6 +105,7 @@ class TestDbSeeder extends Seeder {
 			[
 				'code' => 'attribute4',
 				'field_type' => 'text',
+				'table' => 'attribute_values_varchar',
 				'localized' => false,
 				'default_value' => '',
 				'unique' => false,
@@ -114,6 +118,7 @@ class TestDbSeeder extends Seeder {
 			[
 				'code' => 'attribute5',
 				'field_type' => 'text',
+				'table' => 'attribute_values_varchar',
 				'localized' => false,
 				'default_value' => '123',
 				'unique' => false,
@@ -126,6 +131,7 @@ class TestDbSeeder extends Seeder {
 			[
 				'code' => 'attribute6',
 				'field_type' => 'text',
+				'table' => 'attribute_values_varchar',
 				'localized' => false,
 				'default_value' => '',
 				'unique' => false,
@@ -138,6 +144,7 @@ class TestDbSeeder extends Seeder {
 			[
 				'code' => 'attribute7',
 				'field_type' => 'text',
+				'table' => 'attribute_values_varchar',
 				'localized' => false,
 				'default_value' => '',
 				'unique' => false,
@@ -217,6 +224,104 @@ class TestDbSeeder extends Seeder {
 				'attribute_id' => 7,
 				'sort_order' => 1
 			]
+		]);
+
+		DB::table('entities')->truncate();
+		DB::table('entities')->insert([
+			[
+				'entity_type_id' => 1,
+				'attribute_set_id' => 1,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_type_id' => 1,
+				'attribute_set_id' => 1,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_type_id' => 1,
+				'attribute_set_id' => 2,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			]
+		]);
+
+		DB::table('attribute_values_varchar')->truncate();
+		DB::table('attribute_values_varchar')->insert([
+			[
+				'entity_id' => 1,
+				'entity_type_id' => 1,
+				'attribute_set_id' => 1,
+				'attribute_id' => 1,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'value1',
+			],
+			[
+				'entity_id' => 1,
+				'entity_type_id' => 1,
+				'attribute_set_id' => 1,
+				'attribute_id' => 2,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'value2',
+			],
+			[
+				'entity_id' => 1,
+				'entity_type_id' => 1,
+				'attribute_set_id' => 1,
+				'attribute_id' => 3,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'value3',
+			],
+			[
+				'entity_id' => 2,
+				'entity_type_id' => 1,
+				'attribute_set_id' => 1,
+				'attribute_id' => 1,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'value12',
+			],
+			[
+				'entity_id' => 2,
+				'entity_type_id' => 1,
+				'attribute_set_id' => 1,
+				'attribute_id' => 2,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'value22',
+			],
+			[
+				'entity_id' => 2,
+				'entity_type_id' => 1,
+				'attribute_set_id' => 1,
+				'attribute_id' => 3,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'value32',
+			],
+			[
+				'entity_id' => 3,
+				'entity_type_id' => 1,
+				'attribute_set_id' => 2,
+				'attribute_id' => 3,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'value3',
+			],
+			[
+				'entity_id' => 3,
+				'entity_type_id' => 1,
+				'attribute_set_id' => 2,
+				'attribute_id' => 4,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'value4',
+			],
 		]);
 	}
 

@@ -41,26 +41,17 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 {
 
 	/**
-	 * Repository for attribute sets
-	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
-	 */
-	protected $attributeSetRepository;
-
-	/**
 	 * Create new EntityTypeRepository
 	 * 
 	 * @param Illuminate\Database\Connection $db
 	 * 
 	 * @return void
 	 */
-	public function __construct(Connection $db, AttributeSetRepositoryContract $attributeSetRepository)
+	public function __construct(Connection $db)
 	{
 
 		// AbstractRepository constructor
 		parent::__construct($db);
-
-		$this->attributeSetRepository = $attributeSetRepository;
 	}
 
 
@@ -150,14 +141,12 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		{
 			throw new NotFoundException(['There is no entity type with that ID.']);
 		}
-
-		$this->attributeSetRepository->deleteByEntityType($id);
-
+		
 		$this->db 	->table('entity_types')
 					->where('id', '=', $id)
 					->delete();
 
-		return $id;
+		return $entityType;
 	}
 
 

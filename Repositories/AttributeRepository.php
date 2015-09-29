@@ -11,16 +11,15 @@
 namespace Cookbook\Eav\Repositories;
 
 
-use Illuminate\Database\Connection;
-
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
+use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
+use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
 use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Repositories\AbstractRepository;
 use Cookbook\Core\Repositories\UsesCache;
-
-use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Eav\Managers\AttributeManager;
+use Illuminate\Database\Connection;
 
 
 /**
@@ -120,7 +119,6 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		// get available field types
 		$this->availableFieldTypes = $this->attributeManager->getFieldTypes();
-
 	}
 
 // ----------------------------------------------------------------------------------------------
@@ -247,30 +245,19 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	protected function _delete($id)
 	{
 		// get the attribute
-		$attribute = $this->db->table('attributes')->find($id);
+		$attribute = $this->fetch($id);
 		if(!$attribute)
 		{
 			throw new NotFoundException(['There is no attribute with that ID.']);
 		}
 
-		// init attribute handler
-		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-
-		// delete related values for this attribute
-		$fieldHandler->sweepAfterAttribute($attribute);
-
-		// delete all related attributes in sets for this attribute
-		$this->db->table('set_attributes')->where('attribute_id', '=', $attribute->id)->delete();
 		// delete all related options for this attribute
 		$this->db->table('attribute_options')->where('attribute_id', '=', $attribute->id)->delete();
-		
-		// // delete attribute translations
-		// $this->db->table('attribute_translations')->where('attribute_id', '=', $attribute->id)->delete();
 		
 		// delete the attribute
 		$this->db->table('attributes')->where('id', '=', $attribute->id)->delete();
 
-		return $attribute->id;
+		return $attribute;
 	}
 
 // ----------------------------------------------------------------------------------------------
@@ -309,6 +296,10 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		}
 
 		$params['created_at'] = $params['updated_at'] = date('Y-m-d H:i:s');
+
+		$table = $this->availableFieldTypes[$params['field_type']]['table'];
+
+		$params['table'] = $table;
 
 		// insert attribute in database
 		$attribute_id = $this->db->table('attributes')->insertGetId($params);
@@ -433,7 +424,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 				if( ! empty($fieldHandler) )
 				{
-					$fieldHandler->sweepAfterOption($option);
+					$fieldHandler->deleteByOption($option);
 				}
 
 				$this->db->table('attribute_options')
@@ -508,6 +499,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 							->get();
 		
 		$attribute->options = $options;
+		unset($attribute->table);
 
 		// $translations = $this->db->table('attribute_translations')
 		// 						 ->where('attribute_id', '=', $id)
@@ -554,6 +546,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 			$ids[] = $attribute->id;
 			$attribute->options = [];
+			unset($attribute->table);
 			// $attribute->translations = [];
 		}
 

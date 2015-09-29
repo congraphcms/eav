@@ -30,6 +30,12 @@ use Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeDeleteHandler;
 use Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeFetchHandler;
 use Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeGetHandler;
 
+use Cookbook\Eav\Handlers\Commands\Entities\EntityCreateHandler;
+use Cookbook\Eav\Handlers\Commands\Entities\EntityUpdateHandler;
+use Cookbook\Eav\Handlers\Commands\Entities\EntityDeleteHandler;
+use Cookbook\Eav\Handlers\Commands\Entities\EntityFetchHandler;
+use Cookbook\Eav\Handlers\Commands\Entities\EntityGetHandler;
+
 /**
  * HandlersServiceProvider service provider for handlers
  * 
@@ -119,6 +125,19 @@ class HandlersServiceProvider extends ServiceProvider {
 				'Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeFetchHandler@handle',
 			'Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand' => 
 				'Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeGetHandler@handle',
+
+			// Entities
+			'Cookbook\Eav\Commands\Entities\EntityCreateCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Entities\EntityCreateHandler@handle',
+			'Cookbook\Eav\Commands\Entities\EntityUpdateCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Entities\EntityUpdateHandler@handle',
+			'Cookbook\Eav\Commands\Entities\EntityDeleteCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Entities\EntityDeleteHandler@handle',
+			'Cookbook\Eav\Commands\Entities\EntityFetchCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Entities\EntityFetchHandler@handle',
+			'Cookbook\Eav\Commands\Entities\EntityGetCommand' => 
+				'Cookbook\Eav\Handlers\Commands\Entities\EntityGetHandler@handle',
+			
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->maps($mappings);
@@ -142,7 +161,11 @@ class HandlersServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->bind('Cookbook\Eav\Handlers\Commands\Attributes\AttributeDeleteHandler', function($app){
-			return new AttributeDeleteHandler($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
+			return new AttributeDeleteHandler(
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')	
+			);
 		});
 
 		$this->app->bind('Cookbook\Eav\Handlers\Commands\Attributes\AttributeFetchHandler', function($app){
@@ -165,7 +188,10 @@ class HandlersServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->bind('Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetDeleteHandler', function($app){
-			return new AttributeSetDeleteHandler($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
+			return new AttributeSetDeleteHandler(
+				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+			);
 		});
 
 		$this->app->bind('Cookbook\Eav\Handlers\Commands\AttributeSets\AttributeSetFetchHandler', function($app){
@@ -188,7 +214,11 @@ class HandlersServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->bind('Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeDeleteHandler', function($app){
-			return new EntityTypeDeleteHandler($app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'));
+			return new EntityTypeDeleteHandler(
+				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')	
+			);
 		});
 
 		$this->app->bind('Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeFetchHandler', function($app){
@@ -197,6 +227,24 @@ class HandlersServiceProvider extends ServiceProvider {
 
 		$this->app->bind('Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeGetHandler', function($app){
 			return new EntityTypeGetHandler($app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'));
+		});
+
+		// Entities
+		
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Entities\EntityCreateHandler', function($app){
+			return new EntityCreateHandler($app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'));
+		});
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Entities\EntityUpdateHandler', function($app){
+			return new EntityUpdateHandler($app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'));
+		});
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Entities\EntityDeleteHandler', function($app){
+			return new EntityDeleteHandler($app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'));
+		});
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Entities\EntityFetchHandler', function($app){
+			return new EntityFetchHandler($app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'));
+		});
+		$this->app->bind('Cookbook\Eav\Handlers\Commands\Entities\EntityGetHandler', function($app){
+			return new EntityGetHandler($app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'));
 		});
 	}
 
@@ -228,7 +276,14 @@ class HandlersServiceProvider extends ServiceProvider {
 			'Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeUpdateHandler',
 			'Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeDeleteHandler',
 			'Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeFetchHandler',
-			'Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeGetHandler'
+			'Cookbook\Eav\Handlers\Commands\EntityTypes\EntityTypeGetHandler',
+
+			// Entities
+			'Cookbook\Eav\Handlers\Commands\Entities\EntityCreateHandler',
+			'Cookbook\Eav\Handlers\Commands\Entities\EntityUpdateHandler',
+			'Cookbook\Eav\Handlers\Commands\Entities\EntityDeleteHandler',
+			'Cookbook\Eav\Handlers\Commands\Entities\EntityFetchHandler',
+			'Cookbook\Eav\Handlers\Commands\Entities\EntityGetHandler',
 		];
 	}
 }

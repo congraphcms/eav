@@ -76,6 +76,8 @@ class CreateEntityTables extends Migration {
 			
 			// flag for ability of multiple sets
 			$table->boolean('multiple_sets')->default(1);
+
+			$table->integer('default_set_id')->default(0);
 			
 			// created_at and updated_at timestamps
 			$table->timestamps();

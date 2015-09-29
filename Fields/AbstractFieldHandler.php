@@ -65,9 +65,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 *  
 	 * @return void
 	 */
-	public function __construct(Connection $db,
-								AttributeManager $attributeManager, 
-								$table)
+	public function __construct(Connection $db, AttributeManager $attributeManager, $table)
 	{
 		// Inject dependencies
 		$this->db = $db;
@@ -78,39 +76,153 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		$this->setErrors();
 	}
 
+
+	
+
 	/**
-	 * Check for specific rules and validation on attribute insert
+	 * Parse value for output
 	 * 
-	 * Called after standard attribute validation with referenced attribute params
-	 * depending on boolean value returned by this function attribute insert will continue or stop the execution
+	 * Takes field value and attribute definition
 	 * 
-	 * @param array $params
+	 * @param array $valueParams
+	 * @param object $attributeDefinition
 	 * 
 	 * @return boolean
 	 */
-	abstract public function checkAttributeForInsert(array &$params);
+	public function parseValue($value, $attributeDefinition)
+	{
+		return $value;
+	}
 
 	/**
-	 * Check for specific rules and validation on attribute update
+	 * Format value for database input
 	 * 
-	 * Called after standard attribute validation with referenced attribute params
-	 * depending on boolean value returned by this function attribute update will continue or stop the execution
+	 * Takes field value and attribute definition
 	 * 
-	 * @param array $params
+	 * @param array $valueParams
+	 * @param object $attributeDefinition
 	 * 
 	 * @return boolean
 	 */
-	abstract public function checkAttributeForUpdate(array &$params);
+	public function formatValue($value, $attributeDefinition)
+	{
+		return $value;
+	}
+
 
 	/**
-	 * Make changes to attribute before handing it to application
+	 * Insert value to database
 	 * 
-	 * @param stdClass $attribute
+	 * Takes attribute value params and attribute definition
 	 * 
-	 * @return object
+	 * @param array $valueParams
+	 * @param object $attributeDefinition
+	 * 
+	 * @return boolean
 	 */
-	abstract public function transformAttribute(\stdClass $attribute);
+	public function insert($valueParams, $attributeDefinition)
+	{
+		$attributeSettings = $this->attributeManager->getFieldTypes()[$attributeDefinition->field_type];
 
+		if($attributeSettings['has_multiple_values'])
+		{
+			if( ! is_array($valueParams['value']) )
+			{
+				$valueParams['value'] = [$valueParams['value']];
+			}
+
+			// sort_order counter
+			$sort_order = 0;
+
+			foreach ($valueParams['value'] as $value)
+			{
+				$singleValueParams = $valueParams;
+				$parsedValue = $this->parseValue($value, $attributeDefinition);
+				$singleValueParams['value'] = $parsedValue;
+				// give it a sort_order
+				$singleValueParams['sort_order'] = $sort_order++;
+				$this->db->table($this->table)->insert($singleValueParams);
+			}
+		}
+		else
+		{
+			$parsedValue = $this->parseValue($valueParams['value'], $attributeDefinition);
+			$valueParams['value'] = $parsedValue;
+			$this->db->table($this->table)->insert($valueParams);
+		}
+	}
+
+
+	/**
+	 * Update value in database
+	 * 
+	 * Takes attribute value params and attribute definition
+	 * 
+	 * @param array $valueParams
+	 * @param object $attributeDefinition
+	 * 
+	 * @return boolean
+	 */
+	public function update($valueParams, $attributeDefinition)
+	{
+
+		$attributeSettings = $this->attributeManager->getFieldTypes()[$attributeDefinition->field_type];
+
+		// delete all values for provided entity, attribute and language
+		$this	->db->table( $this->table )
+				->where( 'attribute_id', '=', $valueParams['attribute_id'] )
+				->where( 'entity_id', '=', $valueParams['entity_id'] )
+				->where( 'locale_id', '=', $valueParams['locale_id'] )
+				->delete();
+
+		// if this field type has multiple values and 
+		// value is array give each value a sort_order
+		// and then insert them separately into database
+		if($attributeSettings['has_multiple_values'])
+		{
+			if( ! is_array($valueParams['value']) )
+			{
+				$valueParams['value'] = [$valueParams['value']];
+			}
+
+			// sort_order counter
+			$sort_order = 0;
+
+
+			foreach ($valueParams['value'] as $value)
+			{
+				$singleValueParams = $valueParams;
+				$parsedValue = $this->parseValue($value, $attributeDefinition);
+				$singleValueParams['value'] = $parsedValue;
+				// give it a sort_order
+				$singleValueParams['sort_order'] = $sort_order++;
+				$this->db->table($this->table)->insert($singleValueParams);
+			}
+		}
+		else
+		{
+			$parsedValue = $this->parseValue($valueParams['value'], $attributeDefinition);
+			$valueParams['value'] = $parsedValue;
+			$this->db->table($this->table)->insert($valueParams);
+		}
+	}
+
+	/**
+	 * Delete values in database for entity
+	 * 
+	 * @param object $valueParams
+	 * @param object $attributeDefinition
+	 * 
+	 * @return boolean
+	 */
+	public function deleteByEntity($entity, $attributeDefinition)
+	{
+		// delete all values for provided entity, attribute and language
+		$this	->db->table( $this->table )
+				->where( 'attribute_id', '=', $attributeDefinition->id )
+				->where( 'entity_id', '=', $entity->id )
+				->delete();
+	}
 
 	/**
 	 * Clean all related values and set entries for given attribute
@@ -118,27 +230,19 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Takes attribute that needs to be deleted,
 	 * and deletes all related values and set entries
 	 * 
-	 * @param stdClass $attribute
+	 * @param object $attribute
 	 * 
 	 * @return boolean
 	 * 
 	 * @todo Check if there is need for returning false or there will be an exception if something goes wrong
 	 */
-	public function sweepAfterAttribute(\stdClass $attribute)
+	public function deleteByAttribute($attribute)
 	{
-		// check if attribute has an ID
-		if(empty($attribute->id))
-		{
-			throw new \InvalidArgumentException('Can\'t sweep after attribute that hasn\'t got ID.');
-		}
-
 		// delete all attribute values associated with provided attribute
 		$this->db->table($this->table)->where('attribute_id', '=', $attribute->id)->delete();
 		
 		return true;
 	}
-
-
 
 	/**
 	 * Clean all related values for given attribute option
@@ -146,367 +250,141 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Takes attribute option that needs to be deleted,
 	 * and deletes all related values
 	 * 
-	 * @param stdClass $option
+	 * @param object $option
 	 * 
 	 * @return boolean
 	 * 
 	 * @todo Check if there is need for returning false or there will be an exception if something goes wrong
 	 */
-	public function sweepAfterOption(\stdClass $option)
+	public function deleteByOption($option)
 	{
-		// check if option has an ID
-		if( empty($option->id) )
-		{
-			throw new \InvalidArgumentException('Can\'t sweep after option that hasn\'t got ID.');
-		}
-
-		// check if option has attribute ID
-		if( empty($option->attribute_id) )
-		{
-			throw new \InvalidArgumentException('Can\'t sweep after option that hasn\'t got attribute ID.');
-		}
-
 		// delete all attribute values that are associated with provided attribute option
 		$this	->db->table($this->table)
 				->where('attribute_id', '=', $option->attribute_id)
 				->where('value', '=', $option->id)
 				->delete();
-		
-		return true;
 	}
 
 	/**
-	 * Clean all related values for given set attribute
+	 * Clean all related values and set entries for given attribute set
 	 * 
-	 * Takes set attribute that needs to be deleted,
-	 * and deletes all related values
+	 * Takes attribute set that needs to be deleted,
+	 * and deletes all related values and set entries
 	 * 
-	 * @param stdClass $setAttribute
-	 * 
-	 * @return boolean
+	 * @param object $attributeSet
 	 * 
 	 * @todo Check if there is need for returning false or there will be an exception if something goes wrong
 	 */
-	public function sweepAfterSetAttribute(\stdClass $setAttribute)
+	public function deleteByAttributeSet($attributeSet)
 	{
-		// check if setAttribute has attribute set ID
-		if( empty($setAttribute->attribute_set_id) )
-		{
-			throw new \InvalidArgumentException('Can\'t sweep after set attribute that hasn\'t got attribute set ID.');
-		}
-
-		// check if setAttribute has attribute ID
-		if( empty($setAttribute->attribute_id) )
-		{
-			throw new \InvalidArgumentException('Can\'t sweep after set attribute that hasn\'t got attribute ID.');
-		}
-
-		// delete attribute values that are associated with provided set attribute
-		$this	->db->table( $this->table )
-				->join( 'entities', $this->table . '.entity_id', '=', 'entities.id' )
-				->where( 'entities.attribute_set_id', '=', $setAttribute->attribute_set_id )
-				->where( $this->table . '.attribute_id', '=', $setAttribute->attribute_id )
-				->delete();
-		return true;
+		// delete all attribute values associated with provided attribute set
+		$this->db->table($this->table)->where('attribute_set_id', '=', $attributeSet->id)
+				 ->delete();
 	}
 
 	/**
-	 * Clean all related values for given entity
+	 * Clean all related values for given entity type
 	 * 
-	 * Takes entity ID or array of IDs and attribute ID
-	 * and deletes all related values for given attribute
+	 * Takes attribute set that needs to be deleted,
+	 * and deletes all related values and set entries
 	 * 
-	 * @param integer | array 	$entityIDs
-	 * @param integer 			$attributeID
+	 * @param object $entityType
+	 * 
+	 * @todo Check if there is need for returning false or there will be an exception if something goes wrong
+	 */
+	public function deleteByEntityType($entityType)
+	{
+		// delete all attribute values associated with provided entity type
+		$this->db->table($this->table)->where('entity_type_id', '=', $entityType->id)
+				 ->delete();
+	}
+	
+
+	/**
+	 * Add filters to query for field
+	 * 
+	 * @param object $query
+	 * @param object $attributeDefinition
+	 * @param $filter
 	 * 
 	 * @return boolean
 	 */
-	public function sweepAfterEntities($entityIDs, $attributeID)
+	public function filterEntities($query, $attributeDefinition, $filter)
 	{
-		// check if entity IDs are provided
-		if( empty($entityIDs) )
+		$code = $attributeDefinition->code;
+		$query = $query->join($this->table . ' as filter_' . $code, 'filter_' . $code . '.entity_id', '=', 'entities.id');
+
+		if( ! is_array($filter) )
 		{
-			throw new \InvalidArgumentException('You have to provide at least one entity ID for entity sweep.');
+			$filter = $this->parseValue($filter, $attributeDefinition);
+			$query = $query->where('filter_' . $code . '.value', '=', $filter);
+			$query = $query->where('filter_' . $code . '.attribute_id', '=', $attributeDefinition->id);
+			return $query;
 		}
 
-		// make sure that attribute ID is an integer
-		$attributeID = intval($attributeID);
+		$query = $this->parseFilterOperator($query, $attributeDefinition, $filter);
 
-		// check if attribute ID is provided
-		if( empty($attributeID) )
-		{
-			throw new \InvalidArgumentException('You have to provide attribute ID for entity sweep.');
-		}
-		
-		// check if entityIDs is an array and if not make it
-		if(! is_array($entityIDs) )
-		{
-			$entityIDs = array( intval($entityIDs) );
-		}
-
-		// delete all attribute values associated with provided entities and attribute
-		$success = $this	->db->table( $this->table )
-							->whereIn( 'entity_id', $entityIDs )
-							->where( 'attribute_id', '=', $attributeID )
-							->delete();
-		
-		// return success of delete
-		return !!$success;
+		return $query;
 	}
 
-	/**
-	 * Take attribute value and transform it for output (management API use)
-	 * 
-	 * @param $value
-	 * @param $attribute
-	 * @param $options
-	 * 
-	 * @return mixed
-	 */
-	abstract public function transformManagementValue($value, $attribute, $options);
-
-	/**
-	 * Take attribute value and transform it for frontend output
-	 * 
-	 * @param $value
-	 * @param $attribute
-	 * @param $options
-	 * 
-	 * @return mixed
-	 */
-	abstract public function transformValue($value, $attribute, $options);
-
-	/**
-	 * Take attribute values and bulk transform them for frontend output
-	 * 
-	 * @param $values
-	 * @param $with
-	 * 
-	 * @return mixed
-	 */
-	abstract public function bulkTransformValues($values, $lang_id, $with);
-
-	/**
-	 * Provide default value for attribute
-	 * 
-	 * @param $value
-	 * @param $attribute
-	 * @param $options
-	 * 
-	 * @return mixed
-	 */
-	public function getDefaultValue($attribute, $options = [])
+	protected function parseFilterOperator($query, $attributeDefinition, $filter)
 	{
-		// check if attribute has a default value
-		if(! is_null($attribute->default_value) )
-		{
-			return $attribute->default_value;
-		}
+		$code = $attributeDefinition->code;
 
-		// check if there is a default option
-		if(! empty($options) )
-		{
-			foreach ($options as $option)
+		foreach ($filter as $operator => $value) {
+			switch ($operator) 
 			{
-				if(! empty($option->default) && ! empty($option->id) )
-				{
-					return $option->id;
-				}
+				case 'e':
+					$query = $query->where('filter_' . $code . '.value', '=', $value);
+					break;
+				case 'ne':
+					$query = $query->where('filter_' . $code . '.value', '!=', $value);
+					break;
+				case 'lt':
+					$query = $query->where('filter_' . $code . '.value', '<', $value);
+					break;
+				case 'lte':
+					$query = $query->where('filter_' . $code . '.value', '<=', $value);
+					break;
+				case 'gt':
+					$query = $query->where('filter_' . $code . '.value', '>', $value);
+					break;
+				case 'gte':
+					$query = $query->where('filter_' . $code . '.value', '>=', $value);
+					break;
+				case 'in':
+					$query = $query->whereIn('filter_' . $code . '.value', $value);
+					break;
+				case 'nin':
+					$query = $query->whereNotIn('filter_' . $code . '.value', $value);
+					break;
+				
+				default:
+					throw new BadRequestException(['Filter operator not supported.']);
+					break;
 			}
 		}
 
-		// return null if there is no default value
-		return null;
+		return $query;
 	}
 
 	/**
-	 * Perform validation and preparation, and 
-	 * update attribute value in database
+	 * Sort entities by attribute
 	 * 
-	 * Takes attribute value params and attribute definition
-	 * 
-	 * @param array $valueParams
-	 * @param stdClass $attributeDefinition
+	 * @param object $query
+	 * @param object $attributeDefinition
+	 * @param $direction
 	 * 
 	 * @return boolean
 	 */
-	public function updateValue($valueParams, \stdClass $attributeDefinition)
+	public function sortEntities($query, $attributeDefinition, $direction)
 	{
-		// validate params for attribute value
-		$this->validateAttributeValue($valueParams, $attributeDefinition);
+		$code = $attributeDefinition->code;
+		$query = $query->leftJoin($this->table . ' as sort_' . $code, 'sort_' . $code . '.entity_id', '=', 'entities.id');
+		$query = $query->where('sort_' . $code . '.attribute_id', '=', $attributeDefinition->id);
+		$query = $query->orderBy('sort_' . $code . '.value', $direction);
 
-		// if there was an error in params validation
-		// stop and return false
-		if($this->hasErrors())
-		{
-			return false;
-		}
-
-		// delete all values for provided entity, attribute and language
-		$this	->db->table( $this->table )
-				->where( 'attribute_id', '=', $valueParams['attribute_id'] )
-				->where( 'entity_id', '=', $valueParams['entity_id'] )
-				->where( 'language_id', '=', $valueParams['language_id'] )
-				->delete();
-
-		$success = true;
-
-		// prepare value for database
-		$valueParams = $this->prepareValue($valueParams, $attributeDefinition);
-
-		// get settings for attribute from config
-		$attributeSettings = $this->attributeManager->getFieldType($attributeDefinition->data_type);
-		
-		// if this field type has multiple values and 
-		// value is array give each value a sort_order
-		// and then insert them separately into database
-		if( $attributeSettings['has_multiple_values'] && is_array($valueParams['value']) )
-		{
-			// sort_order counter
-			$sort_order = 0;
-
-			// go through values
-			foreach ($valueParams['value'] as $value)
-			{
-				$singleValueParams = $valueParams;
-
-				// override value with one item from array
-				$singleValueParams['value'] = $value;
-
-				// give it a sort_order
-				$singleValueParams['sort_order'] = $sort_order++;
-
-				// and insert it into database
-				$success = $this->db->table($this->table)->insert($singleValueParams) && $success;
-			}
-		}
-		// otherwise just insert value into database
-		else
-		{
-			$success = $this->db->table($this->table)->insert($valueParams) && $success;
-		}
-
-		// check if there were any errors
-		if(! $success || $this->hasErrors() )
-		{
-			return false;
-		}
-
-		// return success
-		return true;
-	}
-
-
-	/**
-	 * Prepare attribute value for database (serialize...)
-	 * 
-	 * This function should be overriden by specific attribute handler
-	 * 
-	 * @param array 	$valueParams
-	 * @param stdClass	$attribute
-	 * 
-	 * @return array
-	 */
-	abstract public function prepareValue($valueParams, \stdClass $attribute);
-
-	/**
-	 * Validate attribute value
-	 * 
-	 * This function can be extended by specific attribute handler
-	 * 
-	 * @param array $valueParams
-	 * @param Eloqunt $attributeDefinition
-	 * 
-	 * @return boolean
-	 */
-	protected function validateAttributeValue($valueParams, \stdClass $attributeDefinition)
-	{
-
-		// check if this attribute is required
-		if($attributeDefinition->required)
-		{
-			// if it's required and it's empty add an error
-			if(empty($valueParams['value']))
-			{
-				$this->addErrors('This is a required field.');
-			}
-		}
-
-		// check if attribute needs to be unique
-		if($attributeDefinition->unique)
-		{
-			// check if this value is unique
-			$unique = $this ->uniqueValue($valueParams, $attributeDefinition);
-			
-			// if it's not unique add an error
-			if(!$unique)
-			{
-				$this->addErrors('This needs to be a unique value.');
-			}
-		}
-
-		// check if attribute is localized
-		if($attributeDefinition->localized)
-		{
-			// if it doesn't have defined language_id add an error
-			if(empty($valueParams['language_id']))
-			{
-				$this->addErrors('You need to specify a language.');
-			}
-		}
-
-		// if there are any errors
-		// return false
-		if($this->hasErrors())
-		{
-			return false;
-		}
-
-		// return success
-		return true;
-	}
-
-
-	/**
-	 * check if attribute value is unique
-	 * 
-	 * @param array $valueParams
-	 * @param Eloqunt $attributeDefinition
-	 * 
-	 * @return boolean
-	 */
-	protected function uniqueValue($valueParams, \stdClass $attributeDefinition)
-	{
-		// check if value is empty and if it is return true
-		// because unique is not checked on empty values 
-		if(empty($valueParams['value']))
-		{
-			return true;
-		}
-
-		// check database for same values
-		$query = $this 	->db->table( $this->table )
-						->where( 'value', '=', $valueParams['value'] )
-						->where( 'attribute_id', '=', $attributeDefinition->id );
-
-		// if enitity_id is defined exclude it from query
-		if($valueParams['entity_id'])
-		{
-			$query = $query->where( 'entity_id', '!=', $valueParams['entity_id'] );
-		}
-		
-		
-		// get values
-		$value = $query->first();
-
-		// if there is such a value return false (not unique)
-		if($value)
-		{
-			return false;
-		}
-
-		// return succes (is unique)
-		return true;
+		return $query;
 	}
 
 

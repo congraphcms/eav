@@ -29,7 +29,12 @@ use Cookbook\Eav\Managers\AttributeManager;
  */
 class TextFieldValidator extends AbstractFieldValidator
 {
-
+	/**
+	 * List of available operations for filtering entities
+	 *
+	 * @var array
+	 */
+	protected $availableFilterOperations = ['e', 'ne', 'in', 'nin'];
 
 	/**
 	 * Check for specific rules and validation on attribute insert
