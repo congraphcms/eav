@@ -10,17 +10,21 @@
 
 namespace Cookbook\Eav\Repositories;
 
-use stdClass;
 use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
 use Cookbook\Contracts\Eav\EntityRepositoryContract;
+use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
 use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
 use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
+use Cookbook\Core\Facades\Trunk;
 use Cookbook\Core\Repositories\AbstractRepository;
+use Cookbook\Core\Repositories\Collection;
+use Cookbook\Core\Repositories\Model;
 use Cookbook\Core\Repositories\UsesCache;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
+use stdClass;
 
 
 /**
@@ -71,6 +75,13 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 */
 	protected $attributeRepository;
 
+	/**
+	 * Repository for handling entity types
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 */
+	protected $entityTypeRepository;
+
 
 
 	/**
@@ -86,7 +97,8 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 								FieldHandlerFactoryContract $fieldHandlerFactory,
 								AttributeManager $attributeManager, 
 								AttributeSetRepositoryContract $attributeSetRepository, 
-								AttributeRepositoryContract $attributeRepository)
+								AttributeRepositoryContract $attributeRepository,
+								EntityTypeRepositoryContract $entityTypeRepository)
 	{
 
 		// AbstractRepository constructor
@@ -97,16 +109,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		$this->attributeManager = $attributeManager;
 		$this->attributeSetRepository = $attributeSetRepository;
 		$this->attributeRepository = $attributeRepository;
-
-		// Validation Rules for entity insert
-		$this->entityInsertParamRules = array(
-			'object_id'				=> 'required|integer',
-			'entity_type_id'		=> 'required|exists:entity_types,id',
-			'attribute_set_id'		=> 'required|exists:attribute_sets,id',
-		);
-
-		
-		
+		$this->entityTypeRepository = $entityTypeRepository;
 	}
 
 
@@ -159,7 +162,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$this->insertFields($fieldsForInsert, $attributes);
 
-		$entity = $this->fetch($entityID);
+		$entity = $this->fetch($entityID, [], $locale_id);
 
 		return $entity;
 		
@@ -181,7 +184,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	protected function _update($id, $model)
 	{
 
-		$entity = $this->fetch($id);
+		$entity = $this->fetch($id, [], $model['locale_id']);
 
 		$fields = array();
 		
@@ -216,7 +219,8 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$this->updateEntity($id);
 
-		$entity = $this->fetch($id);
+		Trunk::forgetType('entity');
+		$entity = $this->fetch($id, [], $model['locale_id']);
 
 		return $entity;
 		
@@ -240,6 +244,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$this->db->table('entities')->where('id', '=', $id)->delete();
 
+		Trunk::forgetType('entity');
 		return $entity;
 	}
 
@@ -253,6 +258,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	public function deleteByAttribute($attribute)
 	{
 		$this->deleteFieldsByAttribute($attribute);
+		Trunk::forgetType('entity');
 	}
 
 	/**
@@ -269,6 +275,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		$entities = $this->db 	->table('entities')
 								->where('attribute_set_id', '=', $attributeSet->id)
 								->delete();
+		Trunk::forgetType('entity');
 	}
 
 	/**
@@ -285,6 +292,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		$entities = $this->db 	->table('entities')
 								->where('entity_type_id', '=', $entityType->id)
 								->delete();
+		Trunk::forgetType('entity');
 	}
 
 
@@ -330,11 +338,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 * Insert attribute values in entity
 	 * 
 	 * @param array $fields - field values
-	 * @param array $attributes - attribute definitions
+	 * @param mixed $attributes - attribute definitions
 	 * 
 	 * @return void
 	 */
-	protected function insertFields(array $fields, array $attributes)
+	protected function insertFields(array $fields, $attributes)
 	{
 		for ($i = 0; $i < count($attributes); $i++)
 		{
@@ -347,11 +355,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 * Update attribute values in entity
 	 * 
 	 * @param array $fields - field values
-	 * @param array $attributes - attribute definitions
+	 * @param mixed $attributes - attribute definitions
 	 * 
 	 * @return boolean
 	 */
-	protected function updateFields(array $fields, array $attributes)
+	protected function updateFields(array $fields, $attributes)
 	{
 		for ($i = 0; $i < count($attributes); $i++)
 		{
@@ -448,14 +456,26 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 * 
 	 * @return array
 	 */
-	protected function _fetch($id, $locale = null)
+	protected function _fetch($id, $include = [], $locale = null)
 	{
+		$params = func_get_args();
+		if( Trunk::has($params, 'entity'))
+		{
+			$entity = Trunk::get($params, 'entity');
+			$entity->clearIncluded();
+			$entity->load($include);
+			$meta = ['id' => $id, 'include' => $include];
+			$entity->setMeta($meta);
+			return $entity;
+		}
+
 		$entity = $this->db->table('entities')
 						->select(
 							'entities.id',  
 							'entities.entity_type_id', 
 							'entities.attribute_set_id',
-							'entity_types.code as type',
+							'entity_types.code as entity_type',
+							$this->db->raw('"entity" as type'),
 							'entities.created_at as created_at',
 							'entities.updated_at as updated_at'
 						)
@@ -472,7 +492,13 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$entity->fields = $fields[$id];
 
-		return $entity;
+		$result = new Model($entity);
+		$result->setParams($params);
+		$meta = ['id' => $id, 'include' => $include];
+		$result->setMeta($meta);
+		$result->load($include);
+
+		return $result;
 	}
 
 	/**
@@ -480,14 +506,29 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 * 
 	 * @return array
 	 */
-	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $locale = 0)
+	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [], $locale = 0)
 	{
+		$params = func_get_args();
+
+		if(Trunk::has($params, 'entity'))
+		{
+			$entityTypes = Trunk::get($params, 'entity');
+			$entityTypes->clearIncluded();
+			$entityTypes->load($include);
+			$meta = [
+				'include' => $include
+			];
+			$entityTypes->setMeta($meta);
+			return $entityTypes;
+		}
+
 		$query =  $this->db->table('entities')
 						->select(
 							'entities.id as id',  
 							'entities.entity_type_id as entity_type_id', 
 							'entities.attribute_set_id as attribute_set_id',
-							'entity_types.code as type',
+							'entity_types.code as entity_type',
+							$this->db->raw('"entity" as type'),
 							'entities.created_at as created_at',
 							'entities.updated_at as updated_at'
 						)
@@ -495,17 +536,21 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$query = $this->parseFilters($query, $filter);
 
+		$query->groupBy('entities.id');
+
+		$total = $query->count();
+
 		$query = $this->parsePaging($query, $offset, $limit);
 
 		$query = $this->parseSorting($query, $sort);
 
-		$query->groupBy('entities.id');
+		
 		
 		$entities = $query->get();
 
 		if( ! $entities )
 		{
-			return [];	
+			$entities = [];
 		}
 
 		$ids = [];
@@ -515,15 +560,34 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			$ids[] = $entity->id;
 		}
 
-		$fields = $this->getFieldsForEntities($ids, $locale);
-
-		foreach ($entities as &$entity) 
+		if( ! empty($ids) )
 		{
-			$entity->fields = $fields[$entity->id];
+			$fields = $this->getFieldsForEntities($ids, $locale);
+
+			foreach ($entities as &$entity) 
+			{
+				$entity->fields = $fields[$entity->id];
+			}
 		}
+
+		$result = new Collection($entities);
 		
+		$result->setParams($params);
+
+		$meta = [
+			'count' => count($entities), 
+			'offset' => $offset, 
+			'limit' => $limit, 
+			'total' => $total, 
+			'filter' => $filter, 
+			'sort' => $sort, 
+			'include' => $include
+		];
+		$result->setMeta($meta);
+
+		$result->load($include);
 		
-		return $entities;
+		return $result;
 	}
 
 	protected function parseFilters($query, $filters)
@@ -702,17 +766,23 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			}
 		}
 
+		// var_dump($attributeIds);
+
 		// get attributes
 		if( ! empty($attributeIds) )
 		{
 			$attributes = $this->attributeRepository->get(['id' => ['in' => $attributeIds]]);
 		}
 
+		// var_dump($attributes);
+
 		$attributesById = [];
 		foreach ($attributes as $attribute)
 		{
 			$attributesById[$attribute->id] = $attribute;
 		}
+
+		// var_dump($attributesById);
 
 		$attributeSettings = $this->attributeManager->getFieldTypes();
 		$fieldHandlers = [];

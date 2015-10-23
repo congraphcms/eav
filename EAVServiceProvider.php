@@ -54,13 +54,6 @@ class EavServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	protected function registerServiceProviders(){
-
-		// Core
-		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Core\CoreServiceProvider');
-
-		
-
 		// Managers
 		// -----------------------------------------------------------------------------
 		$this->app->register('Cookbook\Eav\Managers\ManagersServiceProvider');

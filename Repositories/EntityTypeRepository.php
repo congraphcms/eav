@@ -17,9 +17,11 @@ use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Repositories\AbstractRepository;
 use Cookbook\Core\Repositories\UsesCache;
+use Cookbook\Core\Facades\Trunk;
+use Cookbook\Core\Repositories\Collection;
+use Cookbook\Core\Repositories\Model;
 
 use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
 
 
 /**
@@ -119,6 +121,8 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 
 		$this->db->table('entity_types')->where('id', '=', $id)->update($entityTypeParams);
 
+		Trunk::forgetType('entity-type');
+
 		return $this->fetch($id);
 		
 	}
@@ -146,6 +150,8 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 					->where('id', '=', $id)
 					->delete();
 
+		Trunk::forgetType('entity-type');
+
 		return $entityType;
 	}
 
@@ -165,7 +171,20 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 	 * 
 	 * @return stdClass
 	 */
-	protected function _fetch($id){
+	protected function _fetch($id, $include = [])
+	{
+		$params = func_get_args();
+		
+		if(Trunk::has($params, 'entity-type'))
+		{
+			$entityType = Trunk::get($id, 'entity-type');
+			$entityType->clearIncluded();
+			$entityType->load($include);
+			$meta = ['id' => $id, 'include' => $include];
+			$entityType->setMeta($meta);
+			return $entityType;
+		}
+
 		$entityType = $this->db->table('entity_types')->find($id);
 
 		if( empty($entityType) )
@@ -182,7 +201,14 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 
 		$entityType->type = 'entity-type';
 
-		return $entityType;
+		$result = new Model($entityType);
+		
+		$result->setParams($params);
+		$meta = ['id' => $id, 'include' => $include];
+		$result->setMeta($meta);
+		$result->load($include);
+
+		return $result;
 	}
 
 
@@ -191,11 +217,27 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 	 * 
 	 * @return array
 	 */
-	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [])
+	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [])
 	{
+		$params = func_get_args();
+
+		if(Trunk::has($params, 'entity-type'))
+		{
+			$entityTypes = Trunk::get($params, 'entity-type');
+			$entityTypes->clearIncluded();
+			$entityTypes->load($include);
+			$meta = [
+				'include' => $include
+			];
+			$entityTypes->setMeta($meta);
+			return $entityTypes;
+		}
+
 		$query = $this->db->table('entity_types');
 
 		$query = $this->parseFilters($query, $filter);
+
+		$total = $query->count();
 
 		$query = $this->parsePaging($query, $offset, $limit);
 
@@ -205,7 +247,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 
 		if( ! $entityTypes )
 		{
-			return [];	
+			$entityTypes = [];
 		}
 
 		$ids = [];
@@ -217,10 +259,16 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 			$entityType->type = 'entity-type';
 		}
 
-		$attributeSets = $this->db->table('attribute_sets')
+		$attributeSets = [];
+
+		if( ! empty($ids) )
+		{
+			$attributeSets = $this->db->table('attribute_sets')
 								  ->select($this->db->raw('id as id, entity_type_id as entity_type_id, "attribute-set" as type'))
 								  ->whereIn('entity_type_id', $ids)
 								  ->get();
+		}
+		
 		
 		foreach ($attributeSets as $attributeSet) 
 		{
@@ -235,50 +283,23 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 			}
 		}
 		
-		return $entityTypes;
+		$result = new Collection($entityTypes);
+		
+		$result->setParams($params);
+
+		$meta = [
+			'count' => count($entityTypes), 
+			'offset' => $offset, 
+			'limit' => $limit, 
+			'total' => $total, 
+			'filter' => $filter, 
+			'sort' => $sort, 
+			'include' => $include
+		];
+		$result->setMeta($meta);
+
+		$result->load($include);
+		
+		return $result;
 	}
-
-
-
-
-
-
-
-	// /**
-	//  * Check if there is an entity type with that slug
-	//  * 
-	//  * @param array $params - (entity_type_id, value)
-	//  * 
-	//  * @return boolean
-	//  */
-	// public function uniqueSlug($params)
-	// {
-
-	// 	if( empty( $params['slug'] ) )
-	// 	{
-	// 		$this->addErrors('Invalid params'));
-	// 		return false;
-	// 	}
-
-	// 	if( empty( $params['entity_type_id'] ) )
-	// 	{
-	// 		$entityTypeId = 0;
-	// 	}
-	// 	else
-	// 	{
-	// 		$entityTypeId = intval( $params['entity_type_id'] );
-	// 	}
-		
-	// 	$entityType = $this->db ->table('entity_types')
-	// 							->where('slug', '=', $params['slug'])
-	// 							->where('id', '!=', $entityTypeId)
-	// 							->first();
-
-	// 	if( ! $entityType)
-	// 	{
-	// 		return true;
-	// 	}
-		
-	// 	return false;
-	// }
 }

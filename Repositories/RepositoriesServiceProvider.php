@@ -34,14 +34,25 @@ class RepositoriesServiceProvider extends ServiceProvider {
      */
 	protected $defer = true;
 
+	/**
+	 * Boot
+	 * @return void
+	 */
+	public function boot()
+	{
+		$this->mapObjectResolvers();
+	}
+
 
 	/**
 	 * Register
 	 * 
 	 * @return void
 	 */
-	public function register() {
+	public function register()
+	{
 		$this->registerRepositories();
+		
 	}
 
 	/**
@@ -94,13 +105,30 @@ class RepositoriesServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\FieldHandlerFactoryContract'),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract')
 			);
 		});
 
 		$this->app->alias(
 			'Cookbook\Eav\Repositories\EntityRepository', 'Cookbook\Contracts\Eav\EntityRepositoryContract'
 		);
+	}
+
+	/**
+	 * Map repositories to object resolver
+	 *
+	 * @return void
+	 */
+	public function mapObjectResolvers() {
+		$mappings = [
+			'attribute' => 'Cookbook\Eav\Repositories\AttributeRepository',
+			'attribute-set' => 'Cookbook\Eav\Repositories\AttributeSetRepository',
+			'entity-type' => 'Cookbook\Eav\Repositories\EntityTypeRepository',
+			'entity' => 'Cookbook\Eav\Repositories\EntityRepository',
+		];
+
+		$this->app->make('Cookbook\Contracts\Core\ObjectResolverContract')->maps($mappings);
 	}
 
 	/**

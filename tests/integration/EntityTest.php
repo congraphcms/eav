@@ -85,7 +85,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\Eav\EavServiceProvider'];
+		return ['Cookbook\Core\CoreServiceProvider', 'Cookbook\Eav\EavServiceProvider'];
 	}
 
 	public function testCreateEntity()
@@ -107,9 +107,9 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
 
-		$this->assertTrue(is_object($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->d->dump($result);
+		$this->d->dump($result->toArray());
 	}
 
 
@@ -150,10 +150,11 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, 1));
 		
-		$this->d->dump($result);
-		$this->assertTrue(is_object($result));
+		
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals($result->fields->attribute1, 'changed value');
+		$this->d->dump($result->toArray());
 	}
 
 	/**
@@ -213,9 +214,9 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 1));
-		$this->assertTrue(is_object($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->d->dump($result);
+		$this->d->dump($result->toArray());
 		
 
 	}
@@ -229,9 +230,9 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand([]));
 
-		$this->assertTrue(is_array($result));
-		$this->assertEquals(count($result), 3);
-		$this->d->dump($result);
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+		$this->assertEquals(3, count($result));
+		$this->d->dump($result->toArray());
 
 	}
 
@@ -244,10 +245,10 @@ class EntityTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['sort' => ['fields.attribute3'], 'limit' => 3, 'offset' => 0]));
 
-		$this->assertTrue(is_array($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(3, count($result));
 
-		$this->d->dump($result);
+		$this->d->dump($result->toArray());
 	}
 
 	public function testGetFilters()
@@ -260,58 +261,12 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$filter = [ 'fields.attribute1' => ['in' => ['value12','value1']] ];
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => $filter, 'sort' => ['fields.attribute3']]));
-
-		$this->d->dump($result);
 		
-		$this->assertTrue(is_array($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(2, count($result));
 
-		
+		$this->d->dump($result->toArray());
 
-		// $filter = [ 'id' => ['in'=>'5,6,7'] ];
-
-		// $result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
-
-		// $this->assertTrue(is_array($result));
-		// $this->assertEquals(3, count($result));
-
-		// $this->d->dump($result);
-
-		// $filter = [ 'id' => ['nin'=>[5,6,7,1]] ];
-
-		// $result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
-
-		// $this->assertTrue(is_array($result));
-		// $this->assertEquals(3, count($result));
-
-		// $this->d->dump($result);
-
-		// $filter = [ 'id' => ['lt'=>3] ];
-
-		// $result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
-
-		// $this->assertTrue(is_array($result));
-		// $this->assertEquals(2, count($result));
-
-		// $this->d->dump($result);
-
-		// $filter = [ 'id' => ['lte'=>3] ];
-
-		// $result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
-
-		// $this->assertTrue(is_array($result));
-		// $this->assertEquals(3, count($result));
-
-		// $this->d->dump($result);
-
-		// $filter = [ 'id' => ['ne'=>3] ];
-
-		// $result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
-
-		// $this->assertTrue(is_array($result));
-		// $this->assertEquals(6, count($result));
-
-		// $this->d->dump($result);
 	}
 
 }

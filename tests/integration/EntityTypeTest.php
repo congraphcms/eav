@@ -84,7 +84,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\Eav\EavServiceProvider'];
+		return ['Cookbook\Core\CoreServiceProvider', 'Cookbook\Eav\EavServiceProvider'];
 	}
 
 	public function testCreateEntityType()
@@ -103,9 +103,9 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeCreateCommand($params) );
 
-		$this->assertTrue(is_object($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->d->dump($result);
+		$this->d->dump($result->toArray());
 	}
 
 	/**
@@ -113,6 +113,8 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 	 */
 	public function testCreateException()
 	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
 		$params = [
 			'code' => '',
 			'name' => 'Test Type',
@@ -128,6 +130,8 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 	public function testUpdateEntityType()
 	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
 		$params = [
 			'code' => 'test_type_changed'
 		];
@@ -138,10 +142,10 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeUpdateCommand($params, 1) );
 		
-		$this->assertTrue(is_object($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test_type_changed', $result->code);
-		$this->d->dump($result);
+		$this->d->dump($result->toArray());
 	}
 
 	/**
@@ -149,6 +153,8 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 	 */
 	public function testUpdateException()
 	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
 		$params = [
 			'code' => ''
 		];
@@ -163,6 +169,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 	public function testDeleteEntityType()
 	{
+		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
@@ -178,7 +185,8 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 	 */
 	public function testDeleteException()
 	{
-		
+		fwrite(STDOUT, __METHOD__ . "\n");
+
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
@@ -187,15 +195,40 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 	public function testFetchEntityType()
 	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeFetchCommand([], 1));
 
-		$this->assertTrue(is_object($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(1, $result->id);
-		$this->d->dump($result);
+		$this->d->dump($result->toArray());
+	}
+
+	public function testFetchWithInclude()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeFetchCommand(['include' => 'attribute_sets'], 1));
+
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue(is_int($result->id));
+		$this->assertEquals(1, $result->id);
+		$this->assertEquals(3, count($result->attribute_sets));
+		$this->d->dump($result->toArray());
+
+		$arrayWithMeta = $result->toArray(true, false);
+		$this->assertEquals(1, $arrayWithMeta['meta']['id']);
+		$this->assertEquals('attribute_sets', $arrayWithMeta['meta']['include']);
+		$this->assertEquals(3, count($arrayWithMeta['included']));
+
+		$this->d->dump($arrayWithMeta);
 	}
 
 	/**
@@ -203,7 +236,8 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 	 */
 	public function testFetchException()
 	{
-		
+		fwrite(STDOUT, __METHOD__ . "\n");
+
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
@@ -218,9 +252,9 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand([]));
 
-		$this->assertTrue(is_array($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(count($result), 3);
-		$this->d->dump($result);
+		$this->d->dump($result->toArray());
 
 	}
 
@@ -233,10 +267,10 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand(['sort' => ['-code'], 'limit' => 2, 'offset' => 1]));
 
-		$this->assertTrue(is_array($result));
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(count($result), 2);
 
-		$this->d->dump($result);
+		$this->d->dump($result->toArray());
 	}
 
 }

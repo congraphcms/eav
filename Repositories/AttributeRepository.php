@@ -10,13 +10,15 @@
 
 namespace Cookbook\Eav\Repositories;
 
-
 use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
 use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
 use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
+use Cookbook\Core\Facades\Trunk;
 use Cookbook\Core\Repositories\AbstractRepository;
+use Cookbook\Core\Repositories\Collection;
+use Cookbook\Core\Repositories\Model;
 use Cookbook\Core\Repositories\UsesCache;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
@@ -69,28 +71,6 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * @var array
 	 */
 	protected $availableFieldTypes;
-
-	/**
-	 * Array of available values for sorting attributes
-	 *
-	 * @var array
-	 */
-	protected $availableSorting = [
-		'id',
-		'code',
-		'admin_label',
-		'field_type',
-		'created_at'
-	];
-
-	/**
-	 * Default sorting value
-	 *
-	 * @var array
-	 */
-	protected $defaultSorting = [
-		'created_at'
-	];
 
 	/**
 	 * Create new AttributeRepository
@@ -227,7 +207,11 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$this->updateOptions($options, $keyedOptions, $attribute);
 
 		// update attribute
-		$attribute = $this->updateAttribute($id, $model, $attribute);
+		$id = $this->updateAttribute($id, $model, $attribute);
+
+		Trunk::forgetType('attribute');
+
+		$attribute = $this->fetch($id);
 
 		// and return attrubute
 		return $attribute;
@@ -256,6 +240,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		
 		// delete the attribute
 		$this->db->table('attributes')->where('id', '=', $attribute->id)->delete();
+
+		Trunk::forgetType('attribute');
 
 		return $attribute;
 	}
@@ -374,7 +360,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// 	$this->db->table('attribute_translations')->insert($attributeTranslations);
 		// }
 
-		return $this->fetch($id);
+		return $id;
 	}
 
 	/**
@@ -484,8 +470,20 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @return array
 	 */
-	protected function _fetch($id)
+	protected function _fetch($id, $include = [])
 	{
+		$params = func_get_args();
+		
+		if(Trunk::has($params, 'attribute'))
+		{
+			$attribute = Trunk::get($id, 'attribute');
+			$attribute->clearIncluded();
+			$attribute->load($include);
+			$meta = ['id' => $id, 'include' => $include];
+			$attribute->setMeta($meta);
+			return $attribute;
+		}
+
 		$attribute = $this->db->table('attributes')->find($id);
 		
 		if( ! $attribute )
@@ -511,8 +509,14 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$attribute = $fieldHandler->transformAttribute($attribute);
 
 		$attribute->type = 'attribute';
+
+		$result = new Model($attribute);
 		
-		return $attribute;
+		$result->setParams($params);
+		$meta = ['id' => $id, 'include' => $include];
+		$result->setMeta($meta);
+		$result->load($include);
+		return $result;
 	}
 
 	/**
@@ -520,11 +524,27 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @return array
 	 */
-	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [])
+	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [])
 	{
+		$params = func_get_args();
+
+		if(Trunk::has($params, 'attribute'))
+		{
+			$attributes = Trunk::get($params, 'attribute');
+			$attributes->clearIncluded();
+			$attributes->load($include);
+			$meta = [
+				'include' => $include
+			];
+			$attributes->setMeta($meta);
+			return $attributes;
+		}
+
 		$query = $this->db->table('attributes');
 
 		$query = $this->parseFilters($query, $filter);
+
+		$total = $query->count();
 
 		$query = $this->parsePaging($query, $offset, $limit);
 
@@ -534,7 +554,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		if( ! $attributes )
 		{
-			return [];	
+			$attributes = [];	
 		}
 
 		$ids = [];
@@ -547,13 +567,18 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			$ids[] = $attribute->id;
 			$attribute->options = [];
 			unset($attribute->table);
+			$attribute->type = 'attribute';
 			// $attribute->translations = [];
 		}
-
-		$options = $this->db->table('attribute_options')
-							->whereIn('attribute_id', $ids)
-							->orderBy('sort_order')
-							->get();
+		$options = [];
+		if( ! empty($ids) )
+		{
+			$options = $this->db->table('attribute_options')
+								->whereIn('attribute_id', $ids)
+								->orderBy('sort_order')
+								->get();
+		}
+		
 		
 		foreach ($options as $option) 
 		{
@@ -567,206 +592,24 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			}
 		}
 
-		// $translations = $this->db->table('attribute_translations')
-		// 						 ->whereIn('attribute_id', $ids)
-		// 						 ->get();
+		$result = new Collection($attributes);
+		
+		$result->setParams($params);
 
-		// foreach ($translations as $translation) 
-		// {
-		// 	foreach ($attributes as &$attribute)
-		// 	{
-		// 		if($attribute->id == $translation->attribute_id)
-		// 		{
-		// 			$attribute->translations[] = $translation;
-		// 			break;
-		// 		}
-		// 	}
-		// }
+		$meta = [
+			'count' => count($attributes), 
+			'offset' => $offset, 
+			'limit' => $limit, 
+			'total' => $total, 
+			'filter' => $filter, 
+			'sort' => $sort, 
+			'include' => $include
+		];
+		$result->setMeta($meta);
+
+		$result->load($include);
 		
-		foreach ($attributes as &$attribute) {
-			$attribute->type = 'attribute';
-		}
-		
-		return $attributes;
+		return $result;
 	}
 
-	// /**
-	//  * Get attributes as filters for entities
-	//  * 
-	//  * @param array $filters - criteria for attributes
-	//  * 
-	//  * @return array
-	//  */
-	// public function getFilters($filters = [], $language_id = 0)
-	// {
-		
-	// 	$query = $this->db->table('attributes')
-	// 				->select
-	// 				(
-	// 					'attributes.id as attribute_id',
-	// 					'attributes.code as code',
-	// 					'attributes.is_filterable as is_filterable',
-	// 					'attribute_translations.label as label',
-	// 					'attribute_translations.description as description',
-	// 					'attribute_options.id as option_id',
-	// 					'attribute_options.value as option_value',
-	// 					'attribute_options.label as option_label',
-	// 					'attribute_options.sort_order as option_sort_order'
-	// 				)
-	// 				->join('attribute_translations', 'attribute_translations.attribute_id', '=', 'attributes.id')
-	// 				->join('set_attributes', 'set_attributes.attribute_id', '=', 'attributes.id')
-	// 				->join('attribute_sets', 'attribute_sets.id', '=', 'set_attributes.attribute_set_id')
-	// 				->join('entity_types', 'entity_types.id', '=', 'attribute_sets.entity_type_id')
-	// 				->leftJoin('attribute_options', 'attribute_options.attribute_id', '=', 'attributes.id')
-	// 				->where('attributes.is_filterable', '=', true)
-	// 				->where('attribute_translations.language_id', '=', $language_id)
-	// 				->where
-	// 				(
-	// 					function($query) use ($language_id)
-	// 					{
-	// 						$query	->where('attribute_options.language_id', '=', $language_id)
-	// 								->orWhere('attribute_options.language_id', '=', 0);
-	// 					}
-	// 				)
-	// 				->orderBy('attributes.id')
-	// 				->orderBy('attribute_options.sort_order', 'desc')
-	// 				->groupBy('attributes.id')
-	// 				->groupBy('attribute_options.id');
-
-
-	// 	if(array_key_exists('for', $filters))
-	// 	{
-	// 		$query->where('entity_types.slug', '=', $filters['for']);
-	// 	}
-
-	// 	if(array_key_exists('set', $filters))
-	// 	{
-	// 		$query->where('attribute_sets.name', '=', $filters['set']);
-	// 	}
-
-	// 	if(array_key_exists('code', $filters))
-	// 	{
-	// 		$query->where('attributes.code', '=', $filters['code']);
-	// 	}
-
-
-	// 	$filterResults = $query->get();
-	// 	$attributesKeyed = [];
-	// 	$attributes = [];
-
-	// 	foreach ($filterResults as $filterResult)
-	// 	{
-
-	// 		if(!$filterResult->option_id)
-	// 		{
-	// 			continue;
-	// 		}
-
-	// 		if(!array_key_exists($filterResult->code, $attributesKeyed))
-	// 		{
-	// 			$thisfilter = 
-	// 			[
-	// 				'attribute_id' => $filterResult->attribute_id,
-	// 				'is_filterable' => $filterResult->is_filterable,
-	// 				'code' => $filterResult->code,
-	// 				'label' => $filterResult->label,
-	// 				'description' => $filterResult->description,
-	// 				'options' => []
-	// 			];
-
-	// 			$attributesKeyed[$filterResult->code] = $thisfilter;
-	// 			$attributes[] = $thisfilter;
-	// 		}
-
-			
-
-	// 		$option = 
-	// 		[
-	// 			'id' => $filterResult->option_id,
-	// 			'filter_value' => $filterResult->option_id,
-	// 			'value' => $filterResult->option_value,
-	// 			'label' => $filterResult->option_label,
-	// 			'sort_order' => $filterResult->option_sort_order,
-	// 		];
-
-	// 		$attributes[count($attributes) - 1]['options'][] = $option;
-	// 	}
-
-	// 	if(empty($attributes))
-	// 	{
-	// 		return false;
-	// 	}
-
-	// 	return $attributes;
-	// }
-
-
-	// 	/**
-	//  * Check if the value of the attribute is unique
-	//  * 
-	//  * @param array $params - (attribute_id, value)
-	//  * 
-	//  * @return boolean
-	//  */
-	// public function uniqueValue($params)
-	// {
-	// 	// var_dump($params);
-
-	// 	if(empty($params['attribute_id']))
-	// 	{
-	// 		$this->addErrors('Invalid params');
-	// 		return false;
-	// 	}
-		
-	// 	$attributeDefinition = $this->db->table('attributes')->find($params['attribute_id']);
-	// 	if(!$attributeDefinition)
-	// 	{
-	// 		$this->addErrors('Invalid params');
-	// 		return false;
-	// 	}
-
-	// 	$fieldHandler = $this->fieldHandlerFactory->make($attributeDefinition->field_type);
-
-	// 	$unique = $fieldHandler->uniqueValue($params, $attributeDefinition);
-
-	// 	return $unique;
-	// }
-
-	// /**
-	//  * Check if there is an attribute with that code
-	//  * 
-	//  * @param array $params - (attribute_id, value)
-	//  * 
-	//  * @return boolean
-	//  */
-	// public function uniqueCode($params)
-	// {
-	// 	// var_dump($params);
-
-	// 	if(empty($params['code']))
-	// 	{
-	// 		$this->addErrors('Invalid params');
-	// 		return false;
-	// 	}
-
-	// 	if(empty($params['attribute_id']))
-	// 	{
-	// 		$attributeId = 0;
-	// 	}
-	// 	else
-	// 	{
-	// 		$attributeId = intval($params['attribute_id']);
-	// 	}
-		
-	// 	$attribute = $this->db->table('attributes')->where('code', '=', $params['code'])->where('id', '!=', $attributeId)->first();
-
-	// 	if($attribute)
-	// 	{
-	// 		return false;
-	// 	}
-	// 	else
-	// 	{
-	// 		return true;
-	// 	}
-	// }
 }

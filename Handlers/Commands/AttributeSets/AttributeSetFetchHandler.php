@@ -51,6 +51,7 @@ class AttributeSetFetchHandler extends RepositoryCommandHandler
 	 */
 	public function handle(RepositoryCommand $command)
 	{
-		return $this->repository->fetch($command->id);
+		$include = (!empty($command->params['include']))?$command->params['include']:[];
+		return $this->repository->fetch($command->id, $include);
 	}
 }

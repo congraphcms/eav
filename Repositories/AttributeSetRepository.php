@@ -17,6 +17,9 @@ use Cookbook\Core\Exceptions\BadRequestException;
 use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Repositories\AbstractRepository;
+use Cookbook\Core\Repositories\Collection;
+use Cookbook\Core\Repositories\Model;
+use Cookbook\Core\Facades\Trunk;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 use stdClass;
@@ -94,7 +97,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		$this->insertSetAttributes($attributes);
 
-		$attributeSet = $this->fetch($attributeSetId, true);
+		$attributeSet = $this->fetch($attributeSetId);
 
 		return $attributeSet;
 		
@@ -142,8 +145,8 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			$this->insertSetAttributes($attributes);
 		}
 		
-
-		$attributeSet = $this->fetch($attributeSetId, [], true);
+		Trunk::forgetType('attribute-set');
+		$attributeSet = $this->fetch($attributeSetId);
 
 		return $attributeSet;
 	}
@@ -172,6 +175,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		// delete the attribute set
 		$this->db->table('attribute_sets')->where('id', '=', $id)->delete();
 
+		Trunk::forgetType('attribute-set');
 		return $attributeSet;
 	}
 
@@ -191,6 +195,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		if( ! empty($setIDs) )
 		{
+			Trunk::forgetType('attribute-set');
 			$this->deleteSetAttributes($setIDs);
 
 			// delete the attribute set
@@ -210,6 +215,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	public function deleteByAttribute($attribute)
 	{
 		$this->deleteSetAttributesByAttribute($attribute->id);
+		Trunk::forgetType('attribute-set');
 	}
 
 
@@ -342,7 +348,20 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	 * 
 	 * @return Model
 	 */
-	protected function _fetch($id){
+	protected function _fetch($id, $include = [])
+	{
+		$params = func_get_args();
+		
+		if(Trunk::has($params, 'attribute-set'))
+		{
+			$attributeSet = Trunk::get($id, 'attribute-set');
+			$attributeSet->clearIncluded();
+			$attributeSet->load($include);
+			$meta = ['id' => $id, 'include' => $include];
+			$attributeSet->setMeta($meta);
+			return $attributeSet;
+		}
+
 		$attributeSet = $this->db->table('attribute_sets')->find($id);
 
 		if( empty($attributeSet) )
@@ -366,7 +385,13 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		$attributeSet->entity_type->type = 'entity-type';
 
-		return $attributeSet;
+		$result = new Model($attributeSet);
+		
+		$result->setParams($params);
+		$meta = ['id' => $id, 'include' => $include];
+		$result->setMeta($meta);
+		$result->load($include);
+		return $result;
 	}
 
 	/**
@@ -374,11 +399,29 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	 * 
 	 * @return array
 	 */
-	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [])
+	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [])
 	{
+
+		$params = func_get_args();
+
+		if(Trunk::has($params, 'attribute-set'))
+		{
+			$attributeSets = Trunk::get($params, 'attribute-set');
+			$attributeSets->clearIncluded();
+			$attributeSets->load($include);
+			$meta = [
+				'include' => $include
+			];
+			$attributeSets->setMeta($meta);
+			return $attributeSets;
+		}
+
+
 		$query = $this->db->table('attribute_sets');
 
 		$query = $this->parseFilters($query, $filter);
+
+		$total = $query->count();
 
 		$query = $this->parsePaging($query, $offset, $limit);
 
@@ -388,7 +431,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		if( ! $attributeSets )
 		{
-			return [];	
+			$attributeSets = [];	
 		}
 
 		$ids = [];
@@ -403,11 +446,17 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			$attributeSet->entity_type->type = 'entity-type';
 		}
 
-		$setAttributes = $this->db->table('set_attributes')
+		$setAttributes = [];
+
+		if( ! empty($ids) )
+		{
+			$setAttributes = $this->db->table('set_attributes')
 								  ->select('attribute_id', 'attribute_set_id')
 								  ->whereIn('attribute_set_id', $ids)
 								  ->orderBy('sort_order')
 								  ->get();
+		}
+		
 		
 		foreach ($setAttributes as $setAttribute) 
 		{
@@ -425,68 +474,23 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			}
 		}
 		
-		return $attributeSets;
-	}
-
-	
-
-	// /**
-	//  * Get all attribute sets
-	//  * using $attributeSetModel
-	//  * 
-	//  * @param array $with - optional relations to be fetched with attribute sets
-	//  * 
-	//  * @return Collection
-	//  */
-	// public function fetchAll($with = array()){
-	// 	return $this->attributeSetModel->with($with)->get();
-	// }
-
-	// /**
-	//  * Get all attribute sets belonging to type
-	//  * using $attributeSetModel
-	//  *
-	//  * @param string $type - entity type slug 
-	//  * @param array $with - optional relations to be fetched with attribute sets
-	//  * 
-	//  * @return Collection
-	//  */
-	// public function fetchByType($type, $with = array()){
-	// 	return $this->attributeSetModel
-	// 				->with($with)
-	// 				->whereHas('entityType', function($q) use ($type){
-	// 					$q->where('slug', '=', $type);
-	// 				})->get();
-	// }
-
-	// /**
-	//  * Check if there is an attribute set with that slug
-	//  * 
-	//  * @param array $params - (attribute_set_id, value)
-	//  * 
-	//  * @return boolean
-	//  */
-	// public function uniqueSlug($params){
-
-	// 	if(empty($params['slug'])){
-	// 		$this->addErrors(
-	// 			array('Invalid params')
-	// 		);
-	// 		return false;
-	// 	}
-
-	// 	if(empty($params['attribute_set_id'])){
-	// 		$attributeSetId = 0;
-	// 	}else{
-	// 		$attributeSetId = intval($params['attribute_set_id']);
-	// 	}
+		$result = new Collection($attributeSets);
 		
-	// 	$attributeSet = $this->attributeSetModel->where('slug', '=', $params['slug'])->where('id', '!=', $attributeSetId)->first();
+		$result->setParams($params);
 
-	// 	if($attributeSet){
-	// 		return false;
-	// 	}else{
-	// 		return true;
-	// 	}
-	// }
+		$meta = [
+			'count' => count($attributeSets), 
+			'offset' => $offset, 
+			'limit' => $limit, 
+			'total' => $total, 
+			'filter' => $filter, 
+			'sort' => $sort, 
+			'include' => $include
+		];
+		$result->setMeta($meta);
+
+		$result->load($include);
+		
+		return $result;
+	}
 }
