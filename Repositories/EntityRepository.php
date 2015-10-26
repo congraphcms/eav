@@ -506,7 +506,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 * 
 	 * @return array
 	 */
-	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [], $locale = 0)
+	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [], $locale = 0, $type = null)
 	{
 		$params = func_get_args();
 
@@ -534,6 +534,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 						)
 						->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id');
 
+		if( ! empty($type) )
+		{
+			$query->where('entity_types.code', '=', $type);
+		}
+		
 		$query = $this->parseFilters($query, $filter);
 
 		$query->groupBy('entities.id');

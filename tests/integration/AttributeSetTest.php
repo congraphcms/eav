@@ -1,6 +1,5 @@
 <?php
 
-// include_once(realpath(__DIR__.'/../LaravelMocks.php'));
 use Illuminate\Support\Facades\Cache;
 use Cookbook\Core\Facades\Trunk;
 use Illuminate\Support\Debug\Dumper;
@@ -27,11 +26,6 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 
 		$this->d = new Dumper();
 
-
-		// $this->app = $this->createApplication();
-
-		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
-
 	}
 
 	public function tearDown()
@@ -40,7 +34,6 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		// parent::tearDown();
 		Trunk::forgetAll();
 		$this->artisan('migrate:reset');
-		// unset($this->app);
 
 		parent::tearDown();
 	}
@@ -296,7 +289,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand(['sort' => ['-code'], 'limit' => 2, 'offset' => 1]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(count($result), 2);
+		$this->assertEquals(2, count($result));
 
 		$this->d->dump($result->toArray());
 	}
