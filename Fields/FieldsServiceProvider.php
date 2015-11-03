@@ -36,6 +36,14 @@ class FieldsServiceProvider extends ServiceProvider {
 	 */
 	protected $defer = true;
 
+	/**
+	 * Boot
+	 * @return void
+	 */
+	public function boot()
+	{
+		$this->registerListeners();
+	}
 
 	/**
 	* Register
@@ -49,11 +57,21 @@ class FieldsServiceProvider extends ServiceProvider {
 	}
 
 	/**
+	* Register Event Listeners
+	*
+	* @return void
+	*/
+	protected function registerListeners()
+	{
+		$this->app['events']->listen('cb.after.file.delete', 'Cookbook\Eav\Fields\Asset\AssetFieldHandler@onFileDelete');
+	}
+
+	/**
 	* Register the AttributeHandlerFactory
 	*
 	* @return void
 	*/
-	public function registerFactories() {
+	protected function registerFactories() {
 		$this 	->app
 				->singleton('Cookbook\Eav\Fields\FieldHandlerFactory', function($app){
 					return new FieldHandlerFactory(
@@ -84,8 +102,8 @@ class FieldsServiceProvider extends ServiceProvider {
 	*
 	* @return void
 	*/
-	public function registerFieldHandlers() {
-		$field_types = $this->app['config']->get('eav.field_types');
+	protected function registerFieldHandlers() {
+		$field_types = $this->app['config']->get('cookbook.field_types');
 
 		if( ! is_array($field_types) )
 		{
@@ -101,11 +119,72 @@ class FieldsServiceProvider extends ServiceProvider {
 					return new $settings['handler'](
 						$app['db']->connection(),
 						$app->make('Cookbook\Eav\Managers\AttributeManager'),
+						$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
 						$settings['table']
 					);
 				});
 			}
 		}
+
+
+		$this->app->bind('Cookbook\Eav\Fields\Asset\AssetFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Asset\AssetFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Filesystem\FileRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Decimal\DecimalFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Decimal\DecimalFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Integer\IntegerFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Integer\IntegerFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Relation\RelationFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Relation\RelationFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Select\SelectFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Select\SelectFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Text\TextFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Text\TextFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Textarea\TextareaFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Textarea\TextareaFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
 		
 	}
 
@@ -114,25 +193,87 @@ class FieldsServiceProvider extends ServiceProvider {
 	*
 	* @return void
 	*/
-	public function registerFieldValidators() {
-		$field_types = $this->app['config']->get('eav.field_types');
+	protected function registerFieldValidators() {
+		// $field_types = $this->app['config']->get('cookbook.field_types');
 
-		if( ! is_array($field_types) )
-		{
-			return;
-		}
+		// if( ! is_array($field_types) )
+		// {
+		// 	return;
+		// }
+		$this->app->bind('Cookbook\Eav\Fields\Asset\AssetFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Asset\AssetFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Filesystem\FileRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Datetime\DatetimeFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Datetime\DatetimeFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Decimal\DecimalFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Decimal\DecimalFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Integer\IntegerFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Integer\IntegerFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Relation\RelationFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Relation\RelationFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Select\SelectFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Select\SelectFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Text\TextFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Text\TextFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Textarea\TextareaFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Textarea\TextareaFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
 
-		foreach ($field_types as $type => $settings)
-		{
-			if( isset($settings['validator']) )
-			{
-				$this->app->bind($settings['validator'], function($app) use($settings){
+		// foreach ($field_types as $type => $settings)
+		// {
+		// 	if( isset($settings['validator']) )
+		// 	{
+		// 		$this->app->bind($settings['validator'], function($app) use($settings){
 
-					return new $settings['validator']( $app->make('Cookbook\Eav\Managers\AttributeManager') );
-				});
-			}
+		// 			return new $settings['validator']( 
+		// 				$app['db']->connection(),
+		// 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+		// 				$settings['table']
+		// 			);
+		// 		});
+		// 	}
 			
-		}
+		// }
 		
 	}
 
@@ -148,7 +289,7 @@ class FieldsServiceProvider extends ServiceProvider {
 			'Cookbook\Contracts\Eav\FieldHandlerFactoryContract'
 		];
 
-		$field_types = $this->app['config']->get('eav');
+		$field_types = $this->app['config']->get('cookbook');
 
 		if( ! is_array($field_types) )
 		{

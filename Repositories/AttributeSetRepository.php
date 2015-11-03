@@ -22,6 +22,8 @@ use Cookbook\Core\Repositories\Model;
 use Cookbook\Core\Facades\Trunk;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\Config;
+use Carbon\Carbon;
 use stdClass;
 
 
@@ -232,7 +234,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	{
 
 		// insert attribute set in database
-		$params['created_at'] = $params['updated_at'] = date('Y-m-d H:i:s');
+		$params['created_at'] = $params['updated_at'] = Carbon::now('UTC')->toDateTimeString();
 		$attributeSetId = $this->db->table('attribute_sets')->insertGetId($params);
 
 		return $attributeSetId;
@@ -266,7 +268,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		unset($attributeSetParams['id']);
 
-		$attributeSetParams['updated_at'] = date('Y-m-d H:i:s');
+		$attributeSetParams['updated_at'] = Carbon::now('UTC')->toDateTimeString();
 
 		// update attribute set in database
 		$this->db->table('attribute_sets')->where('id', '=', $id)->update($attributeSetParams);
@@ -385,6 +387,10 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		$attributeSet->entity_type->type = 'entity-type';
 
+		$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+		$attributeSet->created_at = Carbon::parse($attributeSet->created_at)->tz($timezone);
+		$attributeSet->updated_at = Carbon::parse($attributeSet->updated_at)->tz($timezone);
+
 		$result = new Model($attributeSet);
 		
 		$result->setParams($params);
@@ -444,6 +450,10 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			$attributeSet->entity_type = new stdClass();
 			$attributeSet->entity_type->id = $attributeSet->entity_type_id;
 			$attributeSet->entity_type->type = 'entity-type';
+			$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+			$attributeSet->created_at = Carbon::parse($attributeSet->created_at)->tz($timezone);
+			$attributeSet->updated_at = Carbon::parse($attributeSet->updated_at)->tz($timezone);
+
 		}
 
 		$setAttributes = [];

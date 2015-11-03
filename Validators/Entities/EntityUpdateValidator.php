@@ -126,24 +126,18 @@ class EntityUpdateValidator extends Validator
 		$command->params['entity_type_id'] = $entity->entity_type_id;
 		$command->params['attribute_set_id'] = $entity->attribute_set_id;
 
-		$attributeSet = $this->attributeSetRepository->fetch($entity->attribute_set_id);
-
-		$attributeIds = [];
-		$attributes = [];
-		foreach ($attributeSet->attributes as $attribute) {
-			$attributeIds[] = $attribute->id;
-		}
-
-		if (! empty($attributeIds)) {
-			$attributes = $this->attributeRepository->get(['id' => ['in' => $attributeIds]]);
-		}
+		$attributeSet = $this->attributeSetRepository->fetch($entity->attribute_set_id, ['attributes']);
 
 		$attributesByCode = [];
-		foreach ($attributes as $attribute) {
-			$attributesByCode[$attribute->code] = $attribute;
-			if (! isset($command->params['fields'][$attribute->code])) {
-				$command->params['fields'][$attribute->code] = $attribute->default_value;
+		foreach ($attributeSet->attributes as $attr)
+		{
+			$attribute = $this->attributeRepository->fetch($attr->id);
+			if (! isset($command->params['fields'][$attribute->code]))
+			{
+				continue;
 			}
+
+			$attributesByCode[$attribute->code] = $attribute;
 
 			$value = $command->params['fields'][$attribute->code];
 

@@ -272,7 +272,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(7, count($result));
+		$this->assertEquals(14, count($result));
 		$this->d->dump($result->toArray());
 
 	}
@@ -299,7 +299,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals([], $arrayResultWithMeta['meta']['filter']);
 		$this->assertEquals([], $arrayResultWithMeta['meta']['include']);
 		$this->assertEquals(3, $arrayResultWithMeta['meta']['count']);
-		$this->assertEquals(7, $arrayResultWithMeta['meta']['total']);
+		$this->assertEquals(14, $arrayResultWithMeta['meta']['total']);
 		$this->d->dump($arrayResultWithMeta);
 	}
 
@@ -335,7 +335,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(3, count($result));
+		$this->assertEquals(10, count($result));
 
 		$this->d->dump($result->toArray());
 
@@ -362,7 +362,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(6, count($result));
+		$this->assertEquals(13, count($result));
 
 		$this->d->dump($result->toArray());
 	}

@@ -8,14 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields\Textarea;
+namespace Cookbook\Eav\Fields\Integer;
 
+use Illuminate\Support\Facades\Config;
 use Cookbook\Eav\Fields\AbstractFieldHandler;
 
 /**
- * TextAreaFieldHandler class
+ * IntegerFieldHandler class
  * 
- * Responsible for handling text area field types
+ * Responsible for handling integer field types
+ * 
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -23,14 +25,16 @@ use Cookbook\Eav\Fields\AbstractFieldHandler;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class TextareaFieldHandler extends AbstractFieldHandler {
+class IntegerFieldHandler extends AbstractFieldHandler {
+
 
 	/**
 	 * DB table for SQL
 	 *
 	 * @var array
 	 */
-	protected $table = 'attribute_values_text';
+	protected $table = 'attribute_values_integer';
+
 	
 	/**
 	 * Parse value for database input
@@ -42,9 +46,7 @@ class TextareaFieldHandler extends AbstractFieldHandler {
 	 */
 	public function parseValue($value, $attribute)
 	{
-		$value = strval($value);
+		$value = intval($value);
 		return $value;
 	}
-
-	
 }

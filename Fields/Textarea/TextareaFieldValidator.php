@@ -8,15 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields\Text;
+namespace Cookbook\Eav\Fields\Textarea;
 
 use Cookbook\Eav\Fields\AbstractFieldValidator;
-use Cookbook\Eav\Managers\AttributeManager;
 
 /**
- * TextFieldValidator class
+ * TextareaFieldValidator class
  * 
- * Validating fields and values of text type
+ * Validating fields and values of text area type
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -24,7 +23,7 @@ use Cookbook\Eav\Managers\AttributeManager;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class TextFieldValidator extends AbstractFieldValidator
+class TextareaFieldValidator extends AbstractFieldValidator
 {
 	/**
 	 * List of available operations for filtering entities
@@ -38,7 +37,7 @@ class TextFieldValidator extends AbstractFieldValidator
 	 *
 	 * @var array
 	 */
-	protected $table = 'attribute_values_varchar';
+	protected $table = 'attribute_values_text';
 
 	/**
 	 * Check for specific rules and validation on attribute insert
@@ -54,7 +53,7 @@ class TextFieldValidator extends AbstractFieldValidator
 	{
 		if( ! empty($params['data']) )
 		{
-			$this->exception->addErrors(array('data' => 'Text field attributes can\'t have data'));
+			$this->exception->addErrors(array('data' => 'Text area field attributes can\'t have data'));
 			throw $this->exception;
 			
 		}
@@ -76,7 +75,7 @@ class TextFieldValidator extends AbstractFieldValidator
 	{
 		if( ! empty($params['data']) )
 		{
-			$this->exception->addErrors(array('data' => 'Text field attributes can\'t have data'));
+			$this->exception->addErrors(array('data' => 'Text area field attributes can\'t have data'));
 			throw $this->exception;
 		}
 

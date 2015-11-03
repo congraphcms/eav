@@ -49,7 +49,7 @@ return array(
 		 * Administration will render this input as HTML5 text input
 		 * values will be written as strings in attribute_values_varchar table
 		 * 
-		 * It's an open field that can be required, unique and filterable
+		 * It's an open field that can be required, unique, sortable and filterable
 		 */
 		'text' => array(
 			'label'						=> 'Text',
@@ -60,8 +60,8 @@ return array(
 			'can_have_default_value'	=> true,
 			'can_be_required' 			=> true,
 			'can_be_unique'				=> true,
-			'can_be_filter'				=> false,
-			'can_be_language_dependent'	=> true,
+			'can_be_filter'				=> true,
+			'can_be_localized'			=> true,
 			'has_options'				=> false,
 			'is_relation'				=> false,
 			'is_asset'					=> false,
@@ -69,30 +69,164 @@ return array(
 			'sortable'					=> true
 		),
 
-		// /**
-		//  * Simple text area
-		//  * 
-		//  * Administration will render this input as HTML5 text area
-		//  * values will be written as strings in attribute_values_text table
-		//  * 
-		//  * It's an open field that can be required, unique and filterable
-		//  */
-		// 'text_area' => array(
-		// 	'label'						=> 'Text Area',
-		// 	'table' 					=> 'attribute_values_text',
-		// 	'handler'					=> 'Vizioart\Attributes\Handlers\TextAreaAttributeHandler',
-		// 	'handler_name'				=> 'TextAreaAttributeHandler',
-		// 	'value_model'				=> 'Vizioart\Attributes\Models\AttributeValueText',
-		// 	'can_have_default_value'	=> true,
-		// 	'can_be_required' 			=> true,
-		// 	'can_be_unique'				=> true,
-		// 	'can_be_filter'				=> false,
-		// 	'can_be_language_dependent'	=> true,
-		// 	'has_options'				=> false,
-		// 	'is_relation'				=> false,
-		// 	'is_asset'					=> false,
-		// 	'has_multiple_values'		=> false
-		// ),
+		/**
+		 * Simple text area
+		 * 
+		 * Administration will render this input as HTML5 text area
+		 * values will be written as strings in attribute_values_text table
+		 * 
+		 * It's an open field that can be required, unique, sortable and filterable
+		 */
+		'text_area' => array(
+			'label'						=> 'Text Area',
+			'table' 					=> 'attribute_values_text',
+			'handler'					=> 'Cookbook\Eav\Fields\Textarea\TextareaFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Textarea\TextareaFieldValidator',
+			'handler_name'				=> 'TextareaFieldHandler',
+			'can_have_default_value'	=> true,
+			'can_be_required' 			=> true,
+			'can_be_unique'				=> true,
+			'can_be_filter'				=> true,
+			'can_be_localized'			=> true,
+			'has_options'				=> false,
+			'is_relation'				=> false,
+			'is_asset'					=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> true
+		),
+
+		/**
+		 * Select input
+		 * 
+		 * Administration will render this input as HTML5 select input
+		 * values will be written as integers (ID of selected option) 
+		 * in attribute_values_integer table
+		 * 
+		 * It's a choise field that can be required and filterable
+		 * It has options (options for HTML5 select)
+		 */
+		'select' => array(
+			'label'						=> 'Select',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Select\SelectFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Select\SelectFieldValidator',
+			'handler_name'				=> 'SelectFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_required' 			=> true,
+			'can_be_unique'				=> false,
+			'can_be_filter'				=> true,
+			'can_be_localized'			=> true,
+			'has_options'				=> true,
+			'is_relation'				=> false,
+			'is_asset'					=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> true
+		),
+
+		/**
+		 * Integer field
+		 */
+		'integer' => array(
+			'label'						=> 'Integer Number',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Integer\IntegerFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Integer\IntegerFieldValidator',
+			'handler_name'				=> 'IntegerFieldHandler',
+			'can_have_default_value'	=> true,
+			'can_be_required' 			=> true,
+			'can_be_unique'				=> true,
+			'can_be_filter'				=> true,
+			'can_be_localized'			=> true,
+			'has_options'				=> false,
+			'is_relation'				=> false,
+			'is_asset'					=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> true
+		),
+
+		/**
+		 * Decimal field
+		 */
+		'decimal' => array(
+			'label'						=> 'Decimal Number',
+			'table' 					=> 'attribute_values_decimal',
+			'handler'					=> 'Cookbook\Eav\Fields\Decimal\DecimalFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Decimal\DecimalFieldValidator',
+			'handler_name'				=> 'DecimalFieldHandler',
+			'can_have_default_value'	=> true,
+			'can_be_required' 			=> true,
+			'can_be_unique'				=> true,
+			'can_be_filter'				=> true,
+			'can_be_localized'			=> true,
+			'has_options'				=> false,
+			'is_relation'				=> false,
+			'is_asset'					=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> true
+		),
+
+		/**
+		 * Datetime field
+		 */
+		'datetime' => array(
+			'label'						=> 'Date & Time',
+			'table' 					=> 'attribute_values_datetime',
+			'handler'					=> 'Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Datetime\DatetimeFieldValidator',
+			'handler_name'				=> 'DatetimeFieldHandler',
+			'can_have_default_value'	=> true,
+			'can_be_required' 			=> true,
+			'can_be_unique'				=> true,
+			'can_be_filter'				=> true,
+			'can_be_localized'			=> true,
+			'has_options'				=> false,
+			'is_relation'				=> false,
+			'is_asset'					=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> true
+		),
+
+		/**
+		 * Relation field
+		 */
+		'relation' => array(
+			'label'						=> 'Relation',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldValidator',
+			'handler_name'				=> 'RelationFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_required' 			=> true,
+			'can_be_unique'				=> false,
+			'can_be_filter'				=> true,
+			'can_be_localized'			=> true,
+			'has_options'				=> false,
+			'is_relation'				=> true,
+			'is_asset'					=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> false
+		),
+
+		/**
+		 * Asset field
+		 */
+		'asset' => array(
+			'label'						=> 'Asset',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldValidator',
+			'handler_name'				=> 'AssetFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_required' 			=> true,
+			'can_be_unique'				=> false,
+			'can_be_filter'				=> true,
+			'can_be_localized'			=> true,
+			'has_options'				=> false,
+			'is_relation'				=> false,
+			'is_asset'					=> true,
+			'has_multiple_values'		=> false,
+			'sortable'					=> false
+		),
 
 		// /**
 		//  * Rich text area
@@ -143,32 +277,7 @@ return array(
 		// 	'has_multiple_values'		=> false
 		// ),
 
-		// /**
-		//  * Select input
-		//  * 
-		//  * Administration will render this input as HTML5 select input
-		//  * values will be written as integers (ID of selected option) 
-		//  * in attribute_values_integer table
-		//  * 
-		//  * It's a choise field that can be required and filterable
-		//  * It has options (options for HTML5 select)
-		//  */
-		// 'select' => array(
-		// 	'label'						=> 'Select',
-		// 	'table' 					=> 'attribute_values_integer',
-		// 	'handler'					=> 'Vizioart\Attributes\Handlers\SelectAttributeHandler',
-		// 	'handler_name'				=> 'SelectAttributeHandler',
-		// 	'value_model'				=> 'Vizioart\Attributes\Models\AttributeValueInteger',
-		// 	'can_have_default_value'	=> false,
-		// 	'can_be_required' 			=> true,
-		// 	'can_be_unique'				=> false,
-		// 	'can_be_filter'				=> true,
-		// 	'can_be_language_dependent'	=> true,
-		// 	'has_options'				=> true,
-		// 	'is_relation'				=> false,
-		// 	'is_asset'					=> false,
-		// 	'has_multiple_values'		=> false
-		// ),
+		
 
 		// /**
 		//  * Entity relation input

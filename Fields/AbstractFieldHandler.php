@@ -10,6 +10,7 @@
 
 namespace Cookbook\Eav\Fields;
 
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Contracts\Eav\FieldHandlerContract;
 use Cookbook\Core\Traits\ErrorManagerTrait;
 use Cookbook\Eav\Managers\AttributeManager;
@@ -49,6 +50,13 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	public $attributeManager;
 
 	/**
+	 * Repository for attributes
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 */
+	public $attributeRepository;
+
+	/**
 	 * Attribute value table name
 	 * 
 	 * @var string
@@ -65,48 +73,65 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 *  
 	 * @return void
 	 */
-	public function __construct(Connection $db, AttributeManager $attributeManager, $table)
+	public function __construct(Connection $db, AttributeManager $attributeManager, AttributeRepositoryContract $attributeRepository)
 	{
 		// Inject dependencies
 		$this->db = $db;
 		$this->attributeManager = $attributeManager;
-		$this->table = $table;
+		$this->attributeRepository = $attributeRepository;
 
 		// Init empty MessagBag object for errors
 		$this->setErrors();
 	}
 
-
-	
-
 	/**
-	 * Parse value for output
+	 * Parse value for database input
 	 * 
-	 * Takes field value and attribute definition
-	 * 
-	 * @param array $valueParams
-	 * @param object $attributeDefinition
+	 * @param mixed $value
+	 * @param object $attribute
 	 * 
 	 * @return boolean
 	 */
-	public function parseValue($value, $attributeDefinition)
+	public function parseValue($value, $attribute)
 	{
 		return $value;
 	}
 
 	/**
-	 * Format value for database input
+	 * Format value for output
 	 * 
-	 * Takes field value and attribute definition
-	 * 
-	 * @param array $valueParams
-	 * @param object $attributeDefinition
+	 * @param mixed $value
+	 * @param object $attribute
 	 * 
 	 * @return boolean
 	 */
-	public function formatValue($value, $attributeDefinition)
+	public function formatValue($value, $attribute)
 	{
 		return $value;
+	}
+
+	/**
+	 * Parse attribute for database input
+	 * 
+	 * @param array $attribute
+	 * 
+	 * @return object
+	 */
+	public function parseAttribute($attribute)
+	{
+		return $attribute;
+	}
+
+	/**
+	 * Format attribute for output
+	 * 
+	 * @param object $attribute
+	 * 
+	 * @return object
+	 */
+	public function formatAttribute($attribute)
+	{
+		return $attribute;
 	}
 
 
@@ -116,13 +141,13 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Takes attribute value params and attribute definition
 	 * 
 	 * @param array $valueParams
-	 * @param object $attributeDefinition
+	 * @param object $attribute
 	 * 
 	 * @return boolean
 	 */
-	public function insert($valueParams, $attributeDefinition)
+	public function insert($valueParams, $attribute)
 	{
-		$attributeSettings = $this->attributeManager->getFieldTypes()[$attributeDefinition->field_type];
+		$attributeSettings = $this->attributeManager->getFieldTypes()[$attribute->field_type];
 
 		if($attributeSettings['has_multiple_values'])
 		{
@@ -137,7 +162,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			foreach ($valueParams['value'] as $value)
 			{
 				$singleValueParams = $valueParams;
-				$parsedValue = $this->parseValue($value, $attributeDefinition);
+				$parsedValue = $this->parseValue($value, $attribute);
 				$singleValueParams['value'] = $parsedValue;
 				// give it a sort_order
 				$singleValueParams['sort_order'] = $sort_order++;
@@ -146,7 +171,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		}
 		else
 		{
-			$parsedValue = $this->parseValue($valueParams['value'], $attributeDefinition);
+			$parsedValue = $this->parseValue($valueParams['value'], $attribute);
 			$valueParams['value'] = $parsedValue;
 			$this->db->table($this->table)->insert($valueParams);
 		}
@@ -159,14 +184,14 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Takes attribute value params and attribute definition
 	 * 
 	 * @param array $valueParams
-	 * @param object $attributeDefinition
+	 * @param object $attribute
 	 * 
 	 * @return boolean
 	 */
-	public function update($valueParams, $attributeDefinition)
+	public function update($valueParams, $attribute)
 	{
 
-		$attributeSettings = $this->attributeManager->getFieldTypes()[$attributeDefinition->field_type];
+		$attributeSettings = $this->attributeManager->getFieldTypes()[$attribute->field_type];
 
 		// delete all values for provided entity, attribute and language
 		$this	->db->table( $this->table )
@@ -192,7 +217,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			foreach ($valueParams['value'] as $value)
 			{
 				$singleValueParams = $valueParams;
-				$parsedValue = $this->parseValue($value, $attributeDefinition);
+				$parsedValue = $this->parseValue($value, $attribute);
 				$singleValueParams['value'] = $parsedValue;
 				// give it a sort_order
 				$singleValueParams['sort_order'] = $sort_order++;
@@ -201,7 +226,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		}
 		else
 		{
-			$parsedValue = $this->parseValue($valueParams['value'], $attributeDefinition);
+			$parsedValue = $this->parseValue($valueParams['value'], $attribute);
 			$valueParams['value'] = $parsedValue;
 			$this->db->table($this->table)->insert($valueParams);
 		}
@@ -211,15 +236,15 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Delete values in database for entity
 	 * 
 	 * @param object $valueParams
-	 * @param object $attributeDefinition
+	 * @param object $attribute
 	 * 
 	 * @return boolean
 	 */
-	public function deleteByEntity($entity, $attributeDefinition)
+	public function deleteByEntity($entity, $attribute)
 	{
 		// delete all values for provided entity, attribute and language
 		$this	->db->table( $this->table )
-				->where( 'attribute_id', '=', $attributeDefinition->id )
+				->where( 'attribute_id', '=', $attribute->id )
 				->where( 'entity_id', '=', $entity->id )
 				->delete();
 	}
@@ -272,14 +297,18 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * and deletes all related values and set entries
 	 * 
 	 * @param object $attributeSet
+	 * @param object $attribute
 	 * 
 	 * @todo Check if there is need for returning false or there will be an exception if something goes wrong
 	 */
-	public function deleteByAttributeSet($attributeSet)
+	public function deleteByAttributeSet($attributeSet, $attribute)
 	{
 		// delete all attribute values associated with provided attribute set
-		$this->db->table($this->table)->where('attribute_set_id', '=', $attributeSet->id)
+		$this->db->table($this->table)
+				 ->where('attribute_id', '=', $attribute->id)
+				 ->where('attribute_set_id', '=', $attributeSet->id)
 				 ->delete();
+		
 	}
 
 	/**
@@ -289,13 +318,16 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * and deletes all related values and set entries
 	 * 
 	 * @param object $entityType
+	 * @param object $attribute
 	 * 
 	 * @todo Check if there is need for returning false or there will be an exception if something goes wrong
 	 */
-	public function deleteByEntityType($entityType)
+	public function deleteByEntityType($entityType, $attribute)
 	{
-		// delete all attribute values associated with provided entity type
-		$this->db->table($this->table)->where('entity_type_id', '=', $entityType->id)
+		// delete all attribute values associated with provided attribute set
+		$this->db->table($this->table)
+				 ->where('attribute_id', '=', $attribute->id)
+				 ->where('entity_type_id', '=', $entityType->id)
 				 ->delete();
 	}
 	
@@ -304,34 +336,53 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Add filters to query for field
 	 * 
 	 * @param object $query
-	 * @param object $attributeDefinition
+	 * @param object $attribute
 	 * @param $filter
 	 * 
 	 * @return boolean
 	 */
-	public function filterEntities($query, $attributeDefinition, $filter)
+	public function filterEntities($query, $attribute, $filter)
 	{
-		$code = $attributeDefinition->code;
-		$query = $query->join($this->table . ' as filter_' . $code, 'filter_' . $code . '.entity_id', '=', 'entities.id');
+		$code = $attribute->code;
+
+		$query = $query->join($this->table . ' as filter_' . $code, function($join) use($attribute, $filter)
+			{
+				$join->on('filter_' . $attribute->code . '.entity_id', '=', 'entities.id');
+				$join->on('filter_' . $attribute->code . '.attribute_id', '=', $this->db->raw($attribute->id));
+			}
+		);
 
 		if( ! is_array($filter) )
 		{
-			$filter = $this->parseValue($filter, $attributeDefinition);
+			$filter = $this->parseValue($filter, $attribute);
 			$query = $query->where('filter_' . $code . '.value', '=', $filter);
-			$query = $query->where('filter_' . $code . '.attribute_id', '=', $attributeDefinition->id);
+			$query = $query->where('filter_' . $code . '.attribute_id', '=', $attribute->id);
 			return $query;
 		}
 
-		$query = $this->parseFilterOperator($query, $attributeDefinition, $filter);
+		$query = $this->parseFilterOperator($query, $attribute, $filter);
 
 		return $query;
 	}
 
-	protected function parseFilterOperator($query, $attributeDefinition, $filter)
+	protected function parseFilterOperator($query, $attribute, $filter)
 	{
-		$code = $attributeDefinition->code;
+		$code = $attribute->code;
 
-		foreach ($filter as $operator => $value) {
+		foreach ($filter as $operator => $value) 
+		{	
+			if(is_array($value))
+			{
+				foreach ($value as &$singleValue)
+				{
+					$singleValue = $this->parseValue($singleValue, $attribute);
+				}
+			}
+			else
+			{
+				$value = $this->parseValue($value, $attribute);
+			}
+			
 			switch ($operator) 
 			{
 				case 'e':
@@ -372,16 +423,16 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Sort entities by attribute
 	 * 
 	 * @param object $query
-	 * @param object $attributeDefinition
+	 * @param object $attribute
 	 * @param $direction
 	 * 
 	 * @return boolean
 	 */
-	public function sortEntities($query, $attributeDefinition, $direction)
+	public function sortEntities($query, $attribute, $direction)
 	{
-		$code = $attributeDefinition->code;
+		$code = $attribute->code;
 		$query = $query->leftJoin($this->table . ' as sort_' . $code, 'sort_' . $code . '.entity_id', '=', 'entities.id');
-		$query = $query->where('sort_' . $code . '.attribute_id', '=', $attributeDefinition->id);
+		$query = $query->where('sort_' . $code . '.attribute_id', '=', $attribute->id);
 		$query = $query->orderBy('sort_' . $code . '.value', $direction);
 
 		return $query;

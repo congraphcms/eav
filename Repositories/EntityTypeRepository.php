@@ -12,6 +12,7 @@ namespace Cookbook\Eav\Repositories;
 
 
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\Config;
 
 use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
@@ -22,6 +23,8 @@ use Cookbook\Core\Repositories\Collection;
 use Cookbook\Core\Repositories\Model;
 
 use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
+
+use Carbon\Carbon;
 
 
 /**
@@ -76,7 +79,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 	protected function _create($model)
 	{
 
-		$model['created_at'] = $model['updated_at'] = date('Y-m-d H:i:s');
+		$model['created_at'] = $model['updated_at'] = Carbon::now('UTC')->toDateTimeString();
 		
 		// insert entity type in database
 		$entityTypeID = $this->db->table('entity_types')->insertGetId($model);
@@ -117,7 +120,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 
 		unset($entityTypeParams['id']);
 
-		$entityTypeParams['updated_at'] = date('Y-m-d H:i:s');
+		$entityTypeParams['updated_at'] = Carbon::now('UTC')->toDateTimeString();
 
 		$this->db->table('entity_types')->where('id', '=', $id)->update($entityTypeParams);
 
@@ -200,6 +203,10 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		$entityType->attribute_sets = $attributeSets;
 
 		$entityType->type = 'entity-type';
+		$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+		$entityType->created_at = Carbon::parse($entityType->created_at)->tz($timezone);
+		$entityType->updated_at = Carbon::parse($entityType->updated_at)->tz($timezone);
+
 
 		$result = new Model($entityType);
 		
@@ -257,6 +264,9 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 			$ids[] = $entityType->id;
 			$entityType->attribute_sets = [];
 			$entityType->type = 'entity-type';
+			$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+			$entityType->created_at = Carbon::parse($entityType->created_at)->tz($timezone);
+			$entityType->updated_at = Carbon::parse($entityType->updated_at)->tz($timezone);
 		}
 
 		$attributeSets = [];

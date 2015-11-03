@@ -33,7 +33,7 @@ class EavServiceProvider extends ServiceProvider {
 	* @return void
 	*/
 	public function register() {
-		$this->mergeConfigFrom(realpath(__DIR__ . '/config/eav.php'), 'eav');
+		$this->mergeConfigFrom(realpath(__DIR__ . '/config/cookbook.php'), 'cookbook');
 		$this->registerServiceProviders();
 	}
 
@@ -44,7 +44,7 @@ class EavServiceProvider extends ServiceProvider {
 	 */
 	public function boot() {
 		$this->publishes([
-			__DIR__.'/config/eav.php' => config_path('eav.php'),
+			__DIR__.'/config/cookbook.php' => config_path('cookbook.php'),
 		]);
 	}
 
@@ -65,10 +65,6 @@ class EavServiceProvider extends ServiceProvider {
 		// Commands
 		// -----------------------------------------------------------------------------
 		$this->app->register('Cookbook\Eav\Commands\CommandsServiceProvider');
-
-		// Events
-		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Eav\Events\EventsServiceProvider');
 
 		// Handlers
 		// -----------------------------------------------------------------------------

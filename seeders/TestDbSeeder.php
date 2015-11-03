@@ -13,6 +13,7 @@ namespace Cookbook\Eav\Seeders;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 /**
  * TestDbSeeder
  * 
@@ -57,7 +58,15 @@ class TestDbSeeder extends Seeder {
 				'multiple_sets' => 1,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
-			]
+			],
+			[
+				'code' => 'test_fields',
+				'name' => 'Test Field',
+				'plural_name' => 'Test Fields',
+				'multiple_sets' => 1,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
 		]);
 
 		DB::table('attributes')->truncate();
@@ -154,6 +163,127 @@ class TestDbSeeder extends Seeder {
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
+			[
+				'code' => 'test_text_attribute',
+				'field_type' => 'text',
+				'table' => 'attribute_values_varchar',
+				'localized' => false,
+				'default_value' => '',
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_textarea_attribute',
+				'field_type' => 'text_area',
+				'table' => 'attribute_values_text',
+				'localized' => false,
+				'default_value' => '',
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_select_attribute',
+				'field_type' => 'select',
+				'table' => 'attribute_values_integer',
+				'localized' => false,
+				'default_value' => '',
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_integer_attribute',
+				'field_type' => 'integer',
+				'table' => 'attribute_values_integer',
+				'localized' => false,
+				'default_value' => '',
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_decimal_attribute',
+				'field_type' => 'decimal',
+				'table' => 'attribute_values_decimal',
+				'localized' => false,
+				'default_value' => '',
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_datetime_attribute',
+				'field_type' => 'datetime',
+				'table' => 'attribute_values_datetime',
+				'localized' => false,
+				'default_value' => '',
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_relation_attribute',
+				'field_type' => 'relation',
+				'table' => 'attribute_values_integer',
+				'localized' => false,
+				'default_value' => '',
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			
+		]);
+
+		DB::table('attribute_options')->truncate();
+
+		DB::table('attribute_options')->insert([
+			[
+				'value' => 'option1',
+				'label' => 'Option 1',
+				'attribute_id' => 10,
+				'default' => 0,
+				'locale' => 0,
+				'sort_order' => 0
+			],
+			[
+				'value' => 'option2',
+				'label' => 'Option 2',
+				'attribute_id' => 10,
+				'default' => 1,
+				'locale' => 0,
+				'sort_order' => 1
+			],
+			[
+				'value' => 'option3',
+				'label' => 'Option 3',
+				'attribute_id' => 10,
+				'default' => 0,
+				'locale' => 0,
+				'sort_order' => 2
+			],
 		]);
 
 		DB::table('attribute_sets')->truncate();
@@ -178,6 +308,13 @@ class TestDbSeeder extends Seeder {
 				'code' => 'attribute_set3',
 				'name' => 'Attribute Set 3',
 				'entity_type_id' => 1,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_fields_set',
+				'name' => 'Test Fields Set',
+				'entity_type_id' => 4,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			]
@@ -223,6 +360,41 @@ class TestDbSeeder extends Seeder {
 				'attribute_set_id' => 3,
 				'attribute_id' => 7,
 				'sort_order' => 1
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 8,
+				'sort_order' => 0
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 9,
+				'sort_order' => 1
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 10,
+				'sort_order' => 2
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 11,
+				'sort_order' => 3
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 12,
+				'sort_order' => 4
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 13,
+				'sort_order' => 5
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 14,
+				'sort_order' => 6
 			]
 		]);
 
@@ -243,6 +415,12 @@ class TestDbSeeder extends Seeder {
 			[
 				'entity_type_id' => 1,
 				'attribute_set_id' => 2,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			]
@@ -322,7 +500,88 @@ class TestDbSeeder extends Seeder {
 				'sort_order' => 0,
 				'value' => 'value4',
 			],
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 8,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'field text value',
+			]
 		]);
+		
+		DB::table('attribute_values_text')->truncate();
+		DB::table('attribute_values_text')->insert([
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 9,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 'field text area value',
+			]
+		]);
+
+		DB::table('attribute_values_integer')->truncate();
+		DB::table('attribute_values_integer')->insert([
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 10,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 1,
+			],
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 11,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 11,
+			],
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 14,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 1,
+			]
+		]);
+
+		DB::table('attribute_values_decimal')->truncate();
+		DB::table('attribute_values_decimal')->insert([
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 12,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 11.1,
+			]
+		]);
+
+		DB::table('attribute_values_datetime')->truncate();
+		DB::table('attribute_values_datetime')->insert([
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 13,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => Carbon::now()->toDateTimeString(),
+			]
+		]);
+
+		
 	}
 
 }

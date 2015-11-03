@@ -217,7 +217,8 @@ class ValidatorsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
 				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Eav\Managers\AttributeManager')
 			);
 		});
 

@@ -102,7 +102,6 @@ class AttributeUpdateValidator extends Validator
 			// 'unique'				=> 'boolean',
 			'required'				=> 'sometimes|boolean',
 			'filterable'			=> 'sometimes|boolean',
-			'status'				=> 'sometimes|required|string',
 			'data'					=> 'sometimes',
 			'options'				=> 'sometimes|array',
 			'translations'			=> 'sometimes|array'
@@ -110,7 +109,8 @@ class AttributeUpdateValidator extends Validator
 
 		$this->optionRules = 
 		[
-			'locale' 				=> 'required|integer',
+			'id'					=> 'sometimes|required|integer',
+			'locale' 				=> 'sometimes|required|integer',
 			'label'					=> 'required|max:250',
 			'value'					=> 'required|max:250',
 			'is_default'			=> 'boolean',
@@ -146,10 +146,11 @@ class AttributeUpdateValidator extends Validator
 
 		if( isset($command->params['options']) )
 		{
-			$this->exception->setErrorKey('attribute.options.' . $key);
+			
 
 			foreach ($command->params['options'] as $key => &$option)
 			{
+				$this->exception->setErrorKey('attribute.options.' . $key);
 				$this->validateParams($option, $this->optionRules, true);
 			}
 		}

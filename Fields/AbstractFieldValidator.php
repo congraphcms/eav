@@ -10,9 +10,11 @@
 
 namespace Cookbook\Eav\Fields;
 
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Contracts\Eav\FieldValidatorContract;
-use Cookbook\Eav\Managers\AttributeManager;
 use Cookbook\Core\Exceptions\ValidationException;
+use Cookbook\Eav\Managers\AttributeManager;
+use Illuminate\Database\Connection;
 
 /**
  * Abstract Field Validator class
@@ -37,6 +39,13 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * @var AttributeManager
 	 */
 	public $attributeManager;
+	
+	/**
+	 * Repository for attributes
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 */
+	public $attributeRepository;
 
 	/**
 	 * validation exception that will be thrown if validation fails
@@ -51,6 +60,20 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * @var array
 	 */
 	protected $availableFilterOperations;
+
+	/**
+	 * The database connection to use.
+	 *
+	 * @var Illuminate\Database\Connection
+	 */
+	protected $db;
+
+	/**
+	 * Attribute value table name
+	 * 
+	 * @var string
+	 */
+	protected $table;
 	
 
 	/**
@@ -62,10 +85,12 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 *  
 	 * @return void
 	 */
-	public function __construct(AttributeManager $attributeManager)
+	public function __construct(Connection $db, AttributeManager $attributeManager, AttributeRepositoryContract $attributeRepository)
 	{
 		// Inject dependencies
+		$this->db = $db;
 		$this->attributeManager = $attributeManager;
+		$this->attributeRepository = $attributeRepository;
 
 		$this->exception = new ValidationException();
 	}
@@ -80,7 +105,10 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * 
 	 * @return boolean
 	 */
-	abstract public function validateAttributeForInsert(array &$params);
+	public function validateAttributeForInsert(array &$params)
+	{
+		return true;
+	}
 
 	/**
 	 * Check for specific rules and validation on attribute update
@@ -92,7 +120,10 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * 
 	 * @return boolean
 	 */
-	abstract public function validateAttributeForUpdate(array &$params);
+	public function validateAttributeForUpdate(array &$params)
+	{
+		return true;
+	}
 
 	/**
 	 * Validate attribute value
@@ -100,15 +131,15 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * This function can be extended by specific attribute handler
 	 * 
 	 * @param array $value
-	 * @param object $attributeDefinition
+	 * @param object $attribute
 	 * 
 	 * @return boolean
 	 */
-	public function validateValue($value, $attributeDefinition, $entity_id = 0)
+	public function validateValue($value, $attribute, $entity_id = 0)
 	{
 
 		// check if this attribute is required
-		if($attributeDefinition->required)
+		if($attribute->required)
 		{
 			// if it's required and it's empty add an error
 			if(empty($value))
@@ -118,15 +149,15 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 		}
 
 		// check if attribute needs to be unique
-		if($attributeDefinition->unique)
+		if($attribute->unique)
 		{
 			// check if this value is unique
-			$unique = $this ->uniqueValue($value, $attributeDefinition, $entity_id);
+			$unique = $this ->uniqueValue($value, $attribute, $entity_id);
 			
 			// if it's not unique add an error
 			if(!$unique)
 			{
-				throw new ValidationException(['This needs to be a unique value.']);
+				throw new ValidationException(['This field needs to have a unique value.']);
 			}
 		}
 	}
@@ -136,11 +167,13 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * Validate attribute filter
 	 * 
 	 * @param $filter
-	 * @param object $attributeDefinition
+	 * @param object $attribute
+	 * 
+	 * @todo  it should be a valid value nor just operator, but not sure how to check that
 	 * 
 	 * @return boolean
 	 */
-	public function validateFilter(&$filter, $attributeDefinition)
+	public function validateFilter(&$filter, $attribute)
 	{
 
 		if( ! is_array($filter) )
@@ -148,7 +181,7 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 			if( ! in_array('e', $this->availableFilterOperations) )
 			{
 				$e = new BadRequestException();
-				$e->setErrorKey('entities.filter.fields.' . $attributeDefinition->code);
+				$e->setErrorKey('entities.filter.fields.' . $attribute->code);
 				$e->addErrors('Filter operation is not allowed.');
 
 				throw $e;
@@ -161,7 +194,7 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 			if( ! in_array($operation, $this->availableFilterOperations) )
 			{
 				$e = new BadRequestException();
-				$e->setErrorKey('entities.filter.fields.' . $attributeDefinition->code);
+				$e->setErrorKey('entities.filter.fields.' . $attribute->code);
 				$e->addErrors('Filter operation is not allowed.');
 
 				throw $e;
@@ -181,11 +214,13 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * check if attribute value is unique
 	 * 
 	 * @param array $value
-	 * @param object $attributeDefinition
+	 * @param object $attribute
+	 * 
+	 * @todo  parse value before checking if it's unique
 	 * 
 	 * @return boolean
 	 */
-	protected function uniqueValue($value, $attributeDefinition, $entity_id)
+	protected function uniqueValue($value, $attribute, $entity_id)
 	{
 		// check if value is empty and if it is return true
 		// because unique is not checked on empty values 
@@ -197,7 +232,7 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 		// check database for same values
 		$query = $this 	->db->table( $this->table )
 						->where( 'value', '=', $value )
-						->where( 'attribute_id', '=', $attributeDefinition->id );
+						->where( 'attribute_id', '=', $attribute->id );
 
 		// if enitity_id is defined exclude it from query
 		if($entity_id)

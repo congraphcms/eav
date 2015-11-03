@@ -17,6 +17,7 @@ use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Exceptions\ValidationException;
 use Cookbook\Core\Validation\Validator;
+use Cookbook\Eav\Managers\AttributeManager;
 
 /**
  * EntityCreateValidator class
@@ -63,6 +64,13 @@ class EntityCreateValidator extends Validator
 	protected $attributeRepository;
 
 	/**
+	 * Attribute config manager
+	 * 
+	 * @var Cookbook\Eav\Managers\AttributeManager
+	 */
+	protected $attributeManager;
+
+	/**
 	 * Set of rules for validating attribute
 	 *
 	 * @var array
@@ -85,12 +93,14 @@ class EntityCreateValidator extends Validator
 		FieldValidatorFactoryContract $fieldValidatorFactory, 
 		EntityTypeRepositoryContract $entityTypeRepository, 
 		AttributeSetRepositoryContract $attributeSetRepository, 
-		AttributeRepositoryContract $attributeRepository)
+		AttributeRepositoryContract $attributeRepository,
+		AttributeManager $attributeManager)
 	{
 		$this->fieldValidatorFactory = $fieldValidatorFactory;
 		$this->entityTypeRepository = $entityTypeRepository;
 		$this->attributeSetRepository = $attributeSetRepository;
 		$this->attributeRepository = $attributeRepository;
+		$this->attributeManager = $attributeManager;
 
 		$this->rules = [
 			'entity_type_id'        => ['sometimes', 'exists:entity_types,id'],
@@ -172,8 +182,38 @@ class EntityCreateValidator extends Validator
 		$attributesByCode = [];
 		foreach ($attributes as $attribute) {
 			$attributesByCode[$attribute->code] = $attribute;
-			if (! isset($command->params['fields'][$attribute->code])) {
-				$command->params['fields'][$attribute->code] = $attribute->default_value;
+			$attributeSettings = $this->attributeManager->getFieldType($attribute->field_type);
+			if (! isset($command->params['fields'][$attribute->code]) )
+			{
+
+				$default_value = null;
+				if($attributeSettings['has_options'])
+				{
+					foreach ($attribute->options as $option)
+					{
+						if($option->default)
+						{
+							$default_value = $option->value;
+						}
+					}
+				}
+				else
+				{
+					$default_value = $attribute->default_value;
+				}
+
+				if(empty($default_value))
+				{
+					if($attribute->required)
+					{
+						$this->exception->setErrorKey('entities.fields.' . $attribute->code);
+						$this->exception->addErrors(['This field is required.']);
+						
+					}
+					continue;
+				}
+
+				$command->params['fields'][$attribute->code] = $default_value;
 			}
 
 			$value = $command->params['fields'][$attribute->code];
@@ -196,6 +236,7 @@ class EntityCreateValidator extends Validator
 		}
 
 		if ($this->exception->hasErrors()) {
+			var_dump($this->exception->getErrors());
 			throw $this->exception;
 		}
 	}

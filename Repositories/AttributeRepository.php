@@ -22,6 +22,8 @@ use Cookbook\Core\Repositories\Model;
 use Cookbook\Core\Repositories\UsesCache;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\Config;
+use Carbon\Carbon;
 
 
 /**
@@ -132,6 +134,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// for attribute insertation
 		unset($model['options']);
 
+		$model['status'] = 'user_defined';
+
 		// insert attribute
 		$attribute = $this->insertAttribute($model);
 
@@ -147,7 +151,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		}
 
 		// update all options for attribute
-		$this->updateOptions($options, null, $attribute);
+		$this->updateOptions($options, $attribute);
 
 		$attribute = $this->fetch($attribute->id);
 
@@ -170,13 +174,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	{
 
 		// find attribute with that ID
-		$attribute = $this->db->table('attributes')->find($id);
-
-		if( ! $attribute )
-		{
-			throw new NotFoundException(['There is no attribute with that ID.']);
-		}
-
+		$attribute = $this->fetch($id);
+		
 		// extract options from model
 		$options = [];
 		if(!empty($model['options']) && is_array($model['options']))
@@ -187,16 +186,6 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// remove options from model for update
 		unset($model['options']);
 
-		// get all options from database
-		$oldOptions = $this->db->table('attribute_options')->where('attribute_id', '=', $id)->get();
-
-		$keyedOptions = [];
-
-		foreach ($oldOptions as $option)
-		{
-			$keyedOptions[$option->id] = $option;
-		}
-
 		// set relation to attribute in all options
 		for($i = 0; $i < count($options); $i++)
 		{
@@ -204,7 +193,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		}
 
 		// update options
-		$this->updateOptions($options, $keyedOptions, $attribute);
+		$this->updateOptions($options, $attribute);
 
 		// update attribute
 		$id = $this->updateAttribute($id, $model, $attribute);
@@ -230,6 +219,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	{
 		// get the attribute
 		$attribute = $this->fetch($id);
+
 		if(!$attribute)
 		{
 			throw new NotFoundException(['There is no attribute with that ID.']);
@@ -281,7 +271,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			$params['data'] = json_encode($params['data']);
 		}
 
-		$params['created_at'] = $params['updated_at'] = date('Y-m-d H:i:s');
+		$params['created_at'] = $params['updated_at'] = Carbon::now('UTC')->toDateTimeString();
 
 		$table = $this->availableFieldTypes[$params['field_type']]['table'];
 
@@ -347,7 +337,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		unset($attributeParams['id']);
 
-		$attributeParams['updated_at'] = date('Y-m-d H:i:s');
+		$attributeParams['updated_at'] = Carbon::now('UTC')->toDateTimeString();
 
 		$this->db->table('attributes')->where('id', '=', $id)->update($attributeParams);
 
@@ -372,7 +362,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @return boolean
 	 */
-	protected function updateOptions(array $options, array $oldOptions = null, $attribute)
+	protected function updateOptions(array $options, $attribute)
 	{
 		// fabricate attribute handler for this attribute type 
 		// (needed for options update)
@@ -382,14 +372,22 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$optionIDs = [];
 		foreach ($options as $option)
 		{
-
+			$oldOption = null;
 			// if option is alreay in database get its old version
-			if( ! empty($option['id']) && ! empty($oldOptions) )
+			if( ! empty($option['id']) )
 			{
-				$oldOption = $oldOptions[$option['id']];
-				$optionIDs[] = $option['id'];
+				foreach ($attribute->options as $opt)
+				{
+					if($opt->id == $option['id'])
+					{
+						$oldOption = $opt;
+						$optionIDs[] = $option['id'];
+					}
+				}
+
 			}
-			else
+
+			if( ! $oldOption )
 			{
 				$oldOption = null;
 			}
@@ -399,23 +397,22 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		// if there are old options and there were no error
 		// delete options that don't exist anymore.
-		if( ! empty($oldOptions) )
+		$optionsForDelete = [];
+		if( ! empty($attribute->options) )
 		{
-			foreach ($oldOptions as $optionID => $option)
+			foreach ($attribute->options as $option)
 			{
-				if( ! in_array($optionID, $optionIDs) )
+				if( ! in_array($option->id, $optionIDs) )
 				{
-					continue;
-				}
+					if( ! empty($fieldHandler) )
+					{
+						$fieldHandler->deleteByOption($option);
+					}
 
-				if( ! empty($fieldHandler) )
-				{
-					$fieldHandler->deleteByOption($option);
+					$this->db->table('attribute_options')
+							 ->where('id', '=', $option->id)
+							 ->delete();
 				}
-
-				$this->db->table('attribute_options')
-						 ->where('id', '=', $option->id)
-						 ->delete();
 			}
 		}
 	}
@@ -431,11 +428,10 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 */
 	protected function updateOption($params, $oldOption)
 	{
-		
 		if( ! empty($oldOption) )
 		{
 			// if option is already in database - update
-			$optionParams = json_decode(json_encode($option), true);
+			$optionParams = json_decode(json_encode($oldOption), true);
 			$optionParams = array_merge($optionParams, $params);
 			
 			unset($optionParams['id']);
@@ -493,7 +489,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		$options = $this->db->table('attribute_options')
 							->where('attribute_id', '=', $id)
-							->orderBy('sort_order', 'created_at')
+							->orderBy('sort_order')
+							->orderBy('id')
 							->get();
 		
 		$attribute->options = $options;
@@ -506,9 +503,13 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// $attribute->translations = $translations;
 
 		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-		$attribute = $fieldHandler->transformAttribute($attribute);
+		$attribute = $fieldHandler->formatAttribute($attribute);
 
 		$attribute->type = 'attribute';
+
+		$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+		$attribute->created_at = Carbon::parse($attribute->created_at)->tz($timezone);
+		$attribute->updated_at = Carbon::parse($attribute->updated_at)->tz($timezone);
 
 		$result = new Model($attribute);
 		
@@ -562,15 +563,20 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		foreach ($attributes as &$attribute) 
 		{
 			$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-			$attribute = $fieldHandler->transformAttribute($attribute);
+			$attribute = $fieldHandler->formatAttribute($attribute);
 
 			$ids[] = $attribute->id;
 			$attribute->options = [];
 			unset($attribute->table);
 			$attribute->type = 'attribute';
+			$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+			$attribute->created_at = Carbon::parse($attribute->created_at)->tz($timezone);
+			$attribute->updated_at = Carbon::parse($attribute->updated_at)->tz($timezone);
 			// $attribute->translations = [];
 		}
+
 		$options = [];
+		
 		if( ! empty($ids) )
 		{
 			$options = $this->db->table('attribute_options')

@@ -24,6 +24,8 @@ use Cookbook\Core\Repositories\Model;
 use Cookbook\Core\Repositories\UsesCache;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\Config;
+use Carbon\Carbon;
 use stdClass;
 
 
@@ -192,6 +194,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		{
 			$fields = $model['fields'];
 		}
+		
 
 		$fieldsForUpdate = [];
 		$attributes = [];
@@ -200,6 +203,8 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		{
 			$attributes = $this->attributeRepository->get(['code' => ['in' => array_keys($fields)]]);
 		}
+
+
 
 		foreach ($attributes as $attribute)
 		{
@@ -305,8 +310,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 */
 	protected function insertEntity($params)
 	{
-
-		$params['created_at'] = $params['updated_at'] = date('Y-m-d H:i:s');
+		$params['created_at'] = $params['updated_at'] = Carbon::now('UTC')->toDateTimeString();
 
 		// insert entity in database
 		$entityId = $this->db->table('entities')->insertGetId($params);
@@ -329,7 +333,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	protected function updateEntity($id)
 	{
 
-		$params['updated_at'] = date('Y-m-d H:i:s');
+		$params['updated_at'] = Carbon::now('UTC')->toDateTimeString();
 
 		$this->db->table('entities')->where('id', '=', $id)->update($params);
 	}
@@ -378,10 +382,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	protected function deleteFields($entity)
 	{
 		$attributes = [];
-		if( ! empty($entity->fields) )
-		{
-			$attributes = $this->attributeRepository->get(['code' => ['in' => array_keys(get_object_vars($entity->fields))]]);
-		}
+		$attributes = $this->attributeRepository->get();
 		foreach ($attributes as $attribute)
 		{
 			$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
@@ -412,12 +413,12 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 */
 	protected function deleteFieldsByAttributeSet($attributeSet)
 	{
-		$attributeSettings = $this->attributeManager->getFieldTypes();
+		$attributes = $this->attributeRepository->get();
 
-		foreach ($attributeSettings as $fieldType => $settings)
+		foreach ($attributes as $attribute)
 		{
-			$fieldHandler = $this->fieldHandlerFactory->make($fieldType);
-			$fieldHandler->deleteByAttributeSet($attributeSet);
+			$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+			$fieldHandler->deleteByAttributeSet($attributeSet, $attribute);
 		}
 		
 	}
@@ -431,12 +432,12 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 */
 	protected function deleteFieldsByEntityType($entityType)
 	{
-		$attributeSettings = $this->attributeManager->getFieldTypes();
+		$attributes = $this->attributeRepository->get();
 
-		foreach ($attributeSettings as $fieldType => $settings)
+		foreach ($attributes as $attribute)
 		{
-			$fieldHandler = $this->fieldHandlerFactory->make($fieldType);
-			$fieldHandler->deleteByEntityType($entityType);
+			$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+			$fieldHandler->deleteByEntityType($entityType, $attribute);
 		}
 		
 	}
@@ -491,6 +492,10 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		$fields = $this->getFieldsForEntities($id, $locale);
 
 		$entity->fields = $fields[$id];
+
+		$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+		$entity->created_at = Carbon::parse($entity->created_at)->tz($timezone);
+		$entity->updated_at = Carbon::parse($entity->updated_at)->tz($timezone);
 
 		$result = new Model($entity);
 		$result->setParams($params);
@@ -549,8 +554,6 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$query = $this->parseSorting($query, $sort);
 
-		
-		
 		$entities = $query->get();
 
 		if( ! $entities )
@@ -563,6 +566,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		foreach ($entities as &$entity) 
 		{
 			$ids[] = $entity->id;
+			$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+			$entity->created_at = Carbon::parse($entity->created_at)->tz($timezone);
+			$entity->updated_at = Carbon::parse($entity->updated_at)->tz($timezone);
 		}
 
 		if( ! empty($ids) )

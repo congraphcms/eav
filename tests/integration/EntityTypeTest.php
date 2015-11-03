@@ -253,7 +253,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand([]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(count($result), 3);
+		$this->assertEquals(4, count($result));
 		$this->d->dump($result->toArray());
 
 	}

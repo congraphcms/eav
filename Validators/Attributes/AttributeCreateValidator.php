@@ -90,7 +90,6 @@ class AttributeCreateValidator extends Validator
 			'unique'				=> 'boolean',
 			'required'				=> 'boolean',
 			'filterable'			=> 'boolean',
-			'status'				=> 'required|string',
 			'data'					=> '',
 			'options'				=> 'sometimes|array',
 			'translations'			=> 'sometimes|array'
