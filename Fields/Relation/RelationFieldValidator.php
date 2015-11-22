@@ -88,6 +88,11 @@ class RelationFieldValidator extends AbstractFieldValidator
 
 		parent::validateValue($value, $attribute, $entity_id);
 
+		if( ! $attribute->required && empty($value) )
+		{
+			return;
+		}
+
 		if( ! is_array($value) || ! isset($value['id']) || ! isset($value['type']))
 		{
 			throw new ValidationException(['Invalid relation object.']);

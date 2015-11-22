@@ -15,7 +15,9 @@
         "illuminate/database": "5.*",
         "cookbook/core": "dev-master",
         "cookbook/contracts": "dev-master",
-        "cookbook/filesystem": "dev-master"
+        "cookbook/filesystem": "dev-master",
+        "cookbook/locales": "dev-master",
+        "cookbook/workflows": "dev-master"
     },
 
     "repositories": [
@@ -30,6 +32,14 @@
         {
             "type": "git",
             "url":  "git@bitbucket.org:cookbookcms/filesystem.git"
+        },
+        {
+            "type": "git",
+            "url":  "git@bitbucket.org:cookbookcms/locales.git"
+        },
+        {
+            "type": "git",
+            "url":  "git@bitbucket.org:cookbookcms/workflows.git"
         }
     ],
 

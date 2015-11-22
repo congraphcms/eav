@@ -106,7 +106,9 @@ class RepositoriesServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract')
+				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract'),
+				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
 			);
 		});
 

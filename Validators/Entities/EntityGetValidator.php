@@ -14,6 +14,7 @@ use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
 use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
 use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
+use Cookbook\Contracts\Locales\LocaleRepositoryContract;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Exceptions\BadRequestException;
 use Cookbook\Core\Exceptions\NotFoundException;
@@ -77,6 +78,13 @@ class EntityGetValidator extends Validator
 	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
 	 */
 	protected $entityTypeRepository;
+
+	/**
+	 * Repository for locales
+	 * 
+	 * @var Cookbook\Contracts\Locales\LocaleRepositoryContract
+	 */
+	protected $localeRepository;
 	
 	/**
 	 * Factory for field validators,
@@ -104,7 +112,8 @@ class EntityGetValidator extends Validator
 		FieldValidatorFactoryContract $fieldValidatorFactory, 
 		EntityTypeRepositoryContract $entityTypeRepository,
 		AttributeSetRepositoryContract $attributeSetRepository,
-		AttributeRepositoryContract $attributeRepository
+		AttributeRepositoryContract $attributeRepository,
+		LocaleRepositoryContract $localeRepository
 	)
 	{
 		$this->attributeRepository = $attributeRepository;
@@ -120,11 +129,12 @@ class EntityGetValidator extends Validator
 
 		$this->availableFilters = [
 			'id' 					=> ['e', 'ne', 'lt', 'lte', 'gt', 'gte', 'in', 'nin'],
+			'type_id'				=> ['e', 'ne', 'lt', 'lte', 'gt', 'gte', 'in', 'nin'],
 			'type'					=> ['e', 'ne', 'in', 'nin'],
+			'entity_type'			=> ['e', 'ne', 'in', 'nin'],
 			'entity_type_id'		=> ['e', 'ne', 'in', 'nin'],
 			'attribute_set'			=> ['e', 'ne', 'in', 'nin'],
 			'attribute_set_id'		=> ['e', 'ne', 'in', 'nin'],
-			'locale_id'				=> ['e'],
 			'created_at'			=> ['lt', 'lte', 'gt', 'gte']
 		];
 
@@ -136,6 +146,7 @@ class EntityGetValidator extends Validator
 		$this->attributeManager = $attributeManager;
 		$this->attributeSetRepository = $attributeSetRepository;
 		$this->entityTypeRepository = $entityTypeRepository;
+		$this->localeRepository = $localeRepository;
 	}
 
 
@@ -151,7 +162,21 @@ class EntityGetValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
+		if( isset($command->params['locale']) )
+		{
+			try
+			{
+				$this->localeRepository->fetch($command->params['locale']);
+			}
+			catch(NotFoundException $e)
+			{
+				$e = new BadRequestException();
+				$e->setErrorKey('locale.');
+				$e->addErrors('Invalid locale.');
 
+				throw $e;
+			}
+		}
 		if( ! empty($command->params['filter']) )
 		{
 			$this->validateFilters($command->params['filter']);
@@ -409,6 +434,15 @@ class EntityGetValidator extends Validator
 						if( ! is_array($value) )
 						{
 							$value = explode(',', strval($value));
+						}
+					}
+					else
+					{
+						if( is_array($value) || is_object($value))
+						{
+							$e = new BadRequestException();
+							$e->setErrorKey('entities.filter.' . $field);
+							$e->addErrors('Invalid filter.');
 						}
 					}
 				}

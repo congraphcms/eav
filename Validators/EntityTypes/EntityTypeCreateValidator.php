@@ -46,15 +46,18 @@ class EntityTypeCreateValidator extends Validator
 	{
 
 		$this->rules = [
-			'code'					=> 'required|unique:entity_types,code',
+			'code'					=> ['required', 'unique:entity_types,code', 'regex:/^[0-9a-z-_]*$/'],
+			'endpoint'				=> ['required', 'unique:entity_types,endpoint', 'regex:/^[0-9a-z-_]*$/'],
 			'name'					=> 'required|min:3|max:250',
 			'plural_name'			=> 'required|min:3|max:250',
-			'multiple_sets'			=> 'sometimes|boolean'
+			'multiple_sets'			=> 'sometimes|boolean',
+			'has_workflow'			=> 'sometimes|boolean',
+			'localized'				=> 'sometimes|boolean'
 		];
 
 		parent::__construct();
 
-		$this->exception->setErrorKey('entity-types');
+		$this->exception->setErrorKey('entity-type');
 	}
 
 
@@ -70,11 +73,46 @@ class EntityTypeCreateValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
+		if( ! empty($command->params['has_workflow']) )
+		{
+			$this->rules['workflow_id'] = ['required_without:workflow', 'exists:workflows,id'];
+			$this->rules['workflow'] = ['sometimes', 'array'];
+			if(isset($command->params['workflow']))
+			{
+				$this->rules['workflow.id'] = ['required', 'exists:workflows,id'];
+			}
+			
+			$this->rules['default_point_id'] = ['required_without:default_point', 'exists:workflows,id'];
+			$this->rules['default_point'] = ['sometimes', 'array'];
+			if(isset($command->params['default_point']))
+			{
+				$this->rules['default_point.id'] = ['required', 'exists:workflow_points,id'];
+			}
+			$this->rules['localized_workflow'] = ['sometimes', 'boolean'];
+
+		}
+
 		$this->validateParams($command->params, $this->rules, true);
 
 		if( $this->exception->hasErrors() )
 		{
 			throw $this->exception;
 		}
+
+		if( ! empty($command->params['has_workflow']) )
+		{
+			if ( ! isset($command->params['workflow_id']) )
+			{
+				$command->params['workflow_id'] = $command->params['workflow']['id'];
+			}
+
+			if ( ! isset($command->params['default_point_id']) )
+			{
+				$command->params['default_point_id'] = $command->params['default_point']['id'];
+			}
+		}
+		unset($command->params['workflow']);
+		unset($command->params['default_point']);
+		
 	}
 }

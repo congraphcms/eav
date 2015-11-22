@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Cookbook\Eav\Seeders;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Seeder;
@@ -31,7 +30,6 @@ class FileDbSeeder extends Seeder {
 
 	public function run()
 	{
-		
 		DB::table('files')->truncate();
 		DB::table('files')->insert([
 			[

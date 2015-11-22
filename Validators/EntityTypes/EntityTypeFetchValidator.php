@@ -65,10 +65,5 @@ class EntityTypeFetchValidator extends Validator
 	public function validate(RepositoryCommand $command)
 	{
 		$entityType = $this->entityTypeRepository->fetch($command->id);
-
-		if( ! $entityType )
-		{
-			throw new NotFoundException('No entity type with that ID.');
-		}
 	}
 }

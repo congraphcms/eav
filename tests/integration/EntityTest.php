@@ -4,6 +4,12 @@
 use Cookbook\Core\Exceptions\ValidationException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
+require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class EntityTest extends Orchestra\Testbench\TestCase
 {
@@ -21,8 +27,22 @@ class EntityTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../migrations'),
 		]);
 
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+		]);
+
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Workflows/database/migrations'),
+		]);
+
 		$this->artisan('db:seed', [
-			'--class' => 'Cookbook\Eav\Seeders\TestDbSeeder'
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
 		]);
 
 		$this->d = new Dumper();
@@ -38,8 +58,12 @@ class EntityTest extends Orchestra\Testbench\TestCase
 	{
 		// fwrite(STDOUT, __METHOD__ . "\n");
 		// parent::tearDown();
-		
-		$this->artisan('migrate:reset');
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+
+		DB::disconnect();
+		// $this->artisan('migrate:reset');
 		// unset($this->app);
 
 		parent::tearDown();
@@ -85,7 +109,13 @@ class EntityTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\Core\CoreServiceProvider', 'Cookbook\Eav\EavServiceProvider'];
+		return [
+			'Cookbook\Core\CoreServiceProvider', 
+			'Cookbook\Locales\LocalesServiceProvider', 
+			'Cookbook\Eav\EavServiceProvider', 
+			'Cookbook\Filesystem\FilesystemServiceProvider',
+			'Cookbook\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
 	public function testCreateEntity()
@@ -93,12 +123,13 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'type' => 'tests',
+			'entity_type' => ['id' => 1],
 			'attribute_set' => ['id' => 1],
-			'locale_id' => 0,
+			'locale' => 'en_US',
 			'fields' => [
 				'attribute1' => '234',
-				'attribute2' => ''
+				'attribute2' => '',
+				'attribute3' => 'english'
 			]
 		];
 
@@ -119,7 +150,6 @@ class EntityTest extends Orchestra\Testbench\TestCase
 	public function testCreateException()
 	{
 		$params = [
-			'type' => '',
 			'attribute_set' => ['id' => 1],
 			'locale_id' => 0,
 			'fields' => [
@@ -142,9 +172,10 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$params = [
-			'locale_id' => 0,
 			'fields' => [
-				'attribute1' => 'changed value'
+				'attribute3' => [
+					'fr_FR' => 'changed value'
+				]
 			]
 		];
 		
@@ -153,7 +184,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->fields->attribute1, 'changed value');
+		$this->assertEquals($result->fields->attribute3['fr_FR'], 'changed value');
 		$this->d->dump($result->toArray());
 	}
 
@@ -168,7 +199,6 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$params = [
-			'locale_id' => 0,
 			'fields' => [
 				'attribute1' => ''
 			]
@@ -213,7 +243,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 1));
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand(['locale' => 'en_US'], 1));
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->d->dump($result->toArray());
@@ -243,7 +273,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['sort' => ['fields.attribute3'], 'limit' => 3, 'offset' => 0]));
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['locale' => 'en_US', 'sort' => ['fields.attribute3'], 'limit' => 3, 'offset' => 0]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(3, count($result));
@@ -258,12 +288,12 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$filter = [ 'fields.attribute1' => ['in' => ['value12','value1']] ];
+		$filter = [ 'fields.attribute3' => 'value3-en' ];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => $filter, 'sort' => ['fields.attribute3']]));
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => $filter, 'locale' => 'en_US', 'sort' => ['fields.attribute1']]));
 		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(2, count($result));
+		$this->assertEquals(1, count($result));
 
 		$this->d->dump($result->toArray());
 

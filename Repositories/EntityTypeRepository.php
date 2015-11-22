@@ -202,6 +202,19 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 
 		$entityType->attribute_sets = $attributeSets;
 
+		if($entityType->has_workflow)
+		{
+			$workflow = new stdClass();
+			$workflow->id = $entityType->workflow_id;
+			$workflow->type = 'workflow';
+			$point = new stdClass();
+			$point->id = $entityType->default_point_id;
+			$point->type = 'workflow-point';
+			$entityType->workflow = $workflow;
+			$entityType->default_point = $point;
+		}
+		
+
 		$entityType->type = 'entity-type';
 		$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
 		$entityType->created_at = Carbon::parse($entityType->created_at)->tz($timezone);
@@ -267,6 +280,18 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 			$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
 			$entityType->created_at = Carbon::parse($entityType->created_at)->tz($timezone);
 			$entityType->updated_at = Carbon::parse($entityType->updated_at)->tz($timezone);
+
+			if($entityType->has_workflow)
+			{
+				$workflow = new stdClass();
+				$workflow->id = $entityType->workflow_id;
+				$workflow->type = 'workflow';
+				$point = new stdClass();
+				$point->id = $entityType->default_point_id;
+				$point->type = 'workflow-point';
+				$entityType->workflow = $workflow;
+				$entityType->default_point = $point;
+			}
 		}
 
 		$attributeSets = [];

@@ -250,6 +250,25 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	}
 
 	/**
+	 * Delete values in database for entity and locale
+	 * 
+	 * @param object $entity
+	 * @param object $locale
+	 * @param object $attribute
+	 * 
+	 * @return boolean
+	 */
+	public function deleteByEntityAndLocale($entity, $locale, $attribute)
+	{
+		// delete all values for provided entity, attribute and language
+		$this	->db->table( $this->table )
+				->where( 'attribute_id', '=', $attribute->id )
+				->where( 'entity_id', '=', $entity->id )
+				->where( 'locale_id', '=', $locale->id )
+				->delete();
+	}
+
+	/**
 	 * Clean all related values and set entries for given attribute
 	 * 
 	 * Takes attribute that needs to be deleted,
@@ -341,7 +360,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * 
 	 * @return boolean
 	 */
-	public function filterEntities($query, $attribute, $filter)
+	public function filterEntities($query, $attribute, $filter, $locale = null)
 	{
 		$code = $attribute->code;
 
@@ -357,6 +376,10 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			$filter = $this->parseValue($filter, $attribute);
 			$query = $query->where('filter_' . $code . '.value', '=', $filter);
 			$query = $query->where('filter_' . $code . '.attribute_id', '=', $attribute->id);
+			if( ! is_null($locale) && $attribute->localized )
+			{
+				$query->where('filter_' . $code . '.locale_id', '=', $locale->id);
+			}
 			return $query;
 		}
 
@@ -428,11 +451,15 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * 
 	 * @return boolean
 	 */
-	public function sortEntities($query, $attribute, $direction)
+	public function sortEntities($query, $attribute, $direction, $locale = null)
 	{
 		$code = $attribute->code;
 		$query = $query->leftJoin($this->table . ' as sort_' . $code, 'sort_' . $code . '.entity_id', '=', 'entities.id');
 		$query = $query->where('sort_' . $code . '.attribute_id', '=', $attribute->id);
+		if( ! is_null($locale) && $attribute->localized )
+		{
+			$query->where('sort_' . $code . '.locale_id', '=', $locale->id);
+		}
 		$query = $query->orderBy('sort_' . $code . '.value', $direction);
 
 		return $query;

@@ -139,6 +139,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 			{
 				$attributes[$i]['attribute_id'] = $attributes[$i]['id'];
 				unset($attributes[$i]['id']);
+				unset($attributes[$i]['type']);
 				$attributes[$i]['attribute_set_id'] = $attributeSetId;
 				$attributes[$i]['sort_order'] = $i;
 			}

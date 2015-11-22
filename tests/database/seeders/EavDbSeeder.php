@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */ 
-namespace Cookbook\Eav\Seeders;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Seeder;
@@ -27,7 +26,7 @@ use Carbon\Carbon;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class TestDbSeeder extends Seeder {
+class EavDbSeeder extends Seeder {
 
 	public function run()
 	{
@@ -36,33 +35,41 @@ class TestDbSeeder extends Seeder {
 		DB::table('entity_types')->insert([
 			[
 				'code' => 'tests',
+				'endpoint' => 'tests',
 				'name' => 'Test',
 				'plural_name' => 'Tests',
 				'multiple_sets' => 1,
+				'localized' => 1,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
 			[
 				'code' => 'tests2',
+				'endpoint' => 'tests2',
 				'name' => 'Test2',
 				'plural_name' => 'Tests2',
 				'multiple_sets' => 0,
+				'localized' => 0,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
 			[
 				'code' => 'tests3',
+				'endpoint' => 'tests3',
 				'name' => 'Test3',
 				'plural_name' => 'Tests3',
 				'multiple_sets' => 1,
+				'localized' => 0,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
 			[
 				'code' => 'test_fields',
+				'endpoint' => 'test_fields',
 				'name' => 'Test Field',
 				'plural_name' => 'Test Fields',
 				'multiple_sets' => 1,
+				'localized' => 0,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -89,7 +96,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'text',
 				'table' => 'attribute_values_varchar',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => false,
@@ -102,7 +109,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'text',
 				'table' => 'attribute_values_varchar',
 				'localized' => true,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => true,
 				'required' => false,
 				'filterable' => false,
@@ -115,7 +122,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'text',
 				'table' => 'attribute_values_varchar',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -141,7 +148,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'text',
 				'table' => 'attribute_values_varchar',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => false,
@@ -154,7 +161,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'text',
 				'table' => 'attribute_values_varchar',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -167,7 +174,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'text',
 				'table' => 'attribute_values_varchar',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -180,7 +187,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'text_area',
 				'table' => 'attribute_values_text',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -193,7 +200,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'select',
 				'table' => 'attribute_values_integer',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -206,7 +213,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'integer',
 				'table' => 'attribute_values_integer',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -219,7 +226,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'decimal',
 				'table' => 'attribute_values_decimal',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -232,7 +239,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'datetime',
 				'table' => 'attribute_values_datetime',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -245,7 +252,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'relation',
 				'table' => 'attribute_values_integer',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -258,7 +265,7 @@ class TestDbSeeder extends Seeder {
 				'field_type' => 'asset',
 				'table' => 'attribute_values_integer',
 				'localized' => false,
-				'default_value' => '',
+				'default_value' => null,
 				'unique' => false,
 				'required' => false,
 				'filterable' => true,
@@ -268,7 +275,6 @@ class TestDbSeeder extends Seeder {
 			]
 			
 		]);
-		
 
 		DB::table('attribute_options')->truncate();
 

@@ -106,7 +106,7 @@ class AttributeCreateValidator extends Validator
 
 		parent::__construct();
 
-		$this->exception->setErrorKey('attributes');
+		$this->exception->setErrorKey('attribute');
 	}
 
 
@@ -125,14 +125,15 @@ class AttributeCreateValidator extends Validator
 
 		$this->validateParams($command->params, $this->rules, true);
 
+		$validator = $this->newValidator($command->params, $this->rules);
+
 		if( isset($command->params['options']) )
 		{
-			foreach ($command->params['options'] as $key => &$option)
-			{
-				$this->exception->setErrorKey('attribute.options.' . $key);
-				$this->validateParams($option, $this->optionRules, true);
-			}
+			$validator->each('options', $this->optionRules);
 		}
+		$this->setValidator($validator);
+
+		$this->validateParams($command->params, null, true);
 
 		$fieldValidator = $this->fieldValidatorFactory->make($command->params['field_type']);
 
@@ -142,7 +143,6 @@ class AttributeCreateValidator extends Validator
 		}
 		catch(ValidationException $e)
 		{
-			$this->exception->setErrorKey('attribute');
 			$this->exception->addErrors($e->getErrors());
 		}
 

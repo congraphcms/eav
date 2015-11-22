@@ -60,7 +60,7 @@ class CreateAttributeTables extends Migration {
 			$table->boolean('localized')->default(0);
 
 			// default value for this attribute
-			$table->text('default_value')->nullable()->default('');
+			$table->text('default_value')->nullable()->default(null);
 
 			// flag for unique attributes
 			$table->boolean('unique')->default(0);

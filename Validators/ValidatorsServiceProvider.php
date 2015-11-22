@@ -169,11 +169,18 @@ class ValidatorsServiceProvider extends ServiceProvider {
 
 		// Attribute sets
 		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetCreateValidator', function($app){
-			return new AttributeSetCreateValidator();
+			return new AttributeSetCreateValidator(
+				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
 		});
 
 		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetUpdateValidator', function($app){
-			return new AttributeSetUpdateValidator($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
+			return new AttributeSetUpdateValidator(
+				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
 		});
 
 		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetDeleteValidator', function($app){
@@ -218,6 +225,7 @@ class ValidatorsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract'),
 				$app->make('Cookbook\Eav\Managers\AttributeManager')
 			);
 		});
@@ -227,7 +235,8 @@ class ValidatorsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
 				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
 			);
 		});
 
@@ -247,7 +256,8 @@ class ValidatorsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
 				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
 			);
 		});
 	}

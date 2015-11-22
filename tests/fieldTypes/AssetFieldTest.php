@@ -3,6 +3,12 @@
 use Cookbook\Core\Exceptions\ValidationException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
+require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class AssetFieldTest extends Orchestra\Testbench\TestCase
 {
@@ -25,11 +31,21 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Filesystem/migrations'),
 		]);
 
-		$this->artisan('db:seed', [
-			'--class' => 'Cookbook\Eav\Seeders\TestDbSeeder'
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
 		]);
+
 		$this->artisan('db:seed', [
-			'--class' => 'Cookbook\Eav\Seeders\FileDbSeeder'
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'FileDbSeeder'
 		]);
 
 		$this->d = new Dumper();
@@ -42,17 +58,26 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 
 		Storage::copy('temp/test.jpg', 'uploads/1.jpg');
 
+
+		// $this->app = $this->createApplication();
+
+		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
+
 	}
 
 	public function tearDown()
 	{
 		// fwrite(STDOUT, __METHOD__ . "\n");
 		// parent::tearDown();
-		
-		$this->artisan('migrate:reset');
-		// unset($this->app);
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+
 		Storage::deleteDir('files');
 		Storage::deleteDir('uploads');
+		DB::disconnect();
+		// $this->artisan('migrate:reset');
+		// unset($this->app);
 
 		parent::tearDown();
 	}
@@ -104,7 +129,13 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\Core\CoreServiceProvider', 'Cookbook\Eav\EavServiceProvider', 'Cookbook\Filesystem\FilesystemServiceProvider'];
+		return [
+			'Cookbook\Core\CoreServiceProvider', 
+			'Cookbook\Locales\LocalesServiceProvider', 
+			'Cookbook\Eav\EavServiceProvider', 
+			'Cookbook\Filesystem\FilesystemServiceProvider',
+			'Cookbook\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
 	public function testCreateAttribute()
@@ -160,9 +191,9 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'type' => 'test_fields',
+			'entity_type' => 'test_fields',
 			'attribute_set' => ['id' => 4],
-			'locale_id' => 0,
+			'locale' => 'en_US',
 			'fields' => [
 				'test_text_attribute' => 'test value',
 				'test_textarea_attribute' => 'test value for textarea',
@@ -204,7 +235,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$params = [
-			'locale_id' => 0,
+			'locale' => 'en_US',
 			'fields' => [
 				'test_asset_attribute' => ['id' => 2, 'type' => 'file']
 			]

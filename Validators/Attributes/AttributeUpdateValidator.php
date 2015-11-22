@@ -119,7 +119,7 @@ class AttributeUpdateValidator extends Validator
 
 		parent::__construct();
 
-		$this->exception->setErrorKey('attributes');
+		$this->exception->setErrorKey('attribute');
 	}
 
 
@@ -136,24 +136,16 @@ class AttributeUpdateValidator extends Validator
 	public function validate(RepositoryCommand $command)
 	{
 		$attribute = $this->attributeRepository->fetch($command->id);
-		
-		if( ! $attribute )
-		{
-			throw new NotFoundException('No attribute with that ID.');
-		}
 
-		$this->validateParams($command->params, $this->rules, true);
+		$validator = $this->newValidator($command->params, $this->rules);
 
 		if( isset($command->params['options']) )
 		{
-			
-
-			foreach ($command->params['options'] as $key => &$option)
-			{
-				$this->exception->setErrorKey('attribute.options.' . $key);
-				$this->validateParams($option, $this->optionRules, true);
-			}
+			$validator->each('options', $this->optionRules);
 		}
+		$this->setValidator($validator);
+
+		$this->validateParams($command->params, null, true);
 		
 		$fieldValidator = $this->fieldValidatorFactory->make($attribute->field_type);
 
@@ -163,7 +155,6 @@ class AttributeUpdateValidator extends Validator
 		}
 		catch(ValidationException $e)
 		{
-			$this->exception->setErrorKey('attributes');
 			$this->exception->addErrors($e->getErrors());
 		}
 		

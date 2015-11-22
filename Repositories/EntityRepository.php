@@ -10,11 +10,14 @@
 
 namespace Cookbook\Eav\Repositories;
 
+use Carbon\Carbon;
 use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
 use Cookbook\Contracts\Eav\EntityRepositoryContract;
 use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
 use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
+use Cookbook\Contracts\Locales\LocaleRepositoryContract;
+use Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract;
 use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
 use Cookbook\Core\Facades\Trunk;
@@ -25,7 +28,6 @@ use Cookbook\Core\Repositories\UsesCache;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
-use Carbon\Carbon;
 use stdClass;
 
 
@@ -51,7 +53,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 * Factory for field handlers,
 	 * makes appropriate field handler depending on attribute data type
 	 * 
-	 * @var Cookbook\Contracts\Eav\FieldHandlerFactoryContract
+	 * @var \Cookbook\Contracts\Eav\FieldHandlerFactoryContract
 	 */
 	protected $fieldHandlerFactory;
 
@@ -59,30 +61,44 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	/**
 	 * Helper for attributes
 	 * 
-	 * @var Vizioart/Attributes/Manager/AttributeManager
+	 * @var \Cookbook\Eav\Managers\AttributeManager
 	 */
 	protected $attributeManager;
 	
 	/**
 	 * Repository for handling attribute sets
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
+	 * @var \Cookbook\Contracts\Eav\AttributeSetRepositoryContract
 	 */
 	protected $attributeSetRepository;
 
 	/**
 	 * Repository for handling attributes
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 * @var \Cookbook\Contracts\Eav\AttributeRepositoryContract
 	 */
 	protected $attributeRepository;
 
 	/**
 	 * Repository for handling entity types
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 * @var \Cookbook\Contracts\Eav\AttributeRepositoryContract
 	 */
 	protected $entityTypeRepository;
+
+	/**
+	 * Repository for handling locales
+	 * 
+	 * @var \Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract
+	 */
+	protected $workflowPointRepository;
+
+	/**
+	 * Repository for handling locales
+	 * 
+	 * @var \Cookbook\Contracts\Locales\LocaleRepositoryContract
+	 */
+	protected $localeRepository;
 
 
 
@@ -100,7 +116,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 								AttributeManager $attributeManager, 
 								AttributeSetRepositoryContract $attributeSetRepository, 
 								AttributeRepositoryContract $attributeRepository,
-								EntityTypeRepositoryContract $entityTypeRepository)
+								EntityTypeRepositoryContract $entityTypeRepository,
+								WorkflowPointRepositoryContract $workflowPointRepository,
+								LocaleRepositoryContract $localeRepository)
 	{
 
 		// AbstractRepository constructor
@@ -112,6 +130,8 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		$this->attributeSetRepository = $attributeSetRepository;
 		$this->attributeRepository = $attributeRepository;
 		$this->entityTypeRepository = $entityTypeRepository;
+		$this->workflowPointRepository = $workflowPointRepository;
+		$this->localeRepository = $localeRepository;
 	}
 
 
@@ -133,7 +153,16 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			$fields = $model['fields'];
 		}
 
-		$locale_id = $model['locale_id'];
+		$locale = false;
+		$locale_id = null;
+
+		if( ! empty($model['locale']) )
+		{
+			$locale = $this->localeRepository->fetch($model['locale']);
+			$locale_id = $locale->id;
+		}
+		$locales = $this->localeRepository->get();
+		
 
 		$fieldsForInsert = [];
 		$attributes = [];
@@ -143,8 +172,15 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			$attributes = $this->attributeRepository->get(['code' => ['in' => array_keys($fields)]]);
 		}
 
+		$status = null;
+		if( ! empty($model['status']) )
+		{
+			$status = $model['status'];
+		}
+
 		unset($model['fields']);
-		unset($model['locale_id']);
+		unset($model['locale']);
+		unset($model['status']);
 
 		// insert entity
 		$entityID = $this->insertEntity($model);
@@ -156,13 +192,73 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			$fieldForInsert['entity_type_id'] = $model['entity_type_id'];
 			$fieldForInsert['attribute_set_id'] = $model['attribute_set_id'];
 			$fieldForInsert['attribute_id'] = $attribute->id;
-			$fieldForInsert['locale_id'] = ($attribute->localized)?$locale_id:0;
-			$fieldForInsert['value'] = (isset($fields[$attribute->code]))?$fields[$attribute->code]:$attribute->default_value;
+			
+			if( $locale || ! $attribute->localized )
+			{
+				$fieldForInsert['locale_id'] = ($attribute->localized)?$locale->id:0;
+				$fieldForInsert['value'] = (isset($fields[$attribute->code]))?$fields[$attribute->code]:$attribute->default_value;
+				$fieldsForInsert[] = $fieldForInsert;
+			}
+			else
+			{
+				foreach ($locales as $l)
+				{
+					$localizedFieldForInsert = $fieldForInsert;
+					$localizedFieldForInsert['locale_id'] = $l->id;
 
-			$fieldsForInsert[] = $fieldForInsert;
+					if( isset($fields[$attribute->code]) && isset($fields[$attribute->code][$l->code]) )
+					{
+						$localizedFieldForInsert['value'] = $fields[$attribute->code][$l->code];
+						$fieldsForInsert[] = $localizedFieldForInsert;
+						continue;
+					}
+					
+					$localizedFieldForInsert['value'] = $attribute->default_value;
+					$fieldsForInsert[] = $localizedFieldForInsert;
+				}
+				
+			}
+			
+
+			
 		}
 
 		$this->insertFields($fieldsForInsert, $attributes);
+
+		$entityType = $this->entityTypeRepository->fetch($model['entity_type_id']);
+
+		if($entityType->has_workflow)
+		{
+			$locale_ids = [];
+			if( ! $entityType->localized_workflow )
+			{
+				$locale_ids[] = 0;
+			}
+			else
+			{
+				if( empty($locale_id) )
+				{
+					foreach ($locales as $l)
+					{
+						$locale_ids[] = $l->id;
+					}
+				}
+				else
+				{
+					$locale_ids[] = $locale_id;
+				}
+			}
+
+			if(isset($status))
+			{
+				$point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
+				$this->insertStatus($entityID, $point->id, $locale_ids);
+			}
+			else
+			{
+				$this->insertStatus($entityID, $entityType->default_point->id, $locale_ids);
+			}
+		}
 
 		$entity = $this->fetch($entityID, [], $locale_id);
 
@@ -185,8 +281,16 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 */
 	protected function _update($id, $model)
 	{
+		$locale = false;
+		$locale_id = null;
 
-		$entity = $this->fetch($id, [], $model['locale_id']);
+		if( ! empty($model['locale']) )
+		{
+			$locale = $this->localeRepository->fetch($model['locale']);
+			$locale_id = $locale->id;
+		}
+
+		$entity = $this->fetch($id, [], $locale_id);
 
 		$fields = array();
 		
@@ -204,28 +308,79 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			$attributes = $this->attributeRepository->get(['code' => ['in' => array_keys($fields)]]);
 		}
 
-
-
 		foreach ($attributes as $attribute)
 		{
 			$fieldForUpdate = [];
-			$fieldForUpdate['entity_id'] = $id;
-			$fieldForUpdate['entity_type_id'] = $model['entity_type_id'];
+			$fieldForUpdate['entity_id'] = $entity->id;
+			$fieldForUpdate['entity_type_id'] = $entity->entity_type_id;
+			$fieldForUpdate['attribute_set_id'] = $entity->attribute_set_id;
 			$fieldForUpdate['attribute_id'] = $attribute->id;
-			$fieldForUpdate['locale_id'] = ($attribute->localized)?$model['locale_id']:0;
-			$fieldForUpdate['value'] = $fields[$attribute->code];
+			
+			if( $locale || ! $attribute->localized )
+			{
+				$fieldForUpdate['locale_id'] = ($attribute->localized)?$locale->id:0;
+				$fieldForUpdate['value'] = (isset($fields[$attribute->code]))?$fields[$attribute->code]:$attribute->default_value;
+				$fieldsForUpdate[] = $fieldForUpdate;
+			}
+			else
+			{
+				$locales = $this->localeRepository->get();
 
-			$fieldsForUpdate[] = $fieldForUpdate;
+				foreach ($fields[$attribute->code] as $lcode => $value)
+				{
+					$localizedFieldForUpdate = $fieldForUpdate;
+					foreach ($locales as $l)
+					{
+						if($l->code == $lcode)
+						{
+							$localizedFieldForUpdate['locale_id'] = $l->id;
+							$localizedFieldForUpdate['value'] = $value;
+							$fieldsForUpdate[] = $localizedFieldForUpdate;
+						}
+					}
+					
+				}
+				
+			}			
 		}
 
-		
-
 		$this->updateFields($fieldsForUpdate, $attributes);
+
+		$entityType = $this->entityTypeRepository->fetch($entity->entity_type_id);
+
+		if($entityType->has_workflow)
+		{
+			$locale_ids = [];
+			if( ! $entityType->localized_workflow )
+			{
+				$locale_ids[] = 0;
+			}
+			else
+			{
+				if( empty($locale_id) )
+				{
+					foreach ($locales as $l)
+					{
+						$locale_ids[] = $l->id;
+					}
+				}
+				else
+				{
+					$locale_ids[] = $locale_id;
+				}
+			}
+
+			if(isset($status))
+			{
+				$point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
+				$this->updateStatus($entityID, $point->id, $locale_ids);
+			}
+		}
 
 		$this->updateEntity($id);
 
 		Trunk::forgetType('entity');
-		$entity = $this->fetch($id, [], $model['locale_id']);
+		$entity = $this->fetch($id, [], $locale_id);
 
 		return $entity;
 		
@@ -248,6 +403,29 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		$this->deleteFields($entity);
 
 		$this->db->table('entities')->where('id', '=', $id)->delete();
+
+		Trunk::forgetType('entity');
+		return $entity;
+	}
+
+	/**
+	 * Delete locele for entity
+	 * 
+	 * @param mixed $id entity id
+	 * @param mixed $locale_id  locale id
+	 * 
+	 * @todo check if its last locale and delete whole entity if it is
+ 	 */ 
+	public function deleteForLocale($id, $locale_id)
+	{
+		// get the locale
+		$locale = $this->localeRepository->fetch($locale_id);
+		// get the entity
+		$entity = $this->fetch($id, [], $locale->id);
+
+		$this->deleteFieldsForLocale($entity, $locale);
+
+		// $this->db->table('entities')->where('id', '=', $id)->delete();
 
 		Trunk::forgetType('entity');
 		return $entity;
@@ -348,10 +526,16 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 */
 	protected function insertFields(array $fields, $attributes)
 	{
-		for ($i = 0; $i < count($attributes); $i++)
+		foreach ($fields as $field)
 		{
-			$fieldHandler = $this->fieldHandlerFactory->make($attributes[$i]->field_type);
-			$fieldHandler->insert($fields[$i], $attributes[$i]);
+			foreach ($attributes as $attribute)
+			{
+				if($attribute->id == $field['attribute_id'])
+				{
+					$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+					$fieldHandler->insert($field, $attribute);
+				}
+			}
 		}
 	}
 
@@ -365,10 +549,16 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 */
 	protected function updateFields(array $fields, $attributes)
 	{
-		for ($i = 0; $i < count($attributes); $i++)
+		foreach ($fields as $field)
 		{
-			$fieldHandler = $this->fieldHandlerFactory->make($attributes[$i]->field_type);
-			$fieldHandler->update($fields[$i], $attributes[$i]);
+			foreach ($attributes as $attribute)
+			{
+				if($attribute->id == $field['attribute_id'])
+				{
+					$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+					$fieldHandler->insert($field, $attribute);
+				}
+			}
 		}
 	}
 
@@ -391,6 +581,25 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		
 	}
 
+	/**
+	 * Delete attribute values for entity
+	 * 
+	 * @param Model $entity
+	 * @param Model $locale
+	 * 
+	 * @return void
+	 */
+	protected function deleteFieldsForLocale($entity, $locale)
+	{
+		$attributes = [];
+		$attributes = $this->attributeRepository->get();
+		foreach ($attributes as $attribute)
+		{
+			$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
+			$fieldHandler->deleteByEntityAndLocale($entity, $locale, $attribute);
+		}
+		
+	}
 	/**
 	 * Delete attribute values for attribute 
 	 * 
@@ -442,6 +651,49 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		
 	}
 
+	protected function insertStatus($id, $pointId, $localeIds)
+	{
+		$statusParams = [];
+		foreach ($localeIds as $localeId)
+		{
+			$statusParams[] = [
+				'entity_id' => $id,
+				'workflow_point_id' => $pointId,
+				'locale_id' => $localeId,
+				'state' => 'active'
+			];
+		}
+		
+		$this->db->table('entity_statuses')->insert($statusParams);
+	}
+
+	protected function updateStatus($id, $pointId, $localeIds)
+	{
+		$updateParams = [
+			'state' => 'history',
+			'updated_at' => Carbon::now('UTC')->toDateTimeString()
+		];
+
+		$this->db->table('entity_statuses')
+				 ->where('entity_id', '=', $id)
+				 ->where('state', '=', 'active')
+				 ->whereIn('locale_id', $localeIds)
+				 ->update($updateParams);
+
+		$statusParams = [];
+		foreach ($localeIds as $localeId)
+		{
+			$statusParams[] = [
+				'entity_id' => $id,
+				'workflow_point_id' => $pointId,
+				'locale_id' => $localeId,
+				'state' => 'active'
+			];
+		}
+
+		$this->db->table('entity_statuses')->insert($statusParams);
+	}
+
 
 	
 
@@ -453,11 +705,13 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	/**
 	 * Get entity by ID
 	 * 
-	 * @param int $id - ID of attribute to be fetched
+	 * @param mixed $id
+	 * @param array $include
+	 * @param mixed $locale
 	 * 
 	 * @return array
 	 */
-	protected function _fetch($id, $include = [], $locale = null)
+	protected function _fetch($id, $include = [], $locale = null, $status = null)
 	{
 		$params = func_get_args();
 		if( Trunk::has($params, 'entity'))
@@ -465,33 +719,72 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			$entity = Trunk::get($params, 'entity');
 			$entity->clearIncluded();
 			$entity->load($include);
-			$meta = ['id' => $id, 'include' => $include];
+			$meta = ['id' => $id, 'include' => $include, 'locale' => $locale, 'status' => $status];
 			$entity->setMeta($meta);
 			return $entity;
 		}
 
-		$entity = $this->db->table('entities')
+		if( ! is_null($status) && ! is_array($status) )
+		{
+			$status = explode(',', $status);
+			foreach ($status as &$s)
+			{
+				$s = trim($s);
+			}
+		}
+
+		$locale_ids = [0];
+		if( ! is_null($locale) )
+		{
+			$locale = $this->localeRepository->fetch($locale);
+			$locale_ids[] = $locale->id;
+		}
+		else
+		{
+			$locales = $this->localeRepository->get();
+			foreach ($locales as $l)
+			{
+				$locale_ids[] = $l->id;
+			}
+		}
+
+		$query = $this->db->table('entities')
 						->select(
 							'entities.id',  
 							'entities.entity_type_id', 
 							'entities.attribute_set_id',
 							'entity_types.code as entity_type',
+							'entity_types.localized as localized',
+							'entity_types.has_workflow as has_workflow',
+							'entity_types.localized_workflow as localized_workflow',
+							'entity_types.workflow_id as workflow_id',
 							$this->db->raw('"entity" as type'),
 							'entities.created_at as created_at',
 							'entities.updated_at as updated_at'
 						)
 						->where('entities.id', '=', $id)
-						->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
-						->first();
+						->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id');
+
+		if( ! empty($status) )
+		{
+			$query = $this->filterStatus($query, $status, $localeIds);
+		}
+
+		$entity = $query->first();
 		
 		if( ! $entity )
 		{
-			throw new NotFoundException(['There is no entity with that ID.']);
+			throw new NotFoundException(['Entity not found.']);
 		}
 
-		$fields = $this->getFieldsForEntities($id, $locale);
+		if( ! is_null($locale) && $entity->localized )
+		{
+			$entity->locale = $locale->code;
+		}
 
-		$entity->fields = $fields[$id];
+		$entity = $this->getStatusesForEntities($entity, $status, $locale);
+
+		$entity = $this->getFieldsForEntities($entity, $locale);
 
 		$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
 		$entity->created_at = Carbon::parse($entity->created_at)->tz($timezone);
@@ -499,7 +792,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$result = new Model($entity);
 		$result->setParams($params);
-		$meta = ['id' => $id, 'include' => $include];
+		$meta = ['id' => $id, 'include' => $include, 'locale' => is_null($locale)?$locale:$locale->id, 'status' => $status];
 		$result->setMeta($meta);
 		$result->load($include);
 
@@ -511,20 +804,46 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 * 
 	 * @return array
 	 */
-	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [], $locale = 0, $type = null)
+	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [], $locale = null, $status = null)
 	{
 		$params = func_get_args();
 
 		if(Trunk::has($params, 'entity'))
 		{
-			$entityTypes = Trunk::get($params, 'entity');
-			$entityTypes->clearIncluded();
-			$entityTypes->load($include);
+			$entity = Trunk::get($params, 'entity');
+			$entity->clearIncluded();
+			$entity->load($include);
 			$meta = [
-				'include' => $include
+				'include' => $include,
+				'locale' => $locale,
+				'status' => $status
 			];
-			$entityTypes->setMeta($meta);
-			return $entityTypes;
+			$entity->setMeta($meta);
+			return $entity;
+		}
+
+		if( ! is_null($status) && ! is_array($status) )
+		{
+			$status = explode(',', $status);
+			foreach ($status as &$s)
+			{
+				$s = trim($s);
+			}
+		}
+
+		$locale_ids = [0];
+		if( ! is_null($locale) )
+		{
+			$locale = $this->localeRepository->fetch($locale);
+			$locale_ids[] = $locale->id;
+		}
+		else
+		{
+			$locales = $this->localeRepository->get();
+			foreach ($locales as $l)
+			{
+				$locale_ids[] = $l->id;
+			}
 		}
 
 		$query =  $this->db->table('entities')
@@ -533,18 +852,17 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 							'entities.entity_type_id as entity_type_id', 
 							'entities.attribute_set_id as attribute_set_id',
 							'entity_types.code as entity_type',
+							'entity_types.localized as localized',
+							'entity_types.has_workflow as has_workflow',
+							'entity_types.localized_workflow as localized_workflow',
+							'entity_types.workflow_id as workflow_id',
 							$this->db->raw('"entity" as type'),
 							'entities.created_at as created_at',
 							'entities.updated_at as updated_at'
 						)
 						->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id');
-
-		if( ! empty($type) )
-		{
-			$query->where('entity_types.code', '=', $type);
-		}
 		
-		$query = $this->parseFilters($query, $filter);
+		$query = $this->parseFilters($query, $filter, $locale);
 
 		$query->groupBy('entities.id');
 
@@ -554,6 +872,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$query = $this->parseSorting($query, $sort);
 
+		if( ! empty($status) )
+		{
+			$query = $this->filterStatus($query, $status, $localeIds);
+		}
+
 		$entities = $query->get();
 
 		if( ! $entities )
@@ -561,23 +884,17 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			$entities = [];
 		}
 
-		$ids = [];
+		$entities = $this->getStatusesForEntities($entities, $status, $locale);
+		$entities = $this->getFieldsForEntities($entities, $locale);
 
 		foreach ($entities as &$entity) 
 		{
-			$ids[] = $entity->id;
 			$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
 			$entity->created_at = Carbon::parse($entity->created_at)->tz($timezone);
 			$entity->updated_at = Carbon::parse($entity->updated_at)->tz($timezone);
-		}
-
-		if( ! empty($ids) )
-		{
-			$fields = $this->getFieldsForEntities($ids, $locale);
-
-			foreach ($entities as &$entity) 
+			if( ! is_null($locale) && $entity->localized )
 			{
-				$entity->fields = $fields[$entity->id];
+				$entity->locale = $locale->code;
 			}
 		}
 
@@ -592,7 +909,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			'total' => $total, 
 			'filter' => $filter, 
 			'sort' => $sort, 
-			'include' => $include
+			'include' => $include,
+			'locale' => is_null($locale)?$locale:$locale->id,
+			'status' => $status
 		];
 		$result->setMeta($meta);
 
@@ -601,11 +920,27 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		return $result;
 	}
 
-	protected function parseFilters($query, $filters)
+	protected function parseFilters($query, $filters, $locale = null)
 	{
 		$fieldFilters = [];
+		$status = null;
+		$public = false;
 		foreach ($filters as $key => $filter)
 		{
+			if($key == 'entity_type' || $key == 'type')
+			{
+				$key = 'entity_types.code';
+			}
+			if($key == 'type_id')
+			{
+				$key = 'entity_type_id';
+			}
+
+			if(strpos($key, '.') == false)
+			{
+				$key = 'entities.' . $key;
+			}
+
 			if(substr( $key, 0, 7 ) === "fields.")
 			{
 				$code = substr($key, 7);
@@ -615,11 +950,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 			if( ! is_array($filter) )
 			{
-				$query = $query->where('entities.' . $key, '=', $filter);
+				$query = $query->where($key, '=', $filter);
 				continue;
 			}
 
-			$query = $this->parseFilterOperator($query, 'entities.' . $key, $filter);
+			$query = $this->parseFilterOperator($query, $key, $filter);
 		}
 		if( ! empty($fieldFilters) )
 		{
@@ -627,12 +962,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 			foreach ($attributes as $attribute)
 			{
-				$query = $this->parseFieldFilter($query, $attribute, $fieldFilters[$attribute->code]);
+				$query = $this->parseFieldFilter($query, $attribute, $fieldFilters[$attribute->code], $locale);
 			}
 		}
-		
-
-		
 
 		return $query;
 	}
@@ -676,11 +1008,21 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		return $query;
 	}
 
-	protected function parseFieldFilter($query, $attribute, $filter)
+	protected function parseFieldFilter($query, $attribute, $filter, $locale = null)
 	{
 		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-		$query = $fieldHandler->filterEntities($query, $attribute, $filter);
+		$query = $fieldHandler->filterEntities($query, $attribute, $filter, $locale);
 
+		return $query;
+	}
+
+	protected function filterStatus($query, $status, $localeIds)
+	{
+		$query->join('entity_statuses', 'entities.id', '=', 'entity_statuses.entity_id')
+			  ->join('workflow_points', 'entity_statuses.workflow_point_id', '=', 'workflow_points.id')
+			  ->where('entity_statuses.state', '=', 'active')
+			  ->whereIn('entity_statuses.locale_id', $localeIds)
+			  ->whereIn('workflow_points.status', $status);
 		return $query;
 	}
 
@@ -722,6 +1064,20 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 					$sortDirection = 'desc';
 				}
 
+				if($sortCriteria == 'entity_type' || $sortCriteria == 'type')
+				{
+					$sortCriteria = 'entity_types.code';
+				}
+				if($sortCriteria == 'type_id')
+				{
+					$sortCriteria = 'entity_type_id';
+				}
+
+				if(strpos($sortCriteria, '.') == false)
+				{
+					$sortCriteria = 'entities.' . $sortCriteria;
+				}
+
 				if(substr( $sortCriteria, 0, 7 ) === "fields.")
 				{
 					$code = substr($sortCriteria, 7);
@@ -735,38 +1091,172 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 					continue;
 				}
 
-				$query = $query->orderBy('entities.' . $sortCriteria, $sortDirection);
+				$query = $query->orderBy($sortCriteria, $sortDirection);
 			}
 		}
 
 		return $query;
 	}
 
-	protected function parseFieldSorting($query, $attribute, $direction)
+	protected function parseFieldSorting($query, $attribute, $direction, $locale = null)
 	{
 		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-		$query = $fieldHandler->sortEntities($query, $attribute, $direction);
+		$query = $fieldHandler->sortEntities($query, $attribute, $direction, $locale);
 
 		return $query;
+	}
+
+	/**
+	 * Get entity statuses by entity IDs
+	 * 
+	 * @param $entityIds
+	 * @param $locale
+	 * 
+	 * @return array
+	 */
+	protected function getStatusesForEntities($entities, $status, $locale = null)
+	{
+		if(empty($entities))
+		{
+			return $entities;
+		}
+		$singleResult = false;
+		if(!is_array($entities))
+		{
+			$entities = array($entities);
+			$singleResult = true;
+		}
+
+		$entityIds = [];
+		$entitiesById = [];
+		foreach ($entities as $entity)
+		{
+			$entityIds[] = $entity->id;
+			$entitiesById[$entity->id] = $entity;
+		}
+
+		$result = [];
+
+		$statuses = $this->getAllStatuses($entityIds, $status, $locale);
+
+		foreach ($statuses as $status)
+		{
+			if( ! array_key_exists($status->entity_id, $result) && is_null($locale) && $entitiesById[$status->entity_id]->localized_workflow)
+			{
+				$result[$status->entity_id] = [];
+			}
+
+			if($status->locale_id != 0 && is_null($locale) && $entitiesById[$status->entity_id]->localized_workflow)
+			{
+				$result[$status->entity_id][$status->locale_code] = $status->status;
+			}
+			else
+			{
+				$result[$status->entity_id] = $status->status;
+			}
+		}
+
+		foreach ($entities as &$entity)
+		{
+			if( ! empty($result[$entity->id]) )
+			{
+				$entity->status = $result[$entity->id];
+			}
+			
+		}
+
+		if($singleResult)
+		{
+			$entities = $entities[0];
+		}
+
+		return $entities;
+	}
+
+	/**
+	 * Get statuses from database
+	 * 
+	 * @param  array $entityIds
+	 * @param  integer|null $locale 
+	 * 
+	 * @return array
+	 */
+	protected function getAllStatuses($entityIds, $status, $locale)
+	{
+		// statuses query
+		$query = $this->db->table('entities')
+					->select(
+						'entities.id as entity_id',
+						'entity_statuses.locale_id',
+						'locales.code as locale_code',
+						'workflow_points.status',
+						'entity_types.localized_workflow'
+					)
+					->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
+					->join('entity_statuses', 'entities.id', '=', 'entity_statuses.entity_id')
+					->join('workflow_points', 'entity_statuses.workflow_point_id', '=', 'workflow_points.id')
+					->join('locales', 'entity_statuses.locale_id', '=', 'locales.id')
+					->whereIn('entities.id', $entityIds)
+					->where('entity_types.has_workflow', '=', 1)
+					->where('entity_statuses.state', '=', 'active');
+		if( ! is_null($locale) )
+		{
+			$localeIds = [0, $locale->id];
+			$query->whereIn('entity_statuses.locale_id', $localeIds);
+		}
+					
+		if( ! empty($status) )
+		{
+			$query->whereIn('workflow_points.status', $status); 
+		}
+		$statuses = $query->orderBy('entities.id')
+						  ->get();
+
+		return $statuses;
 	}
 
 	/**
 	 * Get entity fields by entity IDs
 	 * 
 	 * @param $entityIds
+	 * @param $locale
+	 * 
+	 * @return array
 	 */
-	protected function getFieldsForEntities($entityIds, $locale = null){
-		
-		if(!is_array($entityIds)){
-			$entityIds = array($entityIds);
+	protected function getFieldsForEntities($entities, $locale = null)
+	{
+		if(empty($entities))
+		{
+			return $entities;
+		}
+		$singleResult = false;
+		if(!is_array($entities))
+		{
+			$entities = array($entities);
+			$singleResult = true;
 		}
 
+		$entityIds = [];
+		$entitiesById = [];
+		foreach ($entities as $entity)
+		{
+			$entityIds[] = $entity->id;
+			$entitiesById[$entity->id] = $entity;
+		}
+
+		$result = [];
 		$attributeIds = [];
 		$attributes = [];
 
-		$values = $this->getValuesAll($entityIds, $locale);
+		$locales = $this->localeRepository->get();
 
-		// 
+		$localesById = [];
+		foreach ($locales as $l)
+		{
+			$localesById[$l->id] = $l;
+		}
+
+		$values = $this->getValuesAll($entityIds, $locale);
 
 		// get distinct attribute ids from values
 		foreach ($values as $value)
@@ -777,15 +1267,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			}
 		}
 
-		// var_dump($attributeIds);
-
 		// get attributes
 		if( ! empty($attributeIds) )
 		{
 			$attributes = $this->attributeRepository->get(['id' => ['in' => $attributeIds]]);
 		}
-
-		// var_dump($attributes);
 
 		$attributesById = [];
 		foreach ($attributes as $attribute)
@@ -793,11 +1279,10 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			$attributesById[$attribute->id] = $attribute;
 		}
 
-		// var_dump($attributesById);
-
 		$attributeSettings = $this->attributeManager->getFieldTypes();
 		$fieldHandlers = [];
 		$fields = [];
+
 		foreach ($entityIds as $entityId)
 		{
 			$fields[$entityId] = new stdClass();
@@ -822,24 +1307,73 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 			{
 				$formattedValue = [$formattedValue];
 			}
-			
-			if( isset($fields[$value->entity_id]->{$attribute->code}) && $hasMultipleValues )
+
+			if( $entitiesById[$value->entity_id]->localized && $attribute->localized && is_null($locale) )
 			{
-				$fields[$value->entity_id]->{$attribute->code} = array_merge($fields[$value->entity_id]->{$attribute->code}, $formattedValue);
-				continue;
+				if( ! isset($fields[$value->entity_id]->{$attribute->code}) )
+				{
+					$fields[$value->entity_id]->{$attribute->code} = [];
+
+					foreach ($locales as $l)
+					{
+						if( ! $entitiesById[$value->entity_id]->has_workflow || ! $entitiesById[$value->entity_id]->localized_workflow || array_key_exists($l->code, $entitiesById[$value->entity_id]->status))
+						{
+							$fields[$value->entity_id]->{$attribute->code}[$l->code] = null;
+						}
+					}
+				}
+
+				foreach ($locales as $l)
+				{
+					if($l->id == $value->locale_id && ( ! $entitiesById[$value->entity_id]->localized_workflow || array_key_exists($l->code, $entitiesById[$value->entity_id]->status) ) )
+					{
+						if( isset($fields[$value->entity_id]->{$attribute->code}[$l->code]) && $hasMultipleValues )
+						{
+							$formattedValue = array_merge($fields[$value->entity_id]->{$attribute->code}[$l->code], $formattedValue);
+						}
+
+						$fields[$value->entity_id]->{$attribute->code}[$l->code] = $formattedValue;
+					}
+					
+				}
+				
+			}
+			else
+			{
+				if( isset($fields[$value->entity_id]->{$attribute->code}) && $hasMultipleValues )
+				{
+					$formattedValue = array_merge($fields[$value->entity_id]->{$attribute->code}, $formattedValue);
+				}
+				$fields[$value->entity_id]->{$attribute->code} = $formattedValue;
 			}
 
-			$fields[$value->entity_id]->{$attribute->code} = $formattedValue;
+			
 		}
-		
 
+		foreach ($entities as &$entity)
+		{
+			$entity->fields = $fields[$entity->id];
+		}
 
+		if($singleResult)
+		{
+			$entities = $entities[0];
+		}
 
-		// finally return all values formatted
-		return $fields;
+		return $entities;
 	}
 
-	protected function getValuesAll($entityIds, $locale)
+	protected function entityHasMultipleLocales($entity)
+	{
+		if($entity->locale)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	protected function getValuesAll($entityIds, $locale = null)
 	{
 		// get values from various tables
 		$valuesDatetime = $this->getValuesDatetime($entityIds, $locale);
@@ -860,38 +1394,39 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		return $values;
 	}
 
-	protected function getValuesDatetime($entityIds, $locale)
+	protected function getValuesDatetime($entityIds, $locale = null)
 	{
 		return $this->getValues('attribute_values_datetime', $entityIds, $locale);
 	}
 
-	protected function getValuesDecimal($entityIds, $locale)
+	protected function getValuesDecimal($entityIds, $locale = null)
 	{
 		return $this->getValues('attribute_values_decimal', $entityIds, $locale);
 	}
 	
-	protected function getValuesInteger($entityIds, $locale)
+	protected function getValuesInteger($entityIds, $locale = null)
 	{
 		return $this->getValues('attribute_values_integer', $entityIds, $locale);
 	}
 	
-	protected function getValuesText($entityIds, $locale)
+	protected function getValuesText($entityIds, $locale = null)
 	{
 		return $this->getValues('attribute_values_text', $entityIds, $locale);
 	}
 	
-	protected function getValuesVarchar($entityIds, $locale)
+	protected function getValuesVarchar($entityIds, $locale = null)
 	{
 		return $this->getValues('attribute_values_varchar', $entityIds, $locale);
 	}
 	
-	protected function getValues($table, $entityIds, $locale)
+	protected function getValues($table, $entityIds, $locale = null)
 	{
 		// values query
-		$values = $this->db->table('entities')
+		$query = $this->db->table('entities')
 					->select(
 						'entities.id as entity_id',
 						'attributes.id as attribute_id',
+						$table . '.locale_id',
 						$table . '.value'
 					)
 					->join('attribute_sets', 'entities.attribute_set_id', '=', 'attribute_sets.id')
@@ -902,778 +1437,16 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 								->on($table . '.entity_id', '=', 'entities.id');
 					})
 					->whereIn('entities.id', $entityIds)
-					->where('attributes.table', '=', $table)
-					->where(function($q) use ($locale, $table){
-						$q	->where($table . '.locale_id', '=', 0);
+					->where('attributes.table', '=', $table);
 
-						if( ! empty($locale) )
-						{
-							$q->orWhere($table . '.locale_id', '=', $locale);
-						}
-					})
-					->orderBy('entities.id', 'set_attributes.sort_order', $table . '.sort_order')
-					->get();
+		if( ! is_null($locale) )
+		{
+			$query->whereIn($table . '.locale_id', [0, $locale->id]);
+		}
+		$values = $query->orderBy('entities.id', 'set_attributes.sort_order', $table . '.sort_order')
+						->get();
 
 		return $values;
 	}
-
-
-
-	/**
-	 * Get entity  with attribute set and values 
-	 * by object ID and entity type
-	 * 
-	 * @param int 		$objectID - ID of a object that is related to this entity
-	 * @param string 	$entityType - entity type of that object (slug)
-	 * @param array 	$with - optional relations to be fetched with entity types
-	 * 
-	 * @return Model
-	 */
-	public function fetchByObject($objectID, $entityType, $with = array()){
-
-		/* 	
-			select entity from database with it's type
-			query by entity.object_id and entity_type.slug
-			this query should be smaller for performance reasons
-		*/
-	
-		$entity = DB::table('entities')
-						->select(
-							'entities.id', 
-							'entities.object_id', 
-							'entities.entity_type_id', 
-							'entities.attribute_set_id',
-							'entity_types.slug', 
-							'entity_types.name',
-							'entity_types.plural_name',
-							'entity_types.parent_type',
-							'entity_types.multiple_sets',
-							'entity_types.archive_parent',
-							'entity_types.default_attribute_set_id'
-						)
-						->where('entities.object_id', '=', $objectID)
-						->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
-						->where('entity_types.slug', '=', $entityType)
-						->first();
-
-
-		// if there is no entity with those params return false
-		if(!$entity){
-			$this->addErrors(array('No such entity'));
-			return false;
-		}
-
-		/* 	
-			create queries for each value table
-			query them by entity ID and include all languages
-		*/
-	
-		// datetime values query
-		$valuesDatetimeQuery = DB::table('attribute_values_datetime')->where('entity_id', '=', $entity->id);
-		// decimal values query
-		$valuesDecimalQuery = DB::table('attribute_values_decimal')->where('entity_id', '=', $entity->id);
-		// integer values query
-		$valuesIntegerQuery = DB::table('attribute_values_integer')->where('entity_id', '=', $entity->id);
-		// text values query
-		$valuesTextQuery = DB::table('attribute_values_text')->where('entity_id', '=', $entity->id);
-		// varchar values query
-		$valuesVarcharQuery = DB::table('attribute_values_varchar')->where('entity_id', '=', $entity->id);
-		// relations values query
-		$valuesRelationQuery = DB::table('attribute_values_relations')->where('entity_id', '=', $entity->id);
-		// assets values query
-		$valuesAssetsQuery = DB::table('attribute_values_assets')->where('entity_id', '=', $entity->id);
-
-		/* 
-			make a union from all values queries to get single table like result
-			all values will be returned as strings,
-			but we will know what to expect with attribute handlers
-		*/
-	
-		$valuesQuery = $valuesDatetimeQuery
-						->union($valuesDecimalQuery)
-						->union($valuesIntegerQuery)
-						->union($valuesTextQuery)
-						->union($valuesVarcharQuery)
-						->union($valuesRelationQuery)
-						->union($valuesAssetsQuery);
-
-		// get all values
-		$values = $valuesQuery->get();
-
-
-		// extract distinct attribute ID's
-		$attributeIDs = array();
-		foreach ($values as $value) {
-			if(!in_array($value->attribute_id, $attributeIDs)){
-				$attributeIDs[] = $value->attribute_id;
-			}
-		}
-
-		// if there are any attributes get them by ID
-		if(!empty($attributeIDs)){
-			$attributes = DB::table('attributes')->whereIn('id', $attributeIDs)->get();
-		}else{
-			$attributes = array();
-		}
-
-		$attributeSet = $this->getAttributeSet($entity->attribute_set_id);
-
-		// put set in entity
-		$entity->attribute_set = $attributeSet;
-		
-		$attributeValues = $this->getDefaultAttributeValues($attributeSet, $entity->id);
-		$entity_values = $attributeValues;
-
-
-		// combine values and attributes, so every value has attribute info on it self.
-		foreach ($values as $value) {
-			foreach ($attributes as &$attribute) {
-				// attribute match for this value
-				if($value->attribute_id == $attribute->id){
-
-					// get options for this attribute if there are any
-					if(!isset($attribute->options)){
-						$attributeSettings = $this->attributeManager->getDataType($attribute->data_type);
-
-						if($attributeSettings['has_options']){
-							$options = DB::table('attribute_options')->where('attribute_id', '=', $attribute->id)->get();
-							$attribute->options = $options;
-						}else{
-							$attribute->options = array();
-						}
-					}
-
-					// let attribute handle process value
-					$attributeHandler = $this->attributeHandlerFactory->make($attribute->data_type);
-					$value = $attributeHandler->getValue($value, $attribute, $attribute->options);
-
-					if($attributeSettings['has_multiple_values']){
-						$value->value = array($value->value);
-					}
-					// get attribute code
-					$value->code = $attribute->code;
-
-					if(!array_key_exists($value->code, $entity_values)){
-						$entity_values[$value->code] = array();
-					}
-
-					if(!array_key_exists($value->language_id, $entity_values[$value->code])){
-						$entity_values[$value->code][$value->language_id] = $value;
-					}else{
-						if($attributeSettings['has_multiple_values']){
-							$entity_values[$value->code][$value->language_id]->value = array_merge($entity_values[$value->code][$value->language_id]->value, $value->value);
-						}else{
-							$entity_values[$value->code][$value->language_id]->value = $value->value;
-						}
-						
-					}
-				}
-			}
-		}
-
-		// put values in entity
-		$entity->attribute_values = $entity_values;
-
-		
-
-
-		// use entity transformer to transform all object as wanted
-		$entityTransformer = new EntityTransformer;
-		$entity = $entityTransformer->transform($entity);
-
-		
-		// finally return entity
-		return $entity;
-		
-	}
-
-	/**
-	 * Get attribute set with its groups and attributes
-	 * @uses Illuminate\Support\Facades\DB
-	 *
-	 * @param int $attributeSetID
-	 * 
-	 * @return Model
-	 */
-	protected function getAttributeSet($attributeSetID){
-
-		// get attribute set for this entity
-		$attributeSetData = DB::table('attribute_sets')
-							->select(
-								'attribute_sets.id as id',
-								'attribute_sets.entity_type_id as entity_type_id',
-								'attribute_sets.slug as slug',
-								'attribute_sets.name as name',
-								'attribute_groups.id as group_id',
-								'attribute_groups.slug as group_code',
-								'attribute_groups.admin_label as group_admin_label',
-								'attribute_groups.sort_order as group_sort_order', 
-								'set_attributes.sort_order as attribute_sort_order',
-								'set_attributes.id as set_attribute_id',
-								'attributes.id as attribute_id',
-								'attributes.code as attribute_code',
-								'attributes.admin_label as attribute_admin_label',
-								'attributes.admin_notice as attribute_admin_notice',
-								'attributes.data_type as data_type',
-								'attributes.default_value as default_value',
-								'attributes.is_unique as is_unique',
-								'attributes.is_required as is_required',
-								'attributes.visibility as visibility',
-								'attributes.status as status',
-								'attributes.language_dependable as language_dependable',
-								'attributes.data as data',
-								'attribute_options.id as option_id',
-								'attribute_options.language_id as language_id',
-								'attribute_options.label as option_label',
-								'attribute_options.value as option_value',
-								'attribute_options.is_default as is_default',
-								'attribute_options.sort_order as option_sort_order'
-							)
-							->leftJoin('attribute_groups', 'attribute_groups.attribute_set_id', '=', 'attribute_sets.id')
-							->leftJoin('set_attributes', function($join){
-								$join 	->on('set_attributes.attribute_set_id', '=', 'attribute_sets.id')
-										->on('set_attributes.attribute_group_id', '=', 'attribute_groups.id');
-							})
-							->leftJoin('attributes', 'attributes.id', '=', 'set_attributes.attribute_id')
-							->leftJoin('attribute_options', 'attribute_options.attribute_id', '=', 'attributes.id')
-							->where('attribute_sets.id', '=', $attributeSetID)
-							->orderBy(
-								'attribute_sets.id', 
-								'attribute_groups.sort_order', 
-								'attribute_groups.id', 
-								'set_attributes.sort_order',
-								'set_attributes.id',
-								'attribute_options.sort_order',
-								'attribute_options.id'
-							)
-							->get();
-
-		if(empty($attributeSetData)){
-			return false;
-		}
-
-		$attributeSet = new \stdClass();
-
-		foreach ($attributeSetData as $data) {
-			if(!isset($attributeSet->id)){
-				$attributeSet->id = $data->id;
-				$attributeSet->entity_type_id = $data->entity_type_id;
-				$attributeSet->slug = $data->slug;
-				$attributeSet->name = $data->name;
-				$attributeSet->groups = array();
-			}
-
-			if(empty($data->group_id)){
-				continue;
-			}
-
-			if(!empty($attributeSet->groups)){
-				$lastGroup = $attributeSet->groups[count($attributeSet->groups) - 1];
-			}
-
-			if(empty($attributeSet->groups) || $lastGroup->id != $data->group_id){
-				$group = new \stdClass();
-				$group->id = $data->group_id;
-				$group->slug = $data->group_code;
-				$group->admin_label = $data->group_admin_label;
-				$group->sort_order = $data->group_sort_order;
-				$group->set_attributes = array();
-				$attributeSet->groups[] = $group;
-				$lastGroup = $attributeSet->groups[count($attributeSet->groups) - 1];
-			}
-
-			if(empty($data->attribute_id)){
-				continue;
-			}
-			if(!empty($lastGroup->set_attributes)){
-				$lastAttribute = $lastGroup->set_attributes[count($lastGroup->set_attributes) - 1];
-			}
-			if(empty($lastGroup->set_attributes) || $lastAttribute->id != $data->attribute_id){
-				$attribute = new \stdClass();
-				$attribute->id = $data->attribute_id;
-				$attribute->attribute_id = $data->attribute_id;
-				$attribute->code = $data->attribute_code;
-				$attribute->admin_label = $data->attribute_admin_label;
-				$attribute->admin_notice = $data->attribute_admin_notice;
-				$attribute->data_type = $data->data_type;
-				$attribute->default_value = $data->default_value;
-				$attribute->is_unique = $data->is_unique;
-				$attribute->is_required = $data->is_required;
-				$attribute->visibility = $data->visibility;
-				$attribute->status = $data->status;
-				$attribute->language_dependable = $data->language_dependable;
-				$attribute->data = json_decode($data->data);
-				$attribute->sort_order = $data->attribute_sort_order;
-				$attribute->options = array();
-
-				$attributeSet->groups[count($attributeSet->groups) - 1]->set_attributes[] = $attribute;
-
-				$lastAttribute = $attributeSet->groups[count($attributeSet->groups) - 1]->set_attributes[count($attributeSet->groups[count($attributeSet->groups) - 1]->set_attributes) - 1];
-			}
-
-			if(!empty($data->option_id)){
-				$option = new \stdClass();
-				$option->id = $data->option_id;
-				$option->language_id = $data->language_id;
-				$option->label = $data->option_label;
-				$option->value = $data->option_value;
-				$option->is_default = $data->is_default;
-				$option->sort_order = $data->option_sort_order;
-
-				$attributeSet->groups[count($attributeSet->groups) - 1]->set_attributes[count($attributeSet->groups[count($attributeSet->groups) - 1]->set_attributes) - 1]->options[] = $option;
-			}
-		}
-
-		return $attributeSet;
-		
-	}
-
-
-	/**
-	 * Get attribute values for attribute set
-	 *
-	 * @param object $attributeSet
-	 * 
-	 * @return object
-	 */
-	protected function getDefaultAttributeValues($attributeSet, $entityID = null, $lang_id = null){
-		$attributeValues = array();
-
-		if(empty($attributeSet->groups)){
-			return $attributeValues;
-		}
-
-		foreach ($attributeSet->groups as $group) {
-			if(empty($group->set_attributes)){
-				continue;
-			}
-
-			foreach ($group->set_attributes as $attribute) {
-				$attributeValue = new \stdClass();
-				$attributeValue->attribute_id = $attribute->id;
-				$attributeValue->entity_id = $entityID;
-				$attributeValue->entity_type_id = $attributeSet->entity_type_id;
-
-				$attributeHandler = $this->attributeHandlerFactory->make($attribute->data_type);
-
-				$attributeValue->value = $attributeHandler->getDefaultValue($attribute, $attribute->options);
-
-				if(!$attribute->language_dependable){
-					$attributeValue->language_id = 0;
-					$attributeValues[$attribute->code][0] = $attributeValue;
-				}elseif($lang_id){
-					$attributeValue->language_id = $lang_id;
-					$attributeValues[$attribute->code][$lang_id] = $attributeValue;
-				}else{
-					$langIDs = DB::table('languages')->lists('id');
-					foreach($langIDs as $langID){
-						$attrVal = clone($attributeValue);
-						$attrVal->language_id = $langID;
-						$attributeValues[$attribute->code][$langID] = $attrVal;
-					}
-				}
-			}
-		}
-
-		return $attributeValues;
-	}
-
-	/**
-	 * Get entities by entity IDs
-	 * @uses Illuminate\Support\Facades\DB
-	 *
-	 * @param array | int $entityIDs
-	 * @param int $lang_id
-	 * @param array $with - optional objects to be fetched with entities (relations, assets)
-	 * 
-	 * @return Model
-	 *
-	 * @todo some queries should be more performant
-	 */
-	public function getByID($entityIDs, $lang_id, $with = array()){
-		/* 	
-			select entities from database with it's type
-			query by entity.object_id and entity_type.slug
-			this query should be smaller for performance reasons
-		*/
-		
-		if(!is_array($entityIDs)){
-			$entityIDs = array($entityIDs);
-		}
-
-		$entities = DB::table('entities')
-					->select(
-						'entities.id', 
-						'entities.object_id', 
-						'entities.entity_type_id', 
-						'entities.attribute_set_id',
-						'entity_types.slug', 
-						'entity_types.name',
-						'entity_types.plural_name',
-						'entity_types.parent_type',
-						'entity_types.multiple_sets',
-						'entity_types.archive_parent',
-						'entity_types.default_attribute_set_id'
-					)
-					->whereIn('entities.id', $entityIDs)
-					->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
-					->get();
-
-		// if there is no entity with those params return false
-		if(!$entities){
-			$this->addErrors(array('No such entities'));
-			return false;
-		}
-
-		if(in_array('attributes', $with)){
-			$attributes = $this->getAttributesForEntities($entityIDs, $lang_id, $with);
-		}
-
-		foreach ($entities as &$entity) {
-			if($attributes && is_array($attributes) && $attributes[$entity->id]){
-				$entity->fields = $attributes[$entity->id];
-			}
-		}
-
-		return $entities;
-	}
-
-	/**
-	 * Get entities by object IDs
-	 * @uses Illuminate\Support\Facades\DB
-	 *
-	 * @param array | int $objectIDs
-	 * @param int $lang_id
-	 * @param array $with - optional objects to be fetched with entities (relations, assets)
-	 * 
-	 * @return Model
-	 *
-	 * @todo some queries should be more performant
-	 */
-	public function getByObjectID($objectIDs, $lang_id, $with = array()){
-		/* 	
-			select entities from database with it's type
-			query by entity.object_id and entity_type.slug
-			this query should be smaller for performance reasons
-		*/
-		
-		if(!is_array($objectIDs)){
-			$objectIDs = array($objectIDs);
-		}
-
-		$entities = DB::table('entities')
-					->select(
-						'entities.id', 
-						'entities.object_id', 
-						'entities.entity_type_id', 
-						'entities.attribute_set_id',
-						'entity_types.slug', 
-						'entity_types.name',
-						'entity_types.plural_name',
-						'entity_types.parent_type',
-						'entity_types.multiple_sets',
-						'entity_types.archive_parent',
-						'entity_types.default_attribute_set_id',
-						'attribute_sets.name as attribute_set_name',
-						'attribute_sets.slug as attribute_set_slug'
-					)
-					->whereIn('entities.object_id', $objectIDs)
-					->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
-					->join('attribute_sets', 'attribute_sets.id', '=', 'entities.attribute_set_id')
-					->get();
-
-
-
-		// if there is no entity with those params return false
-		if(!$entities){
-			$this->addErrors(array('No such entities'));
-			return false;
-		}
-
-		$entityIDs = array();
-		foreach ($entities as $entity) {
-			$entityIDs[] = $entity->id;
-		}
-
-		// $attributeSet = $this->getAttributeSet($entity->attribute_set_id);
-
-		// put set in entity
-		// $entity->attribute_set = $attributeSet;
-		
-		// $defaultValues = $this->getDefaultAttributeValues($attributeSet, $entity->id);
-		// $entity_values = $attributeValues;
-
-		if(in_array('attributes', $with)){
-			$attributes = $this->getAttributesForEntities($entityIDs, $lang_id, $with);
-		}
-
-		$keyedEntities = array();
-
-		foreach ($entities as &$entity) {
-			if($attributes && is_array($attributes) && isset($attributes[$entity->id])){
-				$entity->fields = $attributes[$entity->id];
-			}else{
-				$entity->fields = array();
-			}
-			$keyedEntities[$entity->object_id] = $entity;
-		}
-
-		return $keyedEntities;
-	}
-
-
-	/**
-	 * Get entity attributes by entity IDs
-	 * @uses Illuminate\Support\Facades\DB
-	 * 
-	 * @param array $with - optional objects to be fetched with attributes (relations, assets)
-	 * 
-	 * @return Model
-	 *
-	 * @todo some queries should be more performant
-	 */
-	public function getAttributesForEntities($entityIDs, $lang_id, $with = array(), $defaultValues = array()){
-		
-		if(!is_array($entityIDs)){
-			$entityIDs = array($entityIDs);
-		}
-
-		/* 	create queries for each value table
-			query them by entity ID and language ID,
-			also include values with language_id = 0 - that are language independable values
-		*/
-	
-		// datetime values query
-		$valuesDatetimeQuery = $this->createValuesQuery('attribute_values_datetime', $entityIDs, $lang_id);
-
-		// decimal values query
-		$valuesDecimalQuery = $this->createValuesQuery('attribute_values_decimal', $entityIDs, $lang_id);
-
-		// integer values query
-		$valuesIntegerQuery = $this->createValuesQuery('attribute_values_integer', $entityIDs, $lang_id);
-
-		// text values query
-		$valuesTextQuery = $this->createValuesQuery('attribute_values_text', $entityIDs, $lang_id);
-
-		// varchar values query
-		$valuesVarcharQuery = $this->createValuesQuery('attribute_values_varchar', $entityIDs, $lang_id);
-
-		// relations values query
-		$valuesRelatioinsQuery = $this->createValuesQuery('attribute_values_relations', $entityIDs, $lang_id);
-		
-		// assets values query
-		$valuesAssetsQuery = $this->createValuesQuery('attribute_values_assets', $entityIDs, $lang_id);
-
-		// make a union from all values queries to get single table like result
-		// all values will be returned as strings,
-		// but we will know what to expect with attribute handlers
-		$valuesDatetime = $valuesDatetimeQuery->get();
-		$valuesDecimal = $valuesDecimalQuery->get();
-		$valuesInteger = $valuesIntegerQuery->get();
-		$valuesText = $valuesTextQuery->get();
-		$valuesVarchar = $valuesVarcharQuery->get();
-		$valuesRelations = $valuesRelatioinsQuery->get();
-		$valuesAssets = $valuesAssetsQuery->get();
-
-						// ->unionAll($valuesDecimalQuery);
-						// ->union($valuesIntegerQuery)
-						// ->union($valuesTextQuery);
-						// ->union($valuesVarcharQuery)
-						// ->union($valuesRelatioinsQuery);
-
-		// get all values
-		$values = array_merge(
-			$valuesDatetime, 
-			$valuesDecimal, 
-			$valuesInteger, 
-			$valuesText, 
-			$valuesVarchar, 
-			$valuesRelations, 
-			$valuesAssets
-		);
-
-		$attributeSettings = $this->attributeManager->getDataTypes();
-		
-		$fieldsByHandler = array();
-		foreach ($values as $value) {
-
-			$handler = $attributeSettings[$value->data_type]['handler_name'];
-
-			if(!array_key_exists($handler, $fieldsByHandler) || !is_array($fieldsByHandler[$handler])){
-				$fieldsByHandler[$handler] = array();
-			}
-			$entity_id = intval($value->entity_id);
-			if(!array_key_exists($entity_id, $fieldsByHandler[$handler])){
-				$fieldsByHandler[$handler][$entity_id] = array();
-			}
-			
-			if(!array_key_exists($value->code, $fieldsByHandler[$handler][$entity_id])){
-				$field = new \stdClass();
-				$field->value = $value->value;
-				$field->entity_id = $value->entity_id;
-
-				$attribute = new \stdClass();
-				$attribute->id = $value->attribute_id;
-				$attribute->code = $value->code;
-				$attribute->label = $value->label;
-				$attribute->description = $value->description;
-				$attribute->data_type = $value->data_type;
-				$attribute->data = json_decode($value->data);
-				$attribute->visibility = $value->visibility;
-				$attribute->is_filterable = $value->is_filterable;
-				$attribute->sort_order = $value->attribute_sort_order;
-				$field->attribute = $attribute;
-
-				$group = new \stdClass();
-				$group->id = $value->group_id;
-				$group->code = $value->group_code;
-				$group->name = $value->group_name;
-				$group->sort_order = $value->group_sort_order;
-				$field->group = $group;
-
-				if($attributeSettings[$value->data_type]['has_multiple_values']){
-					$field->value = array($field->value);
-				}
-				
-				$fieldsByHandler[$handler][$entity_id][$value->code] = $field;
-				
-			}elseif($attributeSettings[$value->data_type]['has_multiple_values']){
-				$fieldsByHandler[$handler][$entity_id][$value->code]->value[] = $value->value;
-			}else{
-				$fieldsByHandler[$handler][$entity_id][$value->code]->value = $value->value;
-			}
-		}
-		
-		$fields = array();
-
-		// if(!empty($defaultValues) && is_array($defaultValues)){
-		// 	$fields = $defaultValues;
-		// }
-		
-		foreach ($fieldsByHandler as $handlerName => $attributes) {
-			$handler = App::make($handlerName);
-			$attributes = $handler->fetchValues($attributes, $lang_id, $with);
-
-			foreach ($attributes as $entity_id => $entityAttributes) {
-				foreach ($entityAttributes as $code => $attribute) {
-					if(!isset($fields[$entity_id]) || !is_array($fields[$entity_id])){
-						$fields[$entity_id] = array();
-					}
-					$fields[$entity_id][$code] = $attribute;
-				}
-				
-				
-			}
-		}
-
-		foreach ($fields as $entity_id => &$values) {
-			uasort($values, array($this, 'compareFields'));
-		}
-		
-
-		// finally return all values formatted
-		return $fields;
-	}
-
-	protected function compareFields($a, $b){
-		if($a->group->sort_order == $b->group->sort_order){
-			if($a->attribute->sort_order == $b->attribute->sort_order){
-				return 0;
-			}else{
-				return ($a->attribute->sort_order < $b->attribute->sort_order) ? -1 : 1;
-			}
-		}else{
-			return ($a->group->sort_order < $b->group->sort_order) ? -1 : 1;
-		}
-	}
-
-	protected function createValuesQuery($table, $entityIDs, $lang_id){
-		// datetime values query
-		$valuesQuery = DB::table($table)
-					->select(
-						$table . '.attribute_id',
-						$table . '.entity_id',
-						$table . '.language_id', 
-						$table . '.sort_order as value_sort_order',
-						$table . '.value',
-						'attributes.code',
-						'attributes.data_type',
-						'attributes.data',
-						'attributes.visibility',
-						'attributes.is_filterable',
-						'attribute_translations.label',
-						'attribute_translations.description',
-						'attribute_groups.id as group_id',
-						'attribute_groups.slug as group_code',
-						'attribute_group_translations.name as group_name',
-						'attribute_groups.sort_order as group_sort_order',
-						'set_attributes.sort_order as attribute_sort_order'
-					)
-					->join('attributes', $table . '.attribute_id', '=', 'attributes.id')
-					->leftJoin('attribute_translations', function($join) use ($lang_id){
-						$join	->on('attributes.id', '=', 'attribute_translations.attribute_id')
-								->where('attribute_translations.language_id', '=', $lang_id);
-					})
-					->join('entities', $table . '.entity_id', '=', 'entities.id')
-					->leftJoin('set_attributes', function($join){
-						$join 	->on('attributes.id', '=', 'set_attributes.attribute_id')
-								->on('entities.attribute_set_id', '=', 'set_attributes.attribute_set_id');
-					})
-					->leftJoin('attribute_groups', 'set_attributes.attribute_group_id', '=', 'attribute_groups.id')
-					->leftJoin('attribute_group_translations', function($join) use($lang_id){
-						$join 	->on('attribute_groups.id', '=', 'attribute_group_translations.attribute_group_id')
-								->where('attribute_group_translations.language_id', '=', $lang_id);
-					})
-					->whereIn('entity_id', $entityIDs)
-					->where(function($q) use ($lang_id, $table){
-						$q	->where($table . '.language_id', '=', $lang_id)
-							->orWhere($table . '.language_id', '=', 0);
-					})
-					->orderBy('set_attributes.sort_order', 'attributes.id', $table . '.sort_order')
-					->groupBy($table . '.id');
-
-		return $valuesQuery;
-	}
-
-	/**
-	 * Get object IDs from entity IDs
-	 * 
-	 * @param array $entityIDs
-	 * 
-	 * @return Model
-	 */
-	public function getObjectIDs($entityIDs = array()){
-		if(!is_array($entityIDs)){
-			$entityIDs = array($entityIDs);
-		}
-
-		$entities = DB::table('entities')
-						->whereIn('id', $entityIDs)
-						->lists('object_id', 'id');
-
-		return $entities;
-	}
-
-	/**
-	 * Get object IDs from attribute sets
-	 * 
-	 * @param array $entityIDs
-	 * 
-	 * @return Model
-	 */
-	public function getObjectIDsFromAttributeSets($attributeSetIDs = array()){
-		if(!is_array($attributeSetIDs)){
-			$attributeSetIDs = array($attributeSetIDs);
-		}
-
-		$entities = DB::table('entities')
-						->whereIn('attribute_set_id', $attributeSetIDs)
-						->lists('object_id');
-
-		return $entities;
-	}
-
-
-	
 
 }

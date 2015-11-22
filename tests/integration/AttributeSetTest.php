@@ -3,6 +3,12 @@
 use Illuminate\Support\Facades\Cache;
 use Cookbook\Core\Facades\Trunk;
 use Illuminate\Support\Debug\Dumper;
+use Illuminate\Support\Facades\DB;
+
+require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class AttributeSetTest extends Orchestra\Testbench\TestCase
 {
@@ -20,11 +26,25 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../migrations'),
 		]);
 
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+		]);
+
 		$this->artisan('db:seed', [
-			'--class' => 'Cookbook\Eav\Seeders\TestDbSeeder'
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
 		]);
 
 		$this->d = new Dumper();
+
+
+		// $this->app = $this->createApplication();
+
+		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 	}
 
@@ -32,8 +52,12 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 	{
 		// fwrite(STDOUT, __METHOD__ . "\n");
 		// parent::tearDown();
-		Trunk::forgetAll();
-		$this->artisan('migrate:reset');
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+		DB::disconnect();
+		// $this->artisan('migrate:reset');
+		// unset($this->app);
 
 		parent::tearDown();
 	}
@@ -79,7 +103,13 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\Core\CoreServiceProvider', 'Cookbook\Eav\EavServiceProvider'];
+		return [
+			'Cookbook\Core\CoreServiceProvider', 
+			'Cookbook\Locales\LocalesServiceProvider', 
+			'Cookbook\Eav\EavServiceProvider', 
+			'Cookbook\Filesystem\FilesystemServiceProvider',
+			'Cookbook\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
 	public function testCreateAttributeSet()

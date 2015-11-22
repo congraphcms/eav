@@ -46,6 +46,10 @@ class RelationFieldHandler extends AbstractFieldHandler {
 	 */
 	public function parseValue($value, $attribute)
 	{
+		if(empty($value))
+		{
+			return null;
+		}
 		$value = $value['id'];
 		return $value;
 	}
@@ -60,6 +64,10 @@ class RelationFieldHandler extends AbstractFieldHandler {
 	 */
 	public function formatValue($value, $attribute)
 	{
+		if(empty($value))
+		{
+			return null;
+		}
 		$relation = new stdClass();
 		$relation->id = $value;
 		$relation->type = 'entity';

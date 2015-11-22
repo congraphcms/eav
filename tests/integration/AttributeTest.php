@@ -3,6 +3,12 @@
 // include_once(realpath(__DIR__.'/../LaravelMocks.php'));
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Debug\Dumper;
+use Illuminate\Support\Facades\DB;
+
+require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class AttributeTest extends Orchestra\Testbench\TestCase
 {
@@ -20,8 +26,17 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../migrations'),
 		]);
 
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+		]);
+
 		$this->artisan('db:seed', [
-			'--class' => 'Cookbook\Eav\Seeders\TestDbSeeder'
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
 		]);
 
 		$this->d = new Dumper();
@@ -37,8 +52,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 	{
 		// fwrite(STDOUT, __METHOD__ . "\n");
 		// parent::tearDown();
-		
-		$this->artisan('migrate:reset');
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+		DB::disconnect();
+		// $this->artisan('migrate:reset');
 		// unset($this->app);
 
 		parent::tearDown();
@@ -84,7 +102,13 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\Core\CoreServiceProvider', 'Cookbook\Eav\EavServiceProvider'];
+		return [
+			'Cookbook\Core\CoreServiceProvider', 
+			'Cookbook\Locales\LocalesServiceProvider', 
+			'Cookbook\Eav\EavServiceProvider', 
+			'Cookbook\Filesystem\FilesystemServiceProvider',
+			'Cookbook\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
 	public function testCreateAttribute()
@@ -272,7 +296,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(14, count($result));
+		$this->assertEquals(15, count($result));
 		$this->d->dump($result->toArray());
 
 	}
@@ -299,7 +323,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals([], $arrayResultWithMeta['meta']['filter']);
 		$this->assertEquals([], $arrayResultWithMeta['meta']['include']);
 		$this->assertEquals(3, $arrayResultWithMeta['meta']['count']);
-		$this->assertEquals(14, $arrayResultWithMeta['meta']['total']);
+		$this->assertEquals(15, $arrayResultWithMeta['meta']['total']);
 		$this->d->dump($arrayResultWithMeta);
 	}
 
@@ -335,7 +359,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(10, count($result));
+		$this->assertEquals(11, count($result));
 
 		$this->d->dump($result->toArray());
 
@@ -362,7 +386,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(13, count($result));
+		$this->assertEquals(14, count($result));
 
 		$this->d->dump($result->toArray());
 	}

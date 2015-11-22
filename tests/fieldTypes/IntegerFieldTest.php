@@ -3,6 +3,12 @@
 use Cookbook\Core\Exceptions\ValidationException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
+require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class IntegerFieldTest extends Orchestra\Testbench\TestCase
 {
@@ -20,11 +26,25 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../migrations'),
 		]);
 
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+		]);
+
 		$this->artisan('db:seed', [
-			'--class' => 'Cookbook\Eav\Seeders\TestDbSeeder'
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
 		]);
 
 		$this->d = new Dumper();
+
+
+		// $this->app = $this->createApplication();
+
+		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 	}
 
@@ -32,8 +52,11 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 	{
 		// fwrite(STDOUT, __METHOD__ . "\n");
 		// parent::tearDown();
-		
-		$this->artisan('migrate:reset');
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+		DB::disconnect();
+		// $this->artisan('migrate:reset');
 		// unset($this->app);
 
 		parent::tearDown();
@@ -79,7 +102,13 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\Core\CoreServiceProvider', 'Cookbook\Eav\EavServiceProvider'];
+		return [
+			'Cookbook\Core\CoreServiceProvider', 
+			'Cookbook\Locales\LocalesServiceProvider', 
+			'Cookbook\Eav\EavServiceProvider', 
+			'Cookbook\Filesystem\FilesystemServiceProvider',
+			'Cookbook\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
 	public function testCreateAttribute()
@@ -136,9 +165,9 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'type' => 'test_fields',
+			'entity_type' => 'test_fields',
 			'attribute_set' => ['id' => 4],
-			'locale_id' => 0,
+			'locale' => 'en_US',
 			'fields' => [
 				'test_text_attribute' => 'test value',
 				'test_textarea_attribute' => 'test value for textarea',
@@ -170,7 +199,7 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$params = [
-			'locale_id' => 0,
+			'locale' => 'en_US',
 			'fields' => [
 				'test_integer_attribute' => 987
 			]

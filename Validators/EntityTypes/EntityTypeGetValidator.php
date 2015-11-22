@@ -63,13 +63,16 @@ class EntityTypeGetValidator extends Validator
 		$this->availableSorting = [
 			'id',
 			'code',
+			'endpoint',
 			'name',
+			'plural_name',
 			'created_at'
 		];
 
 		$this->availableFilters = [
 			'id' 				=> ['e', 'ne', 'lt', 'lte', 'gt', 'gte', 'in', 'nin'],
 			'code'				=> ['e', 'ne', 'in', 'nin'],
+			'endpoint'			=> ['e', 'ne', 'in', 'nin'],
 			'name'				=> ['e', 'ne', 'in', 'nin'],
 			'plural_name'		=> ['e', 'ne', 'in', 'nin'],
 			'multiple_sets'		=> ['e', 'ne'],
@@ -130,7 +133,7 @@ class EntityTypeGetValidator extends Validator
 				if( ! array_key_exists($field, $this->availableFilters) )
 				{
 					$e = new BadRequestException();
-					$e->setErrorKey('entity-types.filter');
+					$e->setErrorKey('filter');
 					$e->addErrors('Filtering by \'' . $field . '\' is not allowed.');
 
 					throw $e;
@@ -140,7 +143,7 @@ class EntityTypeGetValidator extends Validator
 					if( ! in_array('e', $this->availableFilters[$field]) )
 					{
 						$e = new BadRequestException();
-						$e->setErrorKey('entity-types.filter');
+						$e->setErrorKey('filter');
 						$e->addErrors('Filter operation is not allowed.');
 
 						throw $e;
@@ -153,7 +156,7 @@ class EntityTypeGetValidator extends Validator
 					if( ! in_array($operation, $this->availableFilters[$field]) )
 					{
 						$e = new BadRequestException();
-						$e->setErrorKey('entity-types.filter');
+						$e->setErrorKey('filter');
 						$e->addErrors('Filter operation is not allowed.');
 
 						throw $e;
@@ -204,7 +207,7 @@ class EntityTypeGetValidator extends Validator
 			if( ! in_array($criteria, $this->availableSorting) )
 			{
 				$e = new BadRequestException();
-				$e->setErrorKey('entity-types.sort');
+				$e->setErrorKey('sort');
 				$e->addErrors('Sorting by \'' . $criteria . '\' is not allowed.');
 
 				throw $e;

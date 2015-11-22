@@ -10,10 +10,12 @@
 
 namespace Cookbook\Eav\Validators\AttributeSets;
 
-use Cookbook\Core\Bus\RepositoryCommand;
-use Cookbook\Core\Validation\Validator;
+use Cookbook\Contracts\Eav\AttributeRepositoryContract;
 use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
+use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
+use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Exceptions\NotFoundException;
+use Cookbook\Core\Validation\Validator;
 
 
 /**
@@ -54,14 +56,30 @@ class AttributeSetUpdateValidator extends Validator
 	protected $attributeSetRepository;
 
 	/**
+	 * Repository for attributes
+	 * 
+	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 */
+	protected $attributeRepository;
+
+	/**
+	 * Repository for entity types
+	 * 
+	 * @var Cookbook\Contracts\Eav\EntityTypeRepositoryContract
+	 */
+	protected $entityTypeRepository;
+
+	/**
 	 * Create new AttributeSetCreateValidator
 	 * 
 	 * @return void
 	 */
-	public function __construct(AttributeSetRepositoryContract $attributeSetRepository)
+	public function __construct(AttributeSetRepositoryContract $attributeSetRepository, EntityTypeRepositoryContract $entityTypeRepository, AttributeRepositoryContract $attributeRepository)
 	{
 
 		$this->attributeSetRepository = $attributeSetRepository;
+		$this->entityTypeRepository = $entityTypeRepository;
+		$this->attributeRepository = $attributeRepository;
 
 		$this->rules = [
 			'code'					=> 'sometimes|required|unique:attribute_sets,code',
@@ -76,7 +94,7 @@ class AttributeSetUpdateValidator extends Validator
 
 		parent::__construct();
 
-		$this->exception->setErrorKey('attribute-sets');
+		$this->exception->setErrorKey('attribute-set');
 	}
 
 
@@ -94,23 +112,58 @@ class AttributeSetUpdateValidator extends Validator
 	{
 		$attributeSet = $this->attributeSetRepository->fetch($command->id);
 		
-		if( ! $attributeSet )
-		{
-			throw new NotFoundException('No attribute set with that ID.');
-		}
-
-		$this->validateParams($command->params, $this->rules, true);
+		$validator = $this->newValidator($command->params, $this->rules);
 
 		if( isset($command->params['attributes']) )
 		{
-			foreach ($command->params['attributes'] as $key => &$attribute) {
+			$validator->each('attributes', $this->attributeRules);
+		}
+		$this->setValidator($validator);
 
-				$this->exception->setErrorKey('attribute-sets.attributes.' . $key);
+		$this->validateParams($command->params, null, true);
 
-				$this->validateParams($attribute, $this->attributeRules, true);
-			}
+		if( $this->exception->hasErrors() )
+		{
+			throw $this->exception;
 		}
 
+		if( ! empty($command->params['attributes']) )
+		{
+			$entityType = $this->entityTypeRepository->fetch($attributeSet->entity_type_id);
+
+			if($entityType->localized)
+			{
+				return;
+			}
+
+			$attributeIds = [];
+			foreach ($command->params['attributes'] as $key => $value)
+			{
+				if(in_array($value['id'], $attributeIds))
+				{
+					$this->exception->setErrorKey('attribute-set.attributes.' . $key);
+					$this->exception->addErrors('Can\'t use same attribute more than once.');
+					$key2 = array_search($value['id'], $attributeIds);
+					$this->exception->setErrorKey('attribute-set.attributes.' . $key2);
+					$this->exception->addErrors('Can\'t use same attribute more than once.');
+					continue;
+				}
+				$attributeIds[$key] = $value['id'];
+			}
+
+			$attributes = $this->attributeRepository->get(['id' => ['in' => $attributeIds]]);
+
+			foreach ($attributes as $attribute)
+			{
+				if($attribute->localized)
+				{
+					$key = array_search($attribute->id, $attributeIds);
+					$this->exception->setErrorKey('attribute-set.attributes.' . $key);
+					$this->exception->addErrors('Can\'t add localized attribute to entity type that isn\'t localized');
+				}
+			}
+		}
+		
 		if( $this->exception->hasErrors() )
 		{
 			throw $this->exception;

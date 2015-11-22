@@ -55,7 +55,8 @@ class EntityTypeUpdateValidator extends Validator
 		$this->entityTypeRepository = $entityTypeRepository;
 
 		$this->rules = [
-			'code'					=> 'sometimes|required|unique:entity_types,code',
+			'code'					=> ['sometimes', 'required', 'unique:entity_types,code', 'regex:/^[0-9a-z-_]*$/'],
+			'endpoint'				=> ['sometimes', 'required', 'unique:entity_types,endpoint', 'regex:/^[0-9a-z-_]*$/'],
 			'name'					=> 'sometimes|min:3|max:250',
 			'plural_name'			=> 'sometimes|min:3|max:250',
 			'multiple_sets'			=> 'sometimes|boolean'
@@ -63,7 +64,7 @@ class EntityTypeUpdateValidator extends Validator
 
 		parent::__construct();
 
-		$this->exception->setErrorKey('entity-types');
+		$this->exception->setErrorKey('entity-type');
 	}
 
 
@@ -81,9 +82,15 @@ class EntityTypeUpdateValidator extends Validator
 	{
 		$entityType = $this->entityTypeRepository->fetch($command->id);
 
-		if( ! $entityType )
+		if( $entityType->has_workflow )
 		{
-			throw new NotFoundException('No entity type with that ID.');
+			$this->rules['default_point_id'] = ['sometimes', 'exists:workflows,id'];
+			$this->rules['default_point'] = ['sometimes', 'array'];
+			if(isset($command->params['default_point']))
+			{
+				$this->rules['default_point.id'] = ['required', 'exists:workflow_points,id'];
+			}
+			
 		}
 
 		$this->validateParams($command->params, $this->rules, true);
@@ -92,5 +99,15 @@ class EntityTypeUpdateValidator extends Validator
 		{
 			throw $this->exception;
 		}
+
+		if( $entityType->has_workflow )
+		{
+			if( ! isset($command->params['default_point_id']) && isset($command->params['default_point']) )
+			{
+				$command->params['default_point_id'] = $command->params['default_point']['id'];
+			}
+		}
+
+		unset($command->params['default_point']);
 	}
 }

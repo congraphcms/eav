@@ -46,6 +46,10 @@ class DatetimeFieldHandler extends AbstractFieldHandler {
 	 */
 	public function parseValue($value, $attribute)
 	{
+		if(empty($value))
+		{
+			return null;
+		}
 		$value = Carbon::parse($value)->tz('UTC')->toDateTimeString();
 		return $value;
 	}
@@ -60,6 +64,11 @@ class DatetimeFieldHandler extends AbstractFieldHandler {
 	 */
 	public function formatValue($value, $attribute)
 	{
+		if(empty($value))
+		{
+			return null;
+		}
+		
 		$value = Carbon::parse($value);
 		if(Config::get('app.timezone'))
 		{

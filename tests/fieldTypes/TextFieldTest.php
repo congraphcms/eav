@@ -4,6 +4,12 @@
 use Cookbook\Core\Exceptions\ValidationException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
+require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class TextFieldTest extends Orchestra\Testbench\TestCase
 {
@@ -21,8 +27,17 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../migrations'),
 		]);
 
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+		]);
+
 		$this->artisan('db:seed', [
-			'--class' => 'Cookbook\Eav\Seeders\TestDbSeeder'
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
 		]);
 
 		$this->d = new Dumper();
@@ -38,8 +53,11 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 	{
 		// fwrite(STDOUT, __METHOD__ . "\n");
 		// parent::tearDown();
-		
-		$this->artisan('migrate:reset');
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+		DB::disconnect();
+		// $this->artisan('migrate:reset');
 		// unset($this->app);
 
 		parent::tearDown();
@@ -85,7 +103,13 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 
 	protected function getPackageProviders($app)
 	{
-		return ['Cookbook\Core\CoreServiceProvider', 'Cookbook\Eav\EavServiceProvider'];
+		return [
+			'Cookbook\Core\CoreServiceProvider', 
+			'Cookbook\Locales\LocalesServiceProvider', 
+			'Cookbook\Eav\EavServiceProvider', 
+			'Cookbook\Filesystem\FilesystemServiceProvider',
+			'Cookbook\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
 	public function testCreateAttribute()
@@ -138,9 +162,9 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'type' => 'tests',
+			'entity_type' => 'tests',
 			'attribute_set' => ['id' => 1],
-			'locale_id' => 0,
+			'locale' => 'en_US',
 			'fields' => [
 				'attribute1' => 'test_value',
 				'attribute2' => 'test_value2',
@@ -170,7 +194,7 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$params = [
-			'locale_id' => 0,
+			'locale' => 'en_US',
 			'fields' => [
 				'attribute1' => 'changed value'
 			]
@@ -183,7 +207,7 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('changed value', $result->fields->attribute1);
 		$this->assertEquals('value2', $result->fields->attribute2);
-		$this->assertEquals('value3', $result->fields->attribute3);
+		$this->assertEquals('value3-en', $result->fields->attribute3);
 		$this->d->dump($result->toArray());
 	}
 
@@ -201,7 +225,7 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('value1', $result->fields->attribute1);
 		$this->assertEquals('value2', $result->fields->attribute2);
-		$this->assertEquals('value3', $result->fields->attribute3);
+		$this->assertEquals('value3-en', $result->fields->attribute3['en_US']);
 		
 
 	}

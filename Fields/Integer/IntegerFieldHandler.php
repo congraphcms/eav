@@ -46,6 +46,28 @@ class IntegerFieldHandler extends AbstractFieldHandler {
 	 */
 	public function parseValue($value, $attribute)
 	{
+		if(is_null($value))
+		{
+			return null;
+		}
+		$value = intval($value);
+		return $value;
+	}
+
+	/**
+	 * Format value for output
+	 * 
+	 * @param mixed $value
+	 * @param object $attribute
+	 * 
+	 * @return boolean
+	 */
+	public function formatValue($value, $attribute)
+	{
+		if(is_null($value))
+		{
+			return null;
+		}
 		$value = intval($value);
 		return $value;
 	}

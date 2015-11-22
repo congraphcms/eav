@@ -493,7 +493,17 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 							->orderBy('id')
 							->get();
 		
-		$attribute->options = $options;
+		$attribute->options = [];
+		foreach ($options as $option) 
+		{
+			if($option->default)
+			{
+				$attribute->default_value = $option->value;
+			}
+			
+			$attribute->options[] = $option;
+		}
+
 		unset($attribute->table);
 
 		// $translations = $this->db->table('attribute_translations')
@@ -592,6 +602,11 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			{
 				if($attribute->id == $option->attribute_id)
 				{
+					if($option->default)
+					{
+						$attribute->default_value = $option->value;
+					}
+
 					$attribute->options[] = $option;
 					break;
 				}
