@@ -123,8 +123,6 @@ class AttributeCreateValidator extends Validator
 	public function validate(RepositoryCommand $command)
 	{
 
-		$this->validateParams($command->params, $this->rules, true);
-
 		$validator = $this->newValidator($command->params, $this->rules);
 
 		if( isset($command->params['options']) )

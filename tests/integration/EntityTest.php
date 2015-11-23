@@ -25,7 +25,12 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		// path unless `--path` option is available.
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../migrations'),
+			'--realpath' => realpath(__DIR__.'/../../database/migrations'),
+		]);
+
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Filesystem/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
@@ -44,6 +49,10 @@ class EntityTest extends Orchestra\Testbench\TestCase
 
 		$this->artisan('db:seed', [
 			'--class' => 'LocaleDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'FileDbSeeder'
 		]);
 
 		$this->artisan('db:seed', [

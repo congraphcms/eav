@@ -54,7 +54,7 @@ class AttributeManager
 		$this->config = $config;
 		
 		// get available handlers for different data_types from config
-		$this->availableFieldTypes = $this->config->get('cookbook.field_types');
+		$this->availableFieldTypes = $this->config->get('cb.eav.field_types');
 
 		if(!is_array($this->availableFieldTypes))
 		{
