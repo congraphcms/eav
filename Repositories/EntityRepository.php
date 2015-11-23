@@ -227,37 +227,34 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$entityType = $this->entityTypeRepository->fetch($model['entity_type_id']);
 
-		if($entityType->has_workflow)
+		$locale_ids = [];
+		if( ! $entityType->localized_workflow )
 		{
-			$locale_ids = [];
-			if( ! $entityType->localized_workflow )
+			$locale_ids[] = 0;
+		}
+		else
+		{
+			if( empty($locale_id) )
 			{
-				$locale_ids[] = 0;
+				foreach ($locales as $l)
+				{
+					$locale_ids[] = $l->id;
+				}
 			}
 			else
 			{
-				if( empty($locale_id) )
-				{
-					foreach ($locales as $l)
-					{
-						$locale_ids[] = $l->id;
-					}
-				}
-				else
-				{
-					$locale_ids[] = $locale_id;
-				}
+				$locale_ids[] = $locale_id;
 			}
+		}
 
-			if(isset($status))
-			{
-				$point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
-				$this->insertStatus($entityID, $point->id, $locale_ids);
-			}
-			else
-			{
-				$this->insertStatus($entityID, $entityType->default_point->id, $locale_ids);
-			}
+		if(isset($status))
+		{
+			$point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
+			$this->insertStatus($entityID, $point[0]->id, $locale_ids);
+		}
+		else
+		{
+			$this->insertStatus($entityID, $entityType->default_point->id, $locale_ids);
 		}
 
 		$entity = $this->fetch($entityID, [], $locale_id);
@@ -348,33 +345,30 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		$entityType = $this->entityTypeRepository->fetch($entity->entity_type_id);
 
-		if($entityType->has_workflow)
+		$locale_ids = [];
+		if( ! $entityType->localized_workflow )
 		{
-			$locale_ids = [];
-			if( ! $entityType->localized_workflow )
+			$locale_ids[] = 0;
+		}
+		else
+		{
+			if( empty($locale_id) )
 			{
-				$locale_ids[] = 0;
+				foreach ($locales as $l)
+				{
+					$locale_ids[] = $l->id;
+				}
 			}
 			else
 			{
-				if( empty($locale_id) )
-				{
-					foreach ($locales as $l)
-					{
-						$locale_ids[] = $l->id;
-					}
-				}
-				else
-				{
-					$locale_ids[] = $locale_id;
-				}
+				$locale_ids[] = $locale_id;
 			}
+		}
 
-			if(isset($status))
-			{
-				$point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
-				$this->updateStatus($entityID, $point->id, $locale_ids);
-			}
+		if(isset($status))
+		{
+			$point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
+			$this->updateStatus($entityID, $point->id, $locale_ids);
 		}
 
 		$this->updateEntity($id);
@@ -714,6 +708,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	protected function _fetch($id, $include = [], $locale = null, $status = null)
 	{
 		$params = func_get_args();
+		$params['function'] = __METHOD__;
 		if( Trunk::has($params, 'entity'))
 		{
 			$entity = Trunk::get($params, 'entity');
@@ -755,7 +750,6 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 							'entities.attribute_set_id',
 							'entity_types.code as entity_type',
 							'entity_types.localized as localized',
-							'entity_types.has_workflow as has_workflow',
 							'entity_types.localized_workflow as localized_workflow',
 							'entity_types.workflow_id as workflow_id',
 							$this->db->raw('"entity" as type'),
@@ -807,6 +801,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [], $locale = null, $status = null)
 	{
 		$params = func_get_args();
+		$params['function'] = __METHOD__;
 
 		if(Trunk::has($params, 'entity'))
 		{
@@ -853,7 +848,6 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 							'entities.attribute_set_id as attribute_set_id',
 							'entity_types.code as entity_type',
 							'entity_types.localized as localized',
-							'entity_types.has_workflow as has_workflow',
 							'entity_types.localized_workflow as localized_workflow',
 							'entity_types.workflow_id as workflow_id',
 							$this->db->raw('"entity" as type'),
@@ -1114,7 +1108,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 	 * 
 	 * @return array
 	 */
-	protected function getStatusesForEntities($entities, $status, $locale = null)
+	protected function getStatusesForEntities($entities, $status = null, $locale = null)
 	{
 		if(empty($entities))
 		{
@@ -1136,9 +1130,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		}
 
 		$result = [];
-
 		$statuses = $this->getAllStatuses($entityIds, $status, $locale);
-
 		foreach ($statuses as $status)
 		{
 			if( ! array_key_exists($status->entity_id, $result) && is_null($locale) && $entitiesById[$status->entity_id]->localized_workflow)
@@ -1195,9 +1187,8 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 					->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
 					->join('entity_statuses', 'entities.id', '=', 'entity_statuses.entity_id')
 					->join('workflow_points', 'entity_statuses.workflow_point_id', '=', 'workflow_points.id')
-					->join('locales', 'entity_statuses.locale_id', '=', 'locales.id')
+					->leftJoin('locales', 'entity_statuses.locale_id', '=', 'locales.id')
 					->whereIn('entities.id', $entityIds)
-					->where('entity_types.has_workflow', '=', 1)
 					->where('entity_statuses.state', '=', 'active');
 		if( ! is_null($locale) )
 		{
@@ -1249,7 +1240,6 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		$attributes = [];
 
 		$locales = $this->localeRepository->get();
-
 		$localesById = [];
 		foreach ($locales as $l)
 		{
@@ -1287,13 +1277,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 		{
 			$fields[$entityId] = new stdClass();
 		}
-
 		foreach ($values as $value) {
 
 			$attribute = $attributesById[$value->attribute_id];
 			$handlerName = $attributeSettings[$attribute->field_type]['handler'];
 			$hasMultipleValues = $attributeSettings[$attribute->field_type]['has_multiple_values'];
-			
 			if( ! array_key_exists($handlerName, $fieldHandlers) )
 			{
 				$fieldHandlers[$handlerName] = $this->fieldHandlerFactory->make($attribute->field_type);
@@ -1316,7 +1304,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 					foreach ($locales as $l)
 					{
-						if( ! $entitiesById[$value->entity_id]->has_workflow || ! $entitiesById[$value->entity_id]->localized_workflow || array_key_exists($l->code, $entitiesById[$value->entity_id]->status))
+						if( ! $entitiesById[$value->entity_id]->localized_workflow || array_key_exists($l->code, $entitiesById[$value->entity_id]->status))
 						{
 							$fields[$value->entity_id]->{$attribute->code}[$l->code] = null;
 						}
@@ -1325,6 +1313,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 				foreach ($locales as $l)
 				{
+
 					if($l->id == $value->locale_id && ( ! $entitiesById[$value->entity_id]->localized_workflow || array_key_exists($l->code, $entitiesById[$value->entity_id]->status) ) )
 					{
 						if( isset($fields[$value->entity_id]->{$attribute->code}[$l->code]) && $hasMultipleValues )

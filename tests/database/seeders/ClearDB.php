@@ -77,6 +77,22 @@ class ClearDB extends Seeder {
 		{
 			DB::table('files')->truncate();
 		}
+		if (Schema::hasTable('locales'))
+		{
+			DB::table('locales')->truncate();
+		}
+		if (Schema::hasTable('workflows'))
+		{
+			DB::table('workflows')->truncate();
+		}
+		if (Schema::hasTable('workflow_points'))
+		{
+			DB::table('workflow_points')->truncate();
+		}
+		if (Schema::hasTable('workflow_steps'))
+		{
+			DB::table('workflow_steps')->truncate();
+		}
 	}
 
 }

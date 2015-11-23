@@ -226,6 +226,7 @@ class ValidatorsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
 				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract'),
+				$app->make('Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract'),
 				$app->make('Cookbook\Eav\Managers\AttributeManager')
 			);
 		});
@@ -236,7 +237,8 @@ class ValidatorsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
+				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract'),
+				$app->make('Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract')
 			);
 		});
 

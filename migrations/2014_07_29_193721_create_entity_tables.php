@@ -106,17 +106,14 @@ class CreateEntityTables extends Migration {
 			// Flag for localized entity types
 			$table->boolean('localized')->default(0);
 
-			// Flag for workflow existance
-			$table->boolean('has_workflow')->default(0);
-
 			// Flag for localized workflow
 			$table->boolean('localized_workflow')->default(0);
 
 			// Foreign key for workflow
 			$table->integer('workflow_id')->unsigned()->nullable();
 
-			// Foreign key for workflow step that is default for this entity type
-			$table->integer('default_step_id')->unsigned()->nullable();
+			// Foreign key for workflow point that is default for this entity type
+			$table->integer('default_point_id')->unsigned()->nullable();
 
 			// // Type of parentig (none, paren-child, archive...)
 			// $table->string('parent_type', 50)->default('default');

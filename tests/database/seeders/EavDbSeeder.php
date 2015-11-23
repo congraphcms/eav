@@ -40,6 +40,9 @@ class EavDbSeeder extends Seeder {
 				'plural_name' => 'Tests',
 				'multiple_sets' => 1,
 				'localized' => 1,
+				'workflow_id' => 1,
+				'default_point_id' => 1,
+				'localized_workflow' => 0,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -50,6 +53,9 @@ class EavDbSeeder extends Seeder {
 				'plural_name' => 'Tests2',
 				'multiple_sets' => 0,
 				'localized' => 0,
+				'workflow_id' => 1,
+				'default_point_id' => 1,
+				'localized_workflow' => 0,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -60,6 +66,9 @@ class EavDbSeeder extends Seeder {
 				'plural_name' => 'Tests3',
 				'multiple_sets' => 1,
 				'localized' => 0,
+				'workflow_id' => 1,
+				'default_point_id' => 1,
+				'localized_workflow' => 0,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -70,6 +79,9 @@ class EavDbSeeder extends Seeder {
 				'plural_name' => 'Test Fields',
 				'multiple_sets' => 1,
 				'localized' => 0,
+				'workflow_id' => 1,
+				'default_point_id' => 1,
+				'localized_workflow' => 0,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],

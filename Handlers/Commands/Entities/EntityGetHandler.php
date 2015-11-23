@@ -57,7 +57,8 @@ class EntityGetHandler extends RepositoryCommandHandler
 			(!empty($command->params['limit']))?$command->params['limit']:0,
 			(!empty($command->params['sort']))?$command->params['sort']:[],
 			(!empty($command->params['include']))?$command->params['include']:[],
-			(!empty($command->params['locale']))?$command->params['locale']:null
+			(!empty($command->params['locale']))?$command->params['locale']:null,
+			(!empty($command->params['status']))?$command->params['status']:null
 		);
 	}
 }

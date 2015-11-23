@@ -354,6 +354,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	protected function _fetch($id, $include = [])
 	{
 		$params = func_get_args();
+		$params['function'] = __METHOD__;
 		
 		if(Trunk::has($params, 'attribute-set'))
 		{
@@ -410,6 +411,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	{
 
 		$params = func_get_args();
+		$params['function'] = __METHOD__;
 
 		if(Trunk::has($params, 'attribute-set'))
 		{

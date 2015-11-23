@@ -26,6 +26,8 @@ use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
 
 use Carbon\Carbon;
 
+use stdClass;
+
 
 /**
  * EntityTypeRepository class
@@ -177,6 +179,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 	protected function _fetch($id, $include = [])
 	{
 		$params = func_get_args();
+		$params['function'] = __METHOD__;
 		
 		if(Trunk::has($params, 'entity-type'))
 		{
@@ -202,17 +205,14 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 
 		$entityType->attribute_sets = $attributeSets;
 
-		if($entityType->has_workflow)
-		{
-			$workflow = new stdClass();
-			$workflow->id = $entityType->workflow_id;
-			$workflow->type = 'workflow';
-			$point = new stdClass();
-			$point->id = $entityType->default_point_id;
-			$point->type = 'workflow-point';
-			$entityType->workflow = $workflow;
-			$entityType->default_point = $point;
-		}
+		$workflow = new stdClass();
+		$workflow->id = $entityType->workflow_id;
+		$workflow->type = 'workflow';
+		$point = new stdClass();
+		$point->id = $entityType->default_point_id;
+		$point->type = 'workflow-point';
+		$entityType->workflow = $workflow;
+		$entityType->default_point = $point;
 		
 
 		$entityType->type = 'entity-type';
@@ -240,6 +240,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [])
 	{
 		$params = func_get_args();
+		$params['function'] = __METHOD__;
 
 		if(Trunk::has($params, 'entity-type'))
 		{
@@ -281,17 +282,14 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 			$entityType->created_at = Carbon::parse($entityType->created_at)->tz($timezone);
 			$entityType->updated_at = Carbon::parse($entityType->updated_at)->tz($timezone);
 
-			if($entityType->has_workflow)
-			{
-				$workflow = new stdClass();
-				$workflow->id = $entityType->workflow_id;
-				$workflow->type = 'workflow';
-				$point = new stdClass();
-				$point->id = $entityType->default_point_id;
-				$point->type = 'workflow-point';
-				$entityType->workflow = $workflow;
-				$entityType->default_point = $point;
-			}
+			$workflow = new stdClass();
+			$workflow->id = $entityType->workflow_id;
+			$workflow->type = 'workflow';
+			$point = new stdClass();
+			$point->id = $entityType->default_point_id;
+			$point->type = 'workflow-point';
+			$entityType->workflow = $workflow;
+			$entityType->default_point = $point;
 		}
 
 		$attributeSets = [];
@@ -332,7 +330,6 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 			'include' => $include
 		];
 		$result->setMeta($meta);
-
 		$result->load($include);
 		
 		return $result;

@@ -469,6 +469,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	protected function _fetch($id, $include = [])
 	{
 		$params = func_get_args();
+		$params['function'] = __METHOD__;
 		
 		if(Trunk::has($params, 'attribute'))
 		{
@@ -538,6 +539,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	protected function _get($filter = [], $offset = 0, $limit = 0, $sort = [], $include = [])
 	{
 		$params = func_get_args();
+		$params['function'] = __METHOD__;
 
 		if(Trunk::has($params, 'attribute'))
 		{

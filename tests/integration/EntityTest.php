@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/WorkflowDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class EntityTest extends Orchestra\Testbench\TestCase
@@ -43,6 +44,10 @@ class EntityTest extends Orchestra\Testbench\TestCase
 
 		$this->artisan('db:seed', [
 			'--class' => 'LocaleDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'WorkflowDbSeeder'
 		]);
 
 		$this->d = new Dumper();

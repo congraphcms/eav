@@ -42,7 +42,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$this->d = new Dumper();
 
 
-		// $this->app = $this->createApplication();
+		
 
 		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
 

@@ -15,6 +15,7 @@ use Cookbook\Contracts\EAV\AttributeSetRepositoryContract;
 use Cookbook\Contracts\EAV\EntityRepositoryContract;
 use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
 use Cookbook\Contracts\Locales\LocaleRepositoryContract;
+use Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Exceptions\ValidationException;
 use Cookbook\Core\Validation\Validator;
@@ -71,6 +72,13 @@ class EntityUpdateValidator extends Validator
 	protected $localeRepository;
 
 	/**
+	 * Repository for handling locales
+	 * 
+	 * @var Cookbook\Contracts\Locales\LocaleRepositoryContract
+	 */
+	protected $workflowPointRepository;
+
+	/**
 	 * Set of rules for validating attribute
 	 *
 	 * @var array
@@ -94,7 +102,8 @@ class EntityUpdateValidator extends Validator
 		EntityRepositoryContract $entityRepository, 
 		AttributeSetRepositoryContract $attributeSetRepository, 
 		AttributeRepositoryContract $attributeRepository,
-		LocaleRepositoryContract $localeRepository)
+		LocaleRepositoryContract $localeRepository,
+		WorkflowPointRepositoryContract $workflowPointRepository)
 	{
 		$this->fieldValidatorFactory = $fieldValidatorFactory;
 		$this->entityRepository = $entityRepository;
@@ -102,9 +111,12 @@ class EntityUpdateValidator extends Validator
 		$this->attributeRepository = $attributeRepository;
 		$this->localeRepository = $localeRepository;
 
+		$this->workflowPointRepository = $workflowPointRepository;
+
 		$this->rules = [
 			'locale'             	=> 'sometimes',
-			'fields'                => 'array'
+			'fields'                => 'array',
+			'status'				=> ['sometimes', 'exists:workflow_points,status'],
 		];
 
 		parent::__construct();
@@ -152,6 +164,16 @@ class EntityUpdateValidator extends Validator
 
 		if ($this->exception->hasErrors()) {
 			throw $this->exception;
+		}
+
+		if( isset($command->params['status']) )
+		{
+			$workflowPoint = $this->workflowPointRepository->get(['status' => $command->params['status'], 'workflow_id' => $entity->workflow_id]);
+			if(count($workflowPoint) < 1)
+			{
+				$this->exception->addErrors(['status' => 'This entity type doesn\'t support this status.']);
+				throw $this->exception;
+			}
 		}
 
 		$attributeSet = $this->attributeSetRepository->fetch($entity->attribute_set_id, ['attributes']);

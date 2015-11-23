@@ -32,7 +32,7 @@ class SelectFieldHandler extends AbstractFieldHandler {
 			}
 		}
 
-		return 0;
+		return null;
 	}
 
 	/**
@@ -53,6 +53,6 @@ class SelectFieldHandler extends AbstractFieldHandler {
 			}
 		}
 
-		return $value;
+		return null;
 	}
 }

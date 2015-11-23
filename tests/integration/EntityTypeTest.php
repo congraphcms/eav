@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
+require_once(__DIR__ . '/../database/seeders/WorkflowDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
@@ -31,12 +32,21 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
 		]);
 
+		$this->artisan('migrate', [
+			'--database' => 'testbench',
+			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Workflows/database/migrations'),
+		]);
+
 		$this->artisan('db:seed', [
 			'--class' => 'EavDbSeeder'
 		]);
 
 		$this->artisan('db:seed', [
 			'--class' => 'LocaleDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'WorkflowDbSeeder'
 		]);
 
 		$this->d = new Dumper();
@@ -120,6 +130,9 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 			'endpoint' => 'test-types',
 			'name' => 'Test Type',
 			'plural_name' => 'Test Types',
+			'workflow_id' => 1,
+			'default_point_id' => 1,
+			'localized_workflow' => 0,
 			'multiple_sets' => 1
 		];
 
@@ -144,6 +157,9 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 			'code' => '',
 			'name' => 'Test Type',
 			'plural_name' => 'Test Types',
+			'workflow_id' => 1,
+			'default_point_id' => 1,
+			'localized_workflow' => 0,
 			'multiple_sets' => 1
 		];
 
@@ -240,18 +256,17 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeFetchCommand(['include' => 'attribute_sets'], 1));
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeFetchCommand(['include' => 'workflow, default_point, attribute_sets.attributes'], 1));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(1, $result->id);
 		$this->assertEquals(3, count($result->attribute_sets));
 		$this->d->dump($result->toArray());
-
 		$arrayWithMeta = $result->toArray(true, false);
 		$this->assertEquals(1, $arrayWithMeta['meta']['id']);
-		$this->assertEquals('attribute_sets', $arrayWithMeta['meta']['include']);
-		$this->assertEquals(3, count($arrayWithMeta['included']));
+		$this->assertEquals('workflow, default_point, attribute_sets.attributes', $arrayWithMeta['meta']['include']);
+		$this->assertEquals(12, count($arrayWithMeta['included']));
 
 		$this->d->dump($arrayWithMeta);
 	}
@@ -290,7 +305,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand(['sort' => ['-code'], 'limit' => 2, 'offset' => 1]));
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand(['sort' => ['-code'], 'limit' => 2, 'offset' => 1, 'include' => ['workflow', 'default_point', 'attribute_sets.attributes']]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(count($result), 2);

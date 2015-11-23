@@ -53,6 +53,7 @@ class EntityFetchHandler extends RepositoryCommandHandler
 	{
 		$locale = (!empty($command->params['locale']))?$command->params['locale']:null;
 		$include = (!empty($command->params['include']))?$command->params['include']:[];
-		return $this->repository->fetch($command->id, $include, $locale);
+		$status = (!empty($command->params['status']))?$command->params['status']:null;
+		return $this->repository->fetch($command->id, $include, $locale, $status);
 	}
 }

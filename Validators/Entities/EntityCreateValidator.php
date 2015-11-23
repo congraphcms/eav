@@ -15,6 +15,7 @@ use Cookbook\Contracts\EAV\AttributeSetRepositoryContract;
 use Cookbook\Contracts\EAV\EntityTypeRepositoryContract;
 use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
 use Cookbook\Contracts\Locales\LocaleRepositoryContract;
+use Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Exceptions\ValidationException;
 use Cookbook\Core\Validation\Validator;
@@ -72,6 +73,13 @@ class EntityCreateValidator extends Validator
 	protected $localeRepository;
 
 	/**
+	 * Repository for handling locales
+	 * 
+	 * @var Cookbook\Contracts\Locales\LocaleRepositoryContract
+	 */
+	protected $workflowPointRepository;
+
+	/**
 	 * Attribute config manager
 	 * 
 	 * @var Cookbook\Eav\Managers\AttributeManager
@@ -103,6 +111,7 @@ class EntityCreateValidator extends Validator
 		AttributeSetRepositoryContract $attributeSetRepository, 
 		AttributeRepositoryContract $attributeRepository,
 		LocaleRepositoryContract $localeRepository,
+		WorkflowPointRepositoryContract $workflowPointRepository,
 		AttributeManager $attributeManager)
 	{
 		$this->fieldValidatorFactory = $fieldValidatorFactory;
@@ -110,6 +119,7 @@ class EntityCreateValidator extends Validator
 		$this->attributeSetRepository = $attributeSetRepository;
 		$this->attributeRepository = $attributeRepository;
 		$this->localeRepository = $localeRepository;
+		$this->workflowPointRepository = $workflowPointRepository;
 		$this->attributeManager = $attributeManager;
 
 		$this->rules = [
@@ -120,7 +130,7 @@ class EntityCreateValidator extends Validator
 			'attribute_set'         => ['sometimes'],
 			'attribute_set.id'      => ['sometimes', 'exists:attribute_sets,id'],
 			'locale'             	=> 'sometimes',
-			'status'				=> ['sometimes'],
+			'status'				=> ['sometimes', 'exists:workflow_points,status'],
 			'fields'                => 'array'
 		];
 
@@ -181,7 +191,7 @@ class EntityCreateValidator extends Validator
 				$attributeSet = $this->attributeSetRepository->get(['code' => $command->params['attribute_set']]);
 				if( empty($attributeSet) )
 				{
-					$this->exception->addErrors(['attribute_set' => 'Invalid entity type.']);
+					$this->exception->addErrors(['attribute_set' => 'Invalid attribute set.']);
 					throw $this->exception;
 				}
 				$attributeSet = $attributeSet[0];
@@ -205,10 +215,19 @@ class EntityCreateValidator extends Validator
 			$entityType = $this->entityTypeRepository->fetch($command->params['entity_type_id']);
 		}
 
-		if (! $entityType->multiple_sets && $command->params['attribute_set_id'] != $entityType->default_set_id) {
+		if( isset($command->params['status']) )
+		{
+			$workflowPoint = $this->workflowPointRepository->get(['status' => $command->params['status'], 'workflow_id' => $entityType->workflow_id]);
+			if(count($workflowPoint) < 1)
+			{
+				$this->exception->addErrors(['status' => 'This entity type doesn\'t support this status.']);
+				throw $this->exception;
+			}
+		}
+
+		if (! $entityType->multiple_sets && $entityType->default_set_id && $command->params['attribute_set_id'] != $entityType->default_set_id) {
 			$this->exception->setErrorKey('entity.attribute_set_id');
 			$this->exception->addErrors(['Invalid attribute set.']);
-
 			throw $this->exception;
 		}
 
@@ -296,7 +315,6 @@ class EntityCreateValidator extends Validator
 				{
 					$command->params['fields'][$attribute->code] = [];
 				}
-
 				foreach ($locales as $l)
 				{
 

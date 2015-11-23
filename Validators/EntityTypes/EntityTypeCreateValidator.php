@@ -51,8 +51,13 @@ class EntityTypeCreateValidator extends Validator
 			'name'					=> 'required|min:3|max:250',
 			'plural_name'			=> 'required|min:3|max:250',
 			'multiple_sets'			=> 'sometimes|boolean',
-			'has_workflow'			=> 'sometimes|boolean',
-			'localized'				=> 'sometimes|boolean'
+			'localized'				=> 'sometimes|boolean',
+			'workflow_id'			=> ['required_without:workflow', 'exists:workflows,id'],
+			'workflow'				=> 'sometimes|array',
+			'default_point_id'		=> ['required_without:default_point', 'exists:workflow_points,id'],
+			'default_point'			=> 'sometimes|array',
+			'localized_workflow'	=> 'sometimes|boolean',
+
 		];
 
 		parent::__construct();
@@ -73,23 +78,13 @@ class EntityTypeCreateValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
-		if( ! empty($command->params['has_workflow']) )
+		if(isset($command->params['workflow']))
 		{
-			$this->rules['workflow_id'] = ['required_without:workflow', 'exists:workflows,id'];
-			$this->rules['workflow'] = ['sometimes', 'array'];
-			if(isset($command->params['workflow']))
-			{
-				$this->rules['workflow.id'] = ['required', 'exists:workflows,id'];
-			}
-			
-			$this->rules['default_point_id'] = ['required_without:default_point', 'exists:workflows,id'];
-			$this->rules['default_point'] = ['sometimes', 'array'];
-			if(isset($command->params['default_point']))
-			{
-				$this->rules['default_point.id'] = ['required', 'exists:workflow_points,id'];
-			}
-			$this->rules['localized_workflow'] = ['sometimes', 'boolean'];
-
+			$this->rules['workflow.id'] = ['required', 'exists:workflows,id'];
+		}
+		if(isset($command->params['default_point']))
+		{
+			$this->rules['default_point.id'] = ['required', 'exists:workflow_points,id'];
 		}
 
 		$this->validateParams($command->params, $this->rules, true);
@@ -99,17 +94,19 @@ class EntityTypeCreateValidator extends Validator
 			throw $this->exception;
 		}
 
-		if( ! empty($command->params['has_workflow']) )
+		if( ! empty($command->params['localized']) )
 		{
-			if ( ! isset($command->params['workflow_id']) )
-			{
-				$command->params['workflow_id'] = $command->params['workflow']['id'];
-			}
+			$command->params['localized_workflow'] = false;
+		}
 
-			if ( ! isset($command->params['default_point_id']) )
-			{
-				$command->params['default_point_id'] = $command->params['default_point']['id'];
-			}
+		if ( ! isset($command->params['workflow_id']) )
+		{
+			$command->params['workflow_id'] = $command->params['workflow']['id'];
+		}
+
+		if ( ! isset($command->params['default_point_id']) )
+		{
+			$command->params['default_point_id'] = $command->params['default_point']['id'];
 		}
 		unset($command->params['workflow']);
 		unset($command->params['default_point']);

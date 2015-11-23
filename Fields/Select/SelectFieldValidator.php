@@ -97,6 +97,11 @@ class SelectFieldValidator extends AbstractFieldValidator
 	{
 		parent::validateValue($value, $attribute, $entity_id);
 
+		if( is_null($value) )
+		{
+			return true;
+		}
+		
 		// check if this attribute option exist
 		foreach ($attribute->options as $option)
 		{
