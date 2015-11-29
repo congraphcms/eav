@@ -107,22 +107,63 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 */
 	public function validateAttributeForInsert(array &$params)
 	{
-		return true;
+		$attributeSettings = $this->attributeManager->getFieldType($params['field_type']);
+		if( ! $attributeSettings['can_have_default_value'] && isset($params['default_value']) && ! is_null($params['default_value']) )
+		{
+			$this->exception->addErrors(['default_value' => 'This attribute type can\'t have default value.']);
+		}
+		if( ! $attributeSettings['can_be_unique'] && ! empty($params['unique']) )
+		{
+			$this->exception->addErrors(['unique' => 'This attribute type can\'t be unique.']);
+		}
+		if( ! $attributeSettings['can_be_localized'] && ! empty($params['localized']) )
+		{
+			$this->exception->addErrors(['localized' => 'This attribute type can\'t be localized.']);
+		}
+
+		if($this->exception->hasErrors())
+		{
+			throw $this->exception;
+		}
 	}
 
 	/**
 	 * Check for specific rules and validation on attribute update
 	 * 
 	 * Called after standard attribute validation with referenced attribute params
-	 * depending on boolean value returned by this function attribute update will continue or stop the execution
+	 * depending on boolean value returned by this function 
+	 * attribute update will continue or stop the execution
 	 * 
 	 * @param array $params
+	 * @param object $attribute
 	 * 
 	 * @return boolean
 	 */
-	public function validateAttributeForUpdate(array &$params)
+	public function validateAttributeForUpdate(array &$params, $attribute)
 	{
-		return true;
+		$attributeSettings = $this->attributeManager->getFieldType($attribute->field_type);
+		if( ! $attributeSettings['can_have_default_value'] && isset($params['default_value']) && ! is_null($params['default_value']) )
+		{
+			$this->exception->addErrors(['default_value' => 'This attribute type can\'t have default value.']);
+		}
+		if( ! $attributeSettings['can_be_unique'] && ! empty($params['unique']) )
+		{
+			$this->exception->addErrors(['unique' => 'This attribute type can\'t be unique.']);
+		}
+		if( ! $attributeSettings['can_be_localized'] && ! empty($params['localized']) )
+		{
+			$this->exception->addErrors(['localized' => 'This attribute type can\'t be localized.']);
+		}
+
+		if( ! $attributeSettings['has_options'] && ! empty($params['options']) )
+		{
+			$this->exception->addErrors(['options' => 'This attribute type can\'t have options.']);
+		}
+
+		if($this->exception->hasErrors())
+		{
+			throw $this->exception;
+		}
 	}
 
 	/**

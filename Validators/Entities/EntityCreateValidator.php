@@ -158,6 +158,8 @@ class EntityCreateValidator extends Validator
 			throw $this->exception;
 		}
 
+
+		// Entity Type
 		if ( ! isset($command->params['entity_type_id']) )
 		{
 			if( is_string($command->params['entity_type']) )
@@ -184,6 +186,7 @@ class EntityCreateValidator extends Validator
 
 		unset($command->params['entity_type']);
 
+		// Attribute Set
 		if (! isset($command->params['attribute_set_id']))
 		{
 			if( is_string($command->params['attribute_set']) )
@@ -215,6 +218,16 @@ class EntityCreateValidator extends Validator
 			$entityType = $this->entityTypeRepository->fetch($command->params['entity_type_id']);
 		}
 
+		if (! $entityType->multiple_sets && $entityType->default_set_id && $command->params['attribute_set_id'] != $entityType->default_set_id) {
+			$this->exception->setErrorKey('entity.attribute_set_id');
+			$this->exception->addErrors(['Invalid attribute set.']);
+			throw $this->exception;
+		}
+
+		$attributeSet = $this->attributeSetRepository->fetch($command->params['attribute_set_id']);
+
+
+		// Status
 		if( isset($command->params['status']) )
 		{
 			$workflowPoint = $this->workflowPointRepository->get(['status' => $command->params['status'], 'workflow_id' => $entityType->workflow_id]);
@@ -225,13 +238,7 @@ class EntityCreateValidator extends Validator
 			}
 		}
 
-		if (! $entityType->multiple_sets && $entityType->default_set_id && $command->params['attribute_set_id'] != $entityType->default_set_id) {
-			$this->exception->setErrorKey('entity.attribute_set_id');
-			$this->exception->addErrors(['Invalid attribute set.']);
-			throw $this->exception;
-		}
-
-		$attributeSet = $this->attributeSetRepository->fetch($command->params['attribute_set_id']);
+		// Locale
 		if( isset($command->params['locale']) )
 		{
 			try
@@ -249,6 +256,8 @@ class EntityCreateValidator extends Validator
 			$locales = $this->localeRepository->get();
 		}
 
+
+		// Fields
 		$attributeIds = [];
 		$attributes = [];
 
@@ -272,7 +281,18 @@ class EntityCreateValidator extends Validator
 				{
 					if($option->default)
 					{
-						$default_value = $option->value;
+						if($attributeSettings['has_multiple_values'])
+						{
+							if( ! is_array($default_value) )
+							{
+								$default_value = [];
+							}
+							$default_value[] = $option->value;
+						}
+						else
+						{
+							$default_value = $option->value;
+						}
 					}
 				}
 			}
@@ -317,7 +337,6 @@ class EntityCreateValidator extends Validator
 				}
 				foreach ($locales as $l)
 				{
-
 					if( ! isset($command->params['fields'][$attribute->code][$l->code]) )
 					{
 						if(empty($default_value))
@@ -336,12 +355,32 @@ class EntityCreateValidator extends Validator
 
 					$fieldValidator = $this->fieldValidatorFactory->make($attribute->field_type);
 
-					try {
-						$fieldValidator->validateValue($value, $attribute);
-					} catch (ValidationException $e) {
-						$this->exception->setErrorKey('entity.fields.' . $attribute->code . '.' . $l->code);
-						$this->exception->addErrors($e->getErrors());
+					if($attributeSettings['has_multiple_values'])
+					{
+						if( ! is_array($value) )
+						{
+							$value = [$value];
+						}
+						foreach ($value as $v)
+						{
+							try {
+								$fieldValidator->validateValue($value, $attribute);
+							} catch (ValidationException $e) {
+								$this->exception->setErrorKey('entity.fields.' . $attribute->code . '.' . $l->code);
+								$this->exception->addErrors($e->getErrors());
+							}
+						}
 					}
+					else
+					{
+						try {
+							$fieldValidator->validateValue($value, $attribute);
+						} catch (ValidationException $e) {
+							$this->exception->setErrorKey('entity.fields.' . $attribute->code . '.' . $l->code);
+							$this->exception->addErrors($e->getErrors());
+						}
+					}
+					
 				}
 			}
 			else
@@ -350,11 +389,30 @@ class EntityCreateValidator extends Validator
 
 				$fieldValidator = $this->fieldValidatorFactory->make($attribute->field_type);
 
-				try {
-					$fieldValidator->validateValue($value, $attribute);
-				} catch (ValidationException $e) {
-					$this->exception->setErrorKey('entity.fields.' . $attribute->code);
-					$this->exception->addErrors($e->getErrors());
+				if($attributeSettings['has_multiple_values'])
+				{
+					if( ! is_array($value) )
+					{
+						$value = [$value];
+					}
+					foreach ($value as $v)
+					{
+						try {
+							$fieldValidator->validateValue($value, $attribute);
+						} catch (ValidationException $e) {
+							$this->exception->setErrorKey('entity.fields.' . $attribute->code);
+							$this->exception->addErrors($e->getErrors());
+						}
+					}
+				}
+				else
+				{
+					try {
+						$fieldValidator->validateValue($value, $attribute);
+					} catch (ValidationException $e) {
+						$this->exception->setErrorKey('entity.fields.' . $attribute->code);
+						$this->exception->addErrors($e->getErrors());
+					}
 				}
 			}
 			

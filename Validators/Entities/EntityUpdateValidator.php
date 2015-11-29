@@ -19,6 +19,7 @@ use Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Exceptions\ValidationException;
 use Cookbook\Core\Validation\Validator;
+use Cookbook\Eav\Managers\AttributeManager;
 
 /**
  * EntityUpdateValidator class
@@ -79,6 +80,13 @@ class EntityUpdateValidator extends Validator
 	protected $workflowPointRepository;
 
 	/**
+	 * Attribute config manager
+	 * 
+	 * @var Cookbook\Eav\Managers\AttributeManager
+	 */
+	protected $attributeManager;
+
+	/**
 	 * Set of rules for validating attribute
 	 *
 	 * @var array
@@ -103,15 +111,16 @@ class EntityUpdateValidator extends Validator
 		AttributeSetRepositoryContract $attributeSetRepository, 
 		AttributeRepositoryContract $attributeRepository,
 		LocaleRepositoryContract $localeRepository,
-		WorkflowPointRepositoryContract $workflowPointRepository)
+		WorkflowPointRepositoryContract $workflowPointRepository,
+		AttributeManager $attributeManager)
 	{
 		$this->fieldValidatorFactory = $fieldValidatorFactory;
 		$this->entityRepository = $entityRepository;
 		$this->attributeSetRepository = $attributeSetRepository;
 		$this->attributeRepository = $attributeRepository;
 		$this->localeRepository = $localeRepository;
-
 		$this->workflowPointRepository = $workflowPointRepository;
+		$this->attributeManager = $attributeManager;
 
 		$this->rules = [
 			'locale'             	=> 'sometimes',
@@ -137,8 +146,6 @@ class EntityUpdateValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
-		
-
 		$locale_id = (!empty($command->params['locale']))?$command->params['locale']:null;
 
 		$entity = $this->entityRepository->fetch($command->id, [], $locale_id);
@@ -188,7 +195,7 @@ class EntityUpdateValidator extends Validator
 			}
 
 			$attributesByCode[$attribute->code] = $attribute;
-
+			$attributeSettings = $this->attributeManager->getFieldType($attribute->field_type);
 			$fieldValidator = $this->fieldValidatorFactory->make($attribute->field_type);
 
 			if( ! isset($locale) && $attribute->localized )
@@ -207,11 +214,30 @@ class EntityUpdateValidator extends Validator
 					{
 						$value = $command->params['fields'][$attribute->code][$l->code];
 
-						try {
-							$fieldValidator->validateValue($value, $attribute);
-						} catch (ValidationException $e) {
-							$this->exception->setErrorKey('entity.fields.' . $attribute->code . '.' . $l->code);
-							$this->exception->addErrors($e->getErrors());
+						if($attributeSettings['has_multiple_values'])
+						{
+							if( ! is_array($value) )
+							{
+								$value = [$value];
+							}
+							foreach ($value as $v)
+							{
+								try {
+									$fieldValidator->validateValue($value, $attribute);
+								} catch (ValidationException $e) {
+									$this->exception->setErrorKey('entity.fields.' . $attribute->code . '.' . $l->code);
+									$this->exception->addErrors($e->getErrors());
+								}
+							}
+						}
+						else
+						{
+							try {
+								$fieldValidator->validateValue($value, $attribute);
+							} catch (ValidationException $e) {
+								$this->exception->setErrorKey('entity.fields.' . $attribute->code . '.' . $l->code);
+								$this->exception->addErrors($e->getErrors());
+							}
 						}
 					}
 
@@ -222,11 +248,30 @@ class EntityUpdateValidator extends Validator
 			{
 				$value = $command->params['fields'][$attribute->code];
 
-				try {
-					$fieldValidator->validateValue($value, $attribute);
-				} catch (ValidationException $e) {
-					$this->exception->setErrorKey('entity.fields.' . $attribute->code);
-					$this->exception->addErrors($e->getErrors());
+				if($attributeSettings['has_multiple_values'])
+				{
+					if( ! is_array($value) )
+					{
+						$value = [$value];
+					}
+					foreach ($value as $v)
+					{
+						try {
+							$fieldValidator->validateValue($value, $attribute);
+						} catch (ValidationException $e) {
+							$this->exception->setErrorKey('entity.fields.' . $attribute->code);
+							$this->exception->addErrors($e->getErrors());
+						}
+					}
+				}
+				else
+				{
+					try {
+						$fieldValidator->validateValue($value, $attribute);
+					} catch (ValidationException $e) {
+						$this->exception->setErrorKey('entity.fields.' . $attribute->code);
+						$this->exception->addErrors($e->getErrors());
+					}
 				}
 			}
 		}

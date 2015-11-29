@@ -41,49 +41,6 @@ class SelectFieldValidator extends AbstractFieldValidator
 	protected $table = 'attribute_values_integer';
 
 	/**
-	 * Check for specific rules and validation on attribute insert
-	 * 
-	 * Called after standard attribute validation with referenced attribute params
-	 * depending on boolean value returned by this function attribute insert will continue or stop the execution
-	 * 
-	 * @param array $params
-	 * 
-	 * @return boolean
-	 */
-	public function validateAttributeForInsert(array &$params)
-	{
-		if( ! empty($params['data']) )
-		{
-			$this->exception->addErrors(array('data' => 'Select field attributes can\'t have data'));
-			throw $this->exception;
-			
-		}
-
-		return true;
-	}
-
-	/**
-	 * Check for specific rules and validation on attribute update
-	 * 
-	 * Called after standard attribute validation with referenced attribute params
-	 * depending on boolean value returned by this function attribute update will continue or stop the execution
-	 * 
-	 * @param array $params
-	 * 
-	 * @return boolean
-	 */
-	public function validateAttributeForUpdate(array &$params)
-	{
-		if( ! empty($params['data']) )
-		{
-			$this->exception->addErrors(array('data' => 'Select field attributes can\'t have data'));
-			throw $this->exception;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Validate attribute value
 	 * 
 	 * Validates if option exist

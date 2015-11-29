@@ -139,7 +139,7 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 			'code' => 'select_attribute',
 			'field_type' => 'select',
 			'localized' => true,
-			'default_value' => 'default',
+			'default_value' => null,
 			'unique' => false,
 			'required' => false,
 			'filterable' => true,
@@ -207,7 +207,6 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 10) );
 		
 		$this->d->dump($result->toArray());

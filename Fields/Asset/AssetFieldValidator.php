@@ -74,6 +74,86 @@ class AssetFieldValidator extends AbstractFieldValidator
 	}
 
 	/**
+	 * Check for specific rules and validation on attribute insert
+	 * 
+	 * Called after standard attribute validation with referenced attribute params
+	 * depending on boolean value returned by this function attribute insert will continue or stop the execution
+	 * 
+	 * @param array $params
+	 * 
+	 * @return boolean
+	 */
+	public function validateAttributeForInsert(array &$params)
+	{
+		parent::validateAttributeForInsert($params);
+
+		if ( empty($params['data']) || !is_array($params['data']))
+		{
+			return;
+		}
+
+		$data = $params['data'];
+
+		if ( ! empty($data['filetypes']) )
+		{
+			if( ! is_array($data['filetypes']) )
+			{
+				$data['filetypes'] = [$data['filetypes']];
+			}
+
+			$this->sortFileTypes($data);
+		}
+		else
+		{
+			$data['filetypes'] = [];
+		}
+
+		$params['data'] = $data;
+
+		return true;
+	}
+
+	/**
+	 * Check for specific rules and validation on attribute update
+	 * 
+	 * Called after standard attribute validation with referenced attribute params
+	 * depending on boolean value returned by this function attribute update will continue or stop the execution
+	 * 
+	 * @param array $params
+	 * 
+	 * @return boolean
+	 */
+	public function validateAttributeForUpdate(array &$params, $attribute)
+	{
+		parent::validateAttributeForUpdate($params, $attribute);
+
+		if ( empty($params['data']) || !is_array($params['data']))
+		{
+			return;
+		}
+
+		$data = $params['data'];
+
+		if ( ! empty($data['filetypes']) )
+		{
+			if( ! is_array($data['filetypes']) )
+			{
+				$data['filetypes'] = [$data['filetypes']];
+			}
+
+			$this->sortFileTypes($data);
+		}
+		else
+		{
+			$data['filetypes'] = [];
+		}
+
+		$params['data'] = $data;
+
+		return;
+	}
+
+	/**
 	 * Validate attribute value
 	 * 
 	 * This function can be extended by specific attribute handler
@@ -105,11 +185,30 @@ class AssetFieldValidator extends AbstractFieldValidator
 
 		try
 		{
-			$entity = $this->fileRepository->fetch($value['id']);
+			$file = $this->fileRepository->fetch($value['id']);
 		}
 		catch(NotFoundException $e)
 		{
 			throw new ValidationException(['File doesn\'t exist.']);
 		}
+
+		if( ! empty($attribute->data['filetypes']) )
+		{
+			if( ! in_array($file->extension, $attribute->data['filetypes']) )
+			{
+				throw new ValidationException(['Invalid file extension.']);
+			}
+		}
+	}
+
+	protected function sortFileTypes(array &$data)
+	{
+		$filetypes = $data['filetypes'];
+
+		foreach ($filetypes as &$type) {
+			$type = trim(strval($type));
+		}
+
+		$data['filetypes'] = $filetypes;
 	}
 }

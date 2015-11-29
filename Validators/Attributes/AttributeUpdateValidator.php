@@ -151,7 +151,7 @@ class AttributeUpdateValidator extends Validator
 
 		try
 		{
-			$fieldValidator->validateAttributeForUpdate($command->params);
+			$fieldValidator->validateAttributeForUpdate($command->params, $attribute);
 		}
 		catch(ValidationException $e)
 		{
