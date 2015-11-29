@@ -45,11 +45,11 @@ class CreateAttributeTables extends Migration {
 			// unique attribute code for internal use
 			$table->string('code', 100)->unique();
 
-			// // label for use on administration
-			// $table->string('admin_label', 100)->default('');
+			// label for use on administration
+			$table->string('admin_label', 100)->default('');
 
-			// // instructions for administration
-			// $table->string('admin_notice', 1000)->default('');
+			// instructions for administration
+			$table->string('admin_notice', 1000)->default('');
 
 			// type of the attribute (text input, wysiwyg editor, number...)
 			$table->string('field_type', 100);

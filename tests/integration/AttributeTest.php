@@ -136,6 +136,8 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 		$params = [
 			'code' => 'code',
+			'admin_label' => 'Code',
+			'admin_notice' => 'Enter code here.',
 			'field_type' => 'text',
 			'localized' => false,
 			'default_value' => '',
@@ -232,13 +234,18 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 		$params = [
 			'code' => 'attribute_updated',
+			'admin_label' => 'changed',
+			'admin_notice' => 'changed_notice'
 		];
 		
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 1) );
 		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'attribute_updated');
+		$this->assertEquals('attribute_updated', $result->code);
+		$this->assertEquals('changed', $result->admin_label);
+		$this->assertEquals('changed_notice', $result->admin_notice);
+
 		$this->d->dump($result->toArray());
 	}
 

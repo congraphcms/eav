@@ -82,8 +82,8 @@ class AttributeCreateValidator extends Validator
 
 		$this->rules = [
 			'code'					=> ['required', 'unique:attributes,code', 'regex:/^[0-9a-zA-Z-_]*$/'],
-			// 'admin_label'			=> 'required|between:3,100',
-			// 'admin_notice'			=> 'max:1000',
+			'admin_label'			=> 'sometimes|max:100',
+			'admin_notice'			=> 'sometimes|max:1000',
 			'field_type' 			=> 'required|in:' . implode(array_keys($this->availableFieldTypes), ','),
 			'default_value'			=> '',
 			'localized'				=> 'boolean',
@@ -91,8 +91,7 @@ class AttributeCreateValidator extends Validator
 			'required'				=> 'boolean',
 			'filterable'			=> 'boolean',
 			'data'					=> '',
-			'options'				=> 'sometimes|array',
-			'translations'			=> 'sometimes|array'
+			'options'				=> 'sometimes|array'
 		];
 
 		$this->optionRules = 
