@@ -103,29 +103,6 @@ class FieldsServiceProvider extends ServiceProvider {
 	* @return void
 	*/
 	protected function registerFieldHandlers() {
-		$field_types = $this->app['config']->get('cookbook.field_types');
-
-		if( ! is_array($field_types) )
-		{
-			return;
-		}
-
-		foreach ($field_types as $type => $settings)
-		{
-			if( isset($settings['handler']) )
-			{
-				$this->app->bind($settings['handler'], function($app) use($settings){
-
-					return new $settings['handler'](
-						$app['db']->connection(),
-						$app->make('Cookbook\Eav\Managers\AttributeManager'),
-						$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-						$settings['table']
-					);
-				});
-			}
-		}
-
 
 		$this->app->bind('Cookbook\Eav\Fields\Asset\AssetFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Asset\AssetFieldHandler( 
@@ -185,7 +162,6 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		
 	}
 
 	/**

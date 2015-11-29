@@ -761,7 +761,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		if( ! empty($status) )
 		{
-			$query = $this->filterStatus($query, $status, $localeIds);
+			$query = $this->filterStatus($query, $status, $locale_ids);
 		}
 
 		$entity = $query->first();
@@ -868,7 +868,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		if( ! empty($status) )
 		{
-			$query = $this->filterStatus($query, $status, $localeIds);
+			$query = $this->filterStatus($query, $status, $locale_ids);
 		}
 
 		$entities = $query->get();
@@ -1150,6 +1150,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 		foreach ($entities as &$entity)
 		{
+			$entity->status = null;
 			if( ! empty($result[$entity->id]) )
 			{
 				$entity->status = $result[$entity->id];
@@ -1304,7 +1305,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
 					foreach ($locales as $l)
 					{
-						if( ! $entitiesById[$value->entity_id]->localized_workflow || array_key_exists($l->code, $entitiesById[$value->entity_id]->status))
+						if( ! $entitiesById[$value->entity_id]->localized_workflow || empty($entitiesById[$value->entity_id]->status) || ! is_array($entitiesById[$value->entity_id]->status) || array_key_exists($l->code, $entitiesById[$value->entity_id]->status))
 						{
 							$fields[$value->entity_id]->{$attribute->code}[$l->code] = null;
 						}
@@ -1314,7 +1315,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 				foreach ($locales as $l)
 				{
 
-					if($l->id == $value->locale_id && ( ! $entitiesById[$value->entity_id]->localized_workflow || array_key_exists($l->code, $entitiesById[$value->entity_id]->status) ) )
+					if($l->id == $value->locale_id && ( ! $entitiesById[$value->entity_id]->localized_workflow || empty($entitiesById[$value->entity_id]->status) || ! is_array($entitiesById[$value->entity_id]->status) || array_key_exists($l->code, $entitiesById[$value->entity_id]->status) ) )
 					{
 						if( isset($fields[$value->entity_id]->{$attribute->code}[$l->code]) && $hasMultipleValues )
 						{
