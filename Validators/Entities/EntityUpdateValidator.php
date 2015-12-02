@@ -130,7 +130,7 @@ class EntityUpdateValidator extends Validator
 
 		parent::__construct();
 
-		$this->exception->setErrorKey('entities');
+		$this->exception->setErrorKey('entity');
 	}
 
 
@@ -189,7 +189,7 @@ class EntityUpdateValidator extends Validator
 		foreach ($attributeSet->attributes as $attr)
 		{
 			$attribute = $this->attributeRepository->fetch($attr->id);
-			if (! isset($command->params['fields'][$attribute->code]))
+			if (! isset($command->params['fields'][$attribute->code]) && ! is_null($command->params['fields'][$attribute->code]))
 			{
 				continue;
 			}
@@ -278,7 +278,7 @@ class EntityUpdateValidator extends Validator
 
 		foreach ($command->params['fields'] as $code => $value) {
 			if (! array_key_exists($code, $attributesByCode)) {
-				$this->exception->setErrorKey('entities.fields.' . $code);
+				$this->exception->setErrorKey('entity.fields.' . $code);
 				$this->exception->addErrors(['Field doesn\'t exist.']);
 				continue;
 			}
@@ -298,7 +298,7 @@ class EntityUpdateValidator extends Validator
 
 					if($fault)
 					{
-						$this->exception->setErrorKey('entities.fields.' . $code . '.' . $loc);
+						$this->exception->setErrorKey('entity.fields.' . $code . '.' . $loc);
 						$this->exception->addErrors(['Locale doesn\'t exist.']);
 					}
 				}

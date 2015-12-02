@@ -384,7 +384,7 @@ class EntityGetValidator extends Validator
 		{
 			if(is_string($filters))
 			{
-				$objFilters = json_decode($filters);
+				$objFilters = json_decode($filters, true);
  				if(json_last_error() == JSON_ERROR_NONE)
  				{
  					$filters = $objFilters;
