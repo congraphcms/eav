@@ -10,10 +10,10 @@
 
 namespace Cookbook\Eav\Validators\EntityTypes;
 
-use Cookbook\Core\Bus\RepositoryCommand;
-use Cookbook\Core\Validation\Validator;
-
 use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
+use Cookbook\Core\Bus\RepositoryCommand;
+use Cookbook\Core\Exceptions\BadRequestException;
+use Cookbook\Core\Validation\Validator;
 
 
 /**
@@ -129,6 +129,23 @@ class EntityTypeGetValidator extends Validator
 	{
 		if( ! empty($filters) )
 		{
+			if(is_string($filters))
+			{
+				$objFilters = json_decode($filters);
+ 				if(json_last_error() == JSON_ERROR_NONE)
+ 				{
+ 					$filters = $objFilters;
+ 				}
+ 				else
+ 				{
+ 					$e = new BadRequestException();
+					$e->setErrorKey('filter');
+					$e->addErrors('Invalid filter format.');
+
+					throw $e;
+ 				}
+			}
+			
 			foreach ($filters as $field => &$filter) {
 				if( ! array_key_exists($field, $this->availableFilters) )
 				{

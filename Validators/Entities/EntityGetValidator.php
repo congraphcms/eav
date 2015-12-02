@@ -382,6 +382,22 @@ class EntityGetValidator extends Validator
 	{
 		if( ! empty($filters) )
 		{
+			if(is_string($filters))
+			{
+				$objFilters = json_decode($filters);
+ 				if(json_last_error() == JSON_ERROR_NONE)
+ 				{
+ 					$filters = $objFilters;
+ 				}
+ 				else
+ 				{
+ 					$e = new BadRequestException();
+					$e->setErrorKey('filter');
+					$e->addErrors('Invalid filter format.');
+
+					throw $e;
+ 				}
+			}
 			$fieldFilters = [];
 			foreach ($filters as $field => &$filter)
 			{
@@ -399,7 +415,7 @@ class EntityGetValidator extends Validator
 				if( ! array_key_exists($field, $this->availableFilters) )
 				{
 					$e = new BadRequestException();
-					$e->setErrorKey('entities.filter.' . $field);
+					$e->setErrorKey('filter.' . $field);
 					$e->addErrors('Filtering by \'' . $field . '\' is not allowed.');
 
 					throw $e;
@@ -410,7 +426,7 @@ class EntityGetValidator extends Validator
 					if( ! in_array('e', $this->availableFilters[$field]) )
 					{
 						$e = new BadRequestException();
-						$e->setErrorKey('entities.filter.' . $field);
+						$e->setErrorKey('filter.' . $field);
 						$e->addErrors('Filter operation is not allowed.');
 
 						throw $e;
@@ -423,7 +439,7 @@ class EntityGetValidator extends Validator
 					if( ! in_array($operation, $this->availableFilters[$field]) )
 					{
 						$e = new BadRequestException();
-						$e->setErrorKey('attributes.filter.' . $field);
+						$e->setErrorKey('filter.' . $field);
 						$e->addErrors('Filter operation is not allowed.');
 
 						throw $e;
@@ -441,7 +457,7 @@ class EntityGetValidator extends Validator
 						if( is_array($value) || is_object($value))
 						{
 							$e = new BadRequestException();
-							$e->setErrorKey('entities.filter.' . $field);
+							$e->setErrorKey('filter.' . $field);
 							$e->addErrors('Invalid filter.');
 						}
 					}
@@ -465,7 +481,7 @@ class EntityGetValidator extends Validator
 					if( ! in_array($code, $attributeCodes) )
 					{
 						$e = new BadRequestException();
-						$e->setErrorKey('attributes.filter.fields.' . $code);
+						$e->setErrorKey('filter.fields.' . $code);
 						$e->addErrors('Filtering by \'' . $code . '\' is not allowed.');
 
 						throw $e;
@@ -521,7 +537,7 @@ class EntityGetValidator extends Validator
 			if( ! in_array($criteria, $this->availableSorting) )
 			{
 				$e = new BadRequestException();
-				$e->setErrorKey('attributes.sort.' . $criteria);
+				$e->setErrorKey('sort.' . $criteria);
 				$e->addErrors('Sorting by \'' . $criteria . '\' is not allowed.');
 
 				throw $e;
@@ -538,7 +554,7 @@ class EntityGetValidator extends Validator
 				if( ! isset($attributeSettings['sortable']) || ! $attributeSettings['sortable'] )
 				{
 					$e = new BadRequestException();
-					$e->setErrorKey('attributes.sort.fields.' . $attribute->code);
+					$e->setErrorKey('sort.fields.' . $attribute->code);
 					$e->addErrors('Sorting by \'' . $attribute->code . '\' is not allowed.');
 
 					throw $e;
@@ -552,7 +568,7 @@ class EntityGetValidator extends Validator
 				if( ! in_array($code, $attributeCodes) )
 				{
 					$e = new BadRequestException();
-					$e->setErrorKey('attributes.sort.fields.' . $code);
+					$e->setErrorKey('sort.fields.' . $code);
 					$e->addErrors('Sorting by \'' . $code . '\' is not allowed.');
 
 					throw $e;
