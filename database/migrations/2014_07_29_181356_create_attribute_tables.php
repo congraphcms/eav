@@ -74,10 +74,11 @@ class CreateAttributeTables extends Migration {
 			$table->string('status', 100)->default('user_defined');
 
 			// extra data required for some attributes (usualy json string)
-			$table->text('data')->nullable()->default('');
+			$table->text('data')->nullable();
 			
 			// created_at and updated_at timestamps
-			$table->timestamps();
+			$table->timestamp('created_at')->nullable();
+			$table->timestamp('updated_at')->nullable();
 		});
 
 

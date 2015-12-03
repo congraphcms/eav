@@ -137,6 +137,8 @@ class AttributeUpdateValidator extends Validator
 	{
 		$attribute = $this->attributeRepository->fetch($command->id);
 
+		$command->params['id'] = $command->id;
+
 		$validator = $this->newValidator($command->params, $this->rules);
 
 		if( isset($command->params['options']) )
@@ -149,16 +151,6 @@ class AttributeUpdateValidator extends Validator
 
 		if( $this->exception->hasErrors() )
 		{
-			throw $this->exception;
-		}
-
-		try
-		{
-			$this->attributeManager->getFieldType($command->params);
-		}
-		catch(InvalidArgumentException $e)
-		{
-			$this->exception->addErrors(['field_type' => $e->getMessage()]);
 			throw $this->exception;
 		}
 		

@@ -102,6 +102,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',
 		]);
+		$app['config']->set('database.stricy', true);
 
 		$app['config']->set('cache.default', 'file');
 

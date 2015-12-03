@@ -50,10 +50,11 @@ class CreateEntityTables extends Migration {
 			$table->integer('attribute_set_id');
 			
 			// created_at and updated_at timestamps
-			$table->timestamps();
+			$table->timestamp('created_at')->nullable();
+			$table->timestamp('updated_at')->nullable();
 		});
 
-		// 1.0 Create enity_statuses table
+		// 1.1 Create enity_statuses table
 		// ---------------------------------------------------
 
 		Schema::create('entity_statuses', function($table) {
@@ -79,11 +80,12 @@ class CreateEntityTables extends Migration {
 			$table->timestamp('scheduled_at')->nullable();
 			
 			// created_at and updated_at timestamps
-			$table->timestamps();
+			$table->timestamp('created_at')->nullable();
+			$table->timestamp('updated_at')->nullable();
 		});
 
 
-		// 1.1 Create enity_types table
+		// 1.2 Create enity_types table
 		// ---------------------------------------------------
 
 		Schema::create('entity_types', function($table) {
@@ -124,7 +126,8 @@ class CreateEntityTables extends Migration {
 			$table->integer('default_set_id')->default(0);
 			
 			// created_at and updated_at timestamps
-			$table->timestamps();
+			$table->timestamp('created_at')->nullable();
+			$table->timestamp('updated_at')->nullable();
 		});
 	}
 
@@ -139,8 +142,12 @@ class CreateEntityTables extends Migration {
 		// 1.0 Drop table enity_types
 
 		Schema::drop('entity_types');
-
+		
 		// 1.1 Drop table enities
+
+		Schema::drop('entities');
+
+		// 1.2 Drop table enities
 
 		Schema::drop('entities');
 	}

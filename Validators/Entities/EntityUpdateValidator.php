@@ -189,7 +189,7 @@ class EntityUpdateValidator extends Validator
 		foreach ($attributeSet->attributes as $attr)
 		{
 			$attribute = $this->attributeRepository->fetch($attr->id);
-			if (! isset($command->params['fields'][$attribute->code]) && ! is_null($command->params['fields'][$attribute->code]))
+			if ( ! array_key_exists($attribute->code, $command->params['fields']) )
 			{
 				continue;
 			}

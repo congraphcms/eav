@@ -249,6 +249,30 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->d->dump($result->toArray());
 	}
 
+	public function testUpdateSameCode()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$params = [
+			'code' => 'attribute1',
+			'admin_label' => 'changed',
+			'admin_notice' => 'changed_notice'
+		];
+		
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 1) );
+		
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue(is_int($result->id));
+		$this->assertEquals('attribute1', $result->code);
+		$this->assertEquals('changed', $result->admin_label);
+		$this->assertEquals('changed_notice', $result->admin_notice);
+
+		$this->d->dump($result->toArray());
+	}
+
 	/**
 	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
 	 */

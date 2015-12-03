@@ -52,7 +52,8 @@ class CreateAttributeSetTables extends Migration {
 			$table->string('name', 100)->default('');
 			
 			// created_at and updated_at timestamps
-			$table->timestamps();
+			$table->timestamp('created_at')->nullable();
+			$table->timestamp('updated_at')->nullable();
 		});
 
 

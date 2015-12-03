@@ -139,7 +139,7 @@ class AttributeCreateValidator extends Validator
 
 		try
 		{
-			$this->attributeManager->getFieldType($command->params);
+			$this->attributeManager->getFieldType($command->params['field_type']);
 		}
 		catch(InvalidArgumentException $e)
 		{
