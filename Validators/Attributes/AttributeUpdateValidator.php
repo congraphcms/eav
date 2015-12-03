@@ -146,6 +146,21 @@ class AttributeUpdateValidator extends Validator
 		$this->setValidator($validator);
 
 		$this->validateParams($command->params, null, true);
+
+		if( $this->exception->hasErrors() )
+		{
+			throw $this->exception;
+		}
+
+		try
+		{
+			$this->attributeManager->getFieldType($command->params);
+		}
+		catch(InvalidArgumentException $e)
+		{
+			$this->exception->addErrors(['field_type' => $e->getMessage()]);
+			throw $this->exception;
+		}
 		
 		$fieldValidator = $this->fieldValidatorFactory->make($attribute->field_type);
 

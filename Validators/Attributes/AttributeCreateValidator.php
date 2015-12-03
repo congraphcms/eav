@@ -15,7 +15,7 @@ use Cookbook\Eav\Managers\AttributeManager;
 use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Validation\Validator;
-
+use InvalidArgumentException;
 
 /**
  * AttributeCreateValidator class
@@ -131,6 +131,21 @@ class AttributeCreateValidator extends Validator
 		$this->setValidator($validator);
 
 		$this->validateParams($command->params, null, true);
+
+		if( $this->exception->hasErrors() )
+		{
+			throw $this->exception;
+		}
+
+		try
+		{
+			$this->attributeManager->getFieldType($command->params);
+		}
+		catch(InvalidArgumentException $e)
+		{
+			$this->exception->addErrors(['field_type' => $e->getMessage()]);
+			throw $this->exception;
+		}
 
 		$fieldValidator = $this->fieldValidatorFactory->make($command->params['field_type']);
 

@@ -87,7 +87,7 @@ class AttributeManager
 		// check if type exists
 		if(!array_key_exists($type, $this->availableFieldTypes))
 		{
-			throw new \InvalidArgumentException('No such field type as: "' . $type . '".');
+			throw new \InvalidArgumentException('No such field type as: \'' . $type . '\'.');
 		}
 
 		return $this->availableFieldTypes[$type];
