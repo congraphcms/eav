@@ -144,14 +144,22 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			throw new \Exception('Failed to insert attribute');
 		}
 
+		$optionParams = [];
 		// set relation to attribute in all options
 		for($i = 0; $i < count($options); $i++)
 		{
-			$options[$i]['attribute_id'] = $attribute->id;
+			$optionParam = [];
+			$optionParam['attribute_id'] = $attribute->id;
+			$optionParam['value'] = $options[$i]['value'];
+			$optionParam['label'] = $options[$i]['label'];
+			$optionParam['locale'] = (isset($options[$i]['locale']))?$options[$i]['locale']:0;
+			$optionParam['default'] = $options[$i]['default'];
+			$optionParam['sort_order'] = $i;
+			$optionParams[] = $optionParam;
 		}
 
 		// update all options for attribute
-		$this->updateOptions($options, $attribute);
+		$this->updateOptions($optionParams, $attribute);
 
 		$attribute = $this->fetch($attribute->id);
 
@@ -186,14 +194,26 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// remove options from model for update
 		unset($model['options']);
 
+		$optionParams = [];
 		// set relation to attribute in all options
 		for($i = 0; $i < count($options); $i++)
 		{
-			$options[$i]['attribute_id'] = $id;
+			$optionParam = [];
+			$optionParam['attribute_id'] = $attribute->id;
+			$optionParam['value'] = $options[$i]['value'];
+			$optionParam['label'] = $options[$i]['label'];
+			$optionParam['locale'] = (isset($options[$i]['locale']))?$options[$i]['locale']:0;
+			$optionParam['default'] = $options[$i]['default'];
+			$optionParam['sort_order'] = $i;
+			if( ! empty($options[$i]['id']) )
+			{
+				$optionParam['id'] = $options[$i]['id'];
+			}
+			$optionParams[] = $optionParam;
 		}
 
 		// update options
-		$this->updateOptions($options, $attribute);
+		$this->updateOptions($optionParams, $attribute);
 
 		// update attribute
 		$id = $this->updateAttribute($id, $model, $attribute);

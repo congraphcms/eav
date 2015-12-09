@@ -104,7 +104,7 @@ class AttributeSetCreateValidator extends Validator
 	public function validate(RepositoryCommand $command)
 	{
 
-		$validator = $this->newValidator($command->params, $this->rules);
+		$validator = $this->newValidator($command->params, $this->rules, true);
 
 		if( isset($command->params['attributes']) )
 		{

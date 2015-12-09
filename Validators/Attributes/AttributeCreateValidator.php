@@ -90,6 +90,7 @@ class AttributeCreateValidator extends Validator
 			'unique'				=> 'boolean',
 			'required'				=> 'boolean',
 			'filterable'			=> 'boolean',
+			'searchable'			=> 'boolean',
 			'data'					=> '',
 			'options'				=> 'sometimes|array'
 		];
@@ -99,8 +100,7 @@ class AttributeCreateValidator extends Validator
 			'locale' 				=> 'sometimes|integer',
 			'label'					=> 'required|max:250',
 			'value'					=> 'required|max:250',
-			'default'				=> 'boolean',
-			'sort_order' 			=> 'integer'
+			'default'				=> 'boolean'
 		];
 
 		parent::__construct();
@@ -122,7 +122,7 @@ class AttributeCreateValidator extends Validator
 	public function validate(RepositoryCommand $command)
 	{
 
-		$validator = $this->newValidator($command->params, $this->rules);
+		$validator = $this->newValidator($command->params, $this->rules, true);
 
 		if( isset($command->params['options']) )
 		{
@@ -139,11 +139,67 @@ class AttributeCreateValidator extends Validator
 
 		try
 		{
-			$this->attributeManager->getFieldType($command->params['field_type']);
+			$attributeSettings = $this->attributeManager->getFieldType($command->params['field_type']);
 		}
 		catch(InvalidArgumentException $e)
 		{
 			$this->exception->addErrors(['field_type' => $e->getMessage()]);
+			throw $this->exception;
+		}
+
+		if( ! $attributeSettings['has_options'] )
+		{
+			if( ! empty($params['options']) )
+			{
+				$this->exception->addErrors(['options' => 'This attribute type can\'t have options.']);
+			}
+			$params['options'] = [];
+		}
+
+		if( ! $attributeSettings['can_have_default_value'] )
+		{
+			if( isset($params['default_value']) && ! is_null($params['default_value']) )
+			{
+				$this->exception->addErrors(['default_value' => 'This attribute type can\'t have default value.']);
+			}
+			$params['default_value'] = null;
+		}
+
+		if( ! $attributeSettings['can_be_unique'] )
+		{
+			if( ! empty($params['unique']) )
+			{
+				$this->exception->addErrors(['unique' => 'This attribute type can\'t be unique.']);
+			}
+			$params['unique'] = 0;
+		}
+		if( ! $attributeSettings['can_be_localized'] )
+		{
+			if( ! empty($params['localized']) )
+			{
+				$this->exception->addErrors(['localized' => 'This attribute type can\'t be localized.']);
+			}
+			$params['localized'] = 0;
+		}
+		if( ! $attributeSettings['can_be_filter'] )
+		{
+			if( ! empty($params['filterable']) )
+			{
+				$this->exception->addErrors(['filterable' => 'This attribute type can\'t be filterable.']);
+			}
+			$params['filterable'] = 0;
+		}
+		if( ! $attributeSettings['can_be_searchable'] )
+		{
+			if( ! empty($params['searchable']) )
+			{
+				$this->exception->addErrors(['searchable' => 'This attribute type can\'t be searchable.']);
+			}
+			$params['searchable'] = 0;
+		}
+
+		if($this->exception->hasErrors())
+		{
 			throw $this->exception;
 		}
 

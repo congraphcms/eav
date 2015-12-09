@@ -167,6 +167,10 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				// give it a sort_order
 				$singleValueParams['sort_order'] = $sort_order++;
 				$this->db->table($this->table)->insert($singleValueParams);
+				if($attribute->searchable)
+				{
+					$this->db->table('attribute_values_fulltext')->insert($singleValueParams);
+				}
 			}
 		}
 		else
@@ -174,6 +178,10 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			$parsedValue = $this->parseValue($valueParams['value'], $attribute);
 			$valueParams['value'] = $parsedValue;
 			$this->db->table($this->table)->insert($valueParams);
+			if($attribute->searchable)
+			{
+				$this->db->table('attribute_values_fulltext')->insert($valueParams);
+			}
 		}
 	}
 
@@ -222,6 +230,10 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				// give it a sort_order
 				$singleValueParams['sort_order'] = $sort_order++;
 				$this->db->table($this->table)->insert($singleValueParams);
+				if($attribute->searchable)
+				{
+					$this->db->table('attribute_values_fulltext')->insert($singleValueParams);
+				}
 			}
 		}
 		else
@@ -229,6 +241,10 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			$parsedValue = $this->parseValue($valueParams['value'], $attribute);
 			$valueParams['value'] = $parsedValue;
 			$this->db->table($this->table)->insert($valueParams);
+			if($attribute->searchable)
+			{
+				$this->db->table('attribute_values_fulltext')->insert($singleValueParams);
+			}
 		}
 	}
 
@@ -247,6 +263,13 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				->where( 'attribute_id', '=', $attribute->id )
 				->where( 'entity_id', '=', $entity->id )
 				->delete();
+		if($attribute->searchable)
+		{
+			$this->db->table('attribute_values_fulltext')
+				->where( 'attribute_id', '=', $attribute->id )
+				->where( 'entity_id', '=', $entity->id )
+				->delete();
+		}
 	}
 
 	/**
@@ -266,6 +289,14 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				->where( 'entity_id', '=', $entity->id )
 				->where( 'locale_id', '=', $locale->id )
 				->delete();
+		if($attribute->searchable)
+		{
+			$this->db->table('attribute_values_fulltext')
+				->where( 'attribute_id', '=', $attribute->id )
+				->where( 'entity_id', '=', $entity->id )
+				->where( 'locale_id', '=', $locale->id )
+				->delete();
+		}
 	}
 
 	/**
@@ -284,6 +315,10 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	{
 		// delete all attribute values associated with provided attribute
 		$this->db->table($this->table)->where('attribute_id', '=', $attribute->id)->delete();
+		if($attribute->searchable)
+		{
+			$this->db->table('attribute_values_fulltext')->where( 'attribute_id', '=', $attribute->id )->delete();
+		}
 		
 		return true;
 	}
@@ -307,6 +342,10 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				->where('attribute_id', '=', $option->attribute_id)
 				->where('value', '=', $option->id)
 				->delete();
+		$this->db->table('attribute_values_fulltext')
+			->where('attribute_id', '=', $option->attribute_id)
+			->where('value', '=', $option->id)
+			->delete();
 	}
 
 	/**
@@ -327,6 +366,13 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				 ->where('attribute_id', '=', $attribute->id)
 				 ->where('attribute_set_id', '=', $attributeSet->id)
 				 ->delete();
+		if($attribute->searchable)
+		{
+			$this->db->table('attribute_values_fulltext')
+				->where('attribute_id', '=', $attribute->id)
+				->where('attribute_set_id', '=', $attributeSet->id)
+				->delete();
+		}
 		
 	}
 
@@ -348,6 +394,13 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				 ->where('attribute_id', '=', $attribute->id)
 				 ->where('entity_type_id', '=', $entityType->id)
 				 ->delete();
+		if($attribute->searchable)
+		{
+			$this->db->table('attribute_values_fulltext')
+				->where('attribute_id', '=', $attribute->id)
+				->where('entity_type_id', '=', $entityType->id)
+				->delete();
+		}
 	}
 	
 
@@ -364,26 +417,40 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	{
 		$code = $attribute->code;
 
-		$query = $query->join($this->table . ' as filter_' . $code, function($join) use($attribute, $filter)
-			{
-				$join->on('filter_' . $attribute->code . '.entity_id', '=', 'entities.id');
-				$join->on('filter_' . $attribute->code . '.attribute_id', '=', $this->db->raw($attribute->id));
-			}
-		);
+		if( is_array($filter) && array_key_exists('m', $filter))
+		{
+			$query = $query->join('attribute_values_fulltext as filter_' . $code, function($join) use($attribute, $filter)
+				{
+					$join->on('filter_' . $attribute->code . '.entity_id', '=', 'entities.id');
+					$join->on('filter_' . $attribute->code . '.attribute_id', '=', $this->db->raw($attribute->id));
+				}
+			);
+		}
+		else
+		{
+			$query = $query->join($this->table . ' as filter_' . $code, function($join) use($attribute, $filter)
+				{
+					$join->on('filter_' . $attribute->code . '.entity_id', '=', 'entities.id');
+					$join->on('filter_' . $attribute->code . '.attribute_id', '=', $this->db->raw($attribute->id));
+				}
+			);
+		}
+		
 
 		if( ! is_array($filter) )
 		{
 			$filter = $this->parseValue($filter, $attribute);
 			$query = $query->where('filter_' . $code . '.value', '=', $filter);
-			$query = $query->where('filter_' . $code . '.attribute_id', '=', $attribute->id);
-			if( ! is_null($locale) && $attribute->localized )
-			{
-				$query->where('filter_' . $code . '.locale_id', '=', $locale->id);
-			}
-			return $query;
+		}
+		else
+		{
+			$query = $this->parseFilterOperator($query, $attribute, $filter);
 		}
 
-		$query = $this->parseFilterOperator($query, $attribute, $filter);
+		if( ! is_null($locale) && $attribute->localized )
+		{
+			$query->where('filter_' . $code . '.locale_id', '=', $locale->id);
+		}
 
 		return $query;
 	}
@@ -431,6 +498,9 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 					break;
 				case 'nin':
 					$query = $query->whereNotIn('filter_' . $code . '.value', $value);
+					break;
+				case 'm':
+					$query = $query->whereRaw('MATCH (filter_' . $code . '.value) AGAINST (?)' , array($value));
 					break;
 				
 				default:

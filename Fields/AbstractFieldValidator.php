@@ -222,7 +222,7 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 			if( ! in_array('e', $this->availableFilterOperations) )
 			{
 				$e = new BadRequestException();
-				$e->setErrorKey('entities.filter.fields.' . $attribute->code);
+				$e->setErrorKey('filter.fields.' . $attribute->code);
 				$e->addErrors('Filter operation is not allowed.');
 
 				throw $e;
@@ -235,17 +235,30 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 			if( ! in_array($operation, $this->availableFilterOperations) )
 			{
 				$e = new BadRequestException();
-				$e->setErrorKey('entities.filter.fields.' . $attribute->code);
+				$e->setErrorKey('filter.fields.' . $attribute->code);
 				$e->addErrors('Filter operation is not allowed.');
 
 				throw $e;
 			}
 
-			if($operation == 'in' || $operation == 'nin')
+			if( $operation == 'm' && ! $attribute->searchable )
+			{
+				$e = new BadRequestException();
+				$e->setErrorKey('filter.fields.' . $attribute->code);
+				$e->addErrors('Filter operation is not allowed.');
+
+				throw $e;
+			}
+
+			if( $operation == 'in' || $operation == 'nin' )
 			{
 				if( ! is_array($value) )
 				{
 					$value = explode(',', strval($value));
+					foreach ($value as &$v)
+					{
+						$v = trim($v);
+					}
 				}
 			}
 		}

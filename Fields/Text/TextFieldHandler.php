@@ -33,7 +33,7 @@ class TextFieldHandler extends AbstractFieldHandler {
 	 *
 	 * @var array
 	 */
-	protected $table = 'attribute_values_varchar';
+	protected $table = 'attribute_values_text';
 	
 	/**
 	 * Parse value for database input

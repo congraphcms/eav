@@ -94,7 +94,7 @@ class EntityTypeCreateValidator extends Validator
 			throw $this->exception;
 		}
 
-		if( ! empty($command->params['localized']) )
+		if( empty($command->params['localized']) )
 		{
 			$command->params['localized_workflow'] = false;
 		}

@@ -53,9 +53,17 @@ class ClearDB extends Seeder {
 		{
 			DB::table('entities')->truncate();
 		}
+		if (Schema::hasTable('entity_statuses'))
+		{
+			DB::table('entity_statuses')->truncate();
+		}
 		if (Schema::hasTable('attribute_values_varchar'))
 		{
 			DB::table('attribute_values_varchar')->truncate();
+		}
+		if (Schema::hasTable('attribute_values_fulltext'))
+		{
+			DB::table('attribute_values_fulltext')->truncate();
 		}
 		if (Schema::hasTable('attribute_values_text'))
 		{

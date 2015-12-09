@@ -111,7 +111,7 @@ class AttributeSetUpdateValidator extends Validator
 	public function validate(RepositoryCommand $command)
 	{
 		$attributeSet = $this->attributeSetRepository->fetch($command->id);
-		
+		$command->params['id'] = $command->id;
 		$validator = $this->newValidator($command->params, $this->rules);
 
 		if( isset($command->params['attributes']) )

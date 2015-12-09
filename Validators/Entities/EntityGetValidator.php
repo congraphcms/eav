@@ -411,6 +411,12 @@ class EntityGetValidator extends Validator
 					continue;
 				}
 
+				if($field = 's')
+				{
+					$filter = strval($filter);
+					continue;
+				}
+
 
 				if( ! array_key_exists($field, $this->availableFilters) )
 				{

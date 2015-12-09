@@ -147,20 +147,17 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 				[
 					'value' => 'select_option1',
 					'label' => 'Option 1',
-					'default' => true,
-					'sort_order' => 0
-				],
-				[
-					'value' => 'select_option2',
-					'label' => 'Option 2',
-					'default' => 0,
-					'sort_order' => 2
+					'default' => true
 				],
 				[
 					'value' => 'select_option3',
 					'label' => 'Option 3',
-					'default' => 0,
-					'sort_order' => 1
+					'default' => 0
+				],
+				[
+					'value' => 'select_option2',
+					'label' => 'Option 2',
+					'default' => 0
 				]
 			]
 		];
@@ -168,7 +165,14 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+		try
+		{
+			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+		}
+		catch(ValidationException $e)
+		{
+			$this->d->dump($e->getErrors());
+		}
 
 		$this->d->dump($result->toArray());
 
@@ -193,21 +197,19 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 					'id' => 1,
 					'value' => 'option_changed',
 					'label' => 'Option Changed',
-					'default' => true,
-					'sort_order' => 0
+					'default' => true
 				],
 				[
 					'value' => 'option_new',
 					'label' => 'Option New',
-					'default' => false,
-					'sort_order' => 1
+					'default' => false
 				]
 			]
 		];
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 10) );
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 9) );
 		
 		$this->d->dump($result->toArray());
 
@@ -236,7 +238,6 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 			'locale' => 'en_US',
 			'fields' => [
 				'test_text_attribute' => 'test value',
-				'test_textarea_attribute' => 'test value for textarea',
 				'test_select_attribute' => 'option2'
 			]
 		];
@@ -249,7 +250,6 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test value', $result->fields->test_text_attribute);
-		$this->assertEquals('test value for textarea', $result->fields->test_textarea_attribute);
 		$this->assertEquals('option2', $result->fields->test_select_attribute);
 		$this->d->dump($result->toArray());
 	}
@@ -276,7 +276,6 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 		
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
-		$this->assertEquals('field text area value', $result->fields->test_textarea_attribute);
 		$this->assertEquals('option3', $result->fields->test_select_attribute);
 		$this->d->dump($result->toArray());
 	}
@@ -294,7 +293,6 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
-		$this->assertEquals('field text area value', $result->fields->test_textarea_attribute);
 		$this->assertEquals('option1', $result->fields->test_select_attribute);
 
 	}

@@ -47,45 +47,47 @@ return array(
 		 * Simple text input
 		 * 
 		 * Administration will render this input as HTML5 text input
-		 * values will be written as strings in attribute_values_varchar table
+		 * values will be written as strings in attribute_values_text table
 		 * 
 		 * It's an open field that can be required, unique, sortable and filterable
 		 */
 		'text' => array(
 			'label'						=> 'Text',
-			'table' 					=> 'attribute_values_varchar',
+			'table' 					=> 'attribute_values_text',
 			'handler'					=> 'Cookbook\Eav\Fields\Text\TextFieldHandler',
 			'validator'					=> 'Cookbook\Eav\Fields\Text\TextFieldValidator',
 			'handler_name'				=> 'TextFieldHandler',
 			'can_have_default_value'	=> true,
 			'can_be_unique'				=> true,
 			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> true,
 			'has_options'				=> false,
 			'has_multiple_values'		=> false,
 			'sortable'					=> true
 		),
 
-		/**
-		 * Simple text area
-		 * 
-		 * Administration will render this input as HTML5 text area
-		 * values will be written as strings in attribute_values_text table
-		 * 
-		 * It's an open field that can be required, unique, sortable and filterable
-		 */
-		'text_area' => array(
-			'label'						=> 'Text Area',
-			'table' 					=> 'attribute_values_text',
-			'handler'					=> 'Cookbook\Eav\Fields\Textarea\TextareaFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Textarea\TextareaFieldValidator',
-			'handler_name'				=> 'TextareaFieldHandler',
-			'can_have_default_value'	=> true,
-			'can_be_unique'				=> true,
-			'can_be_localized'			=> true,
-			'has_options'				=> false,
-			'has_multiple_values'		=> false,
-			'sortable'					=> true
-		),
+		// /**
+		//  * Simple text area
+		//  * 
+		//  * Administration will render this input as HTML5 text area
+		//  * values will be written as strings in attribute_values_text table
+		//  * 
+		//  * It's an open field that can be required, unique, sortable and filterable
+		//  */
+		// 'text_area' => array(
+		// 	'label'						=> 'Text Area',
+		// 	'table' 					=> 'attribute_values_text',
+		// 	'handler'					=> 'Cookbook\Eav\Fields\Textarea\TextareaFieldHandler',
+		// 	'validator'					=> 'Cookbook\Eav\Fields\Textarea\TextareaFieldValidator',
+		// 	'handler_name'				=> 'TextareaFieldHandler',
+		// 	'can_have_default_value'	=> true,
+		// 	'can_be_unique'				=> true,
+		// 	'can_be_localized'			=> true,
+		// 	'has_options'				=> false,
+		// 	'has_multiple_values'		=> false,
+		// 	'sortable'					=> true
+		// ),
 
 		/**
 		 * Select input
@@ -104,13 +106,11 @@ return array(
 			'validator'					=> 'Cookbook\Eav\Fields\Select\SelectFieldValidator',
 			'handler_name'				=> 'SelectFieldHandler',
 			'can_have_default_value'	=> false,
-			'can_be_required' 			=> true,
 			'can_be_unique'				=> false,
-			'can_be_filter'				=> true,
 			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
 			'has_options'				=> true,
-			'is_relation'				=> false,
-			'is_asset'					=> false,
 			'has_multiple_values'		=> false,
 			'sortable'					=> true
 		),
@@ -125,13 +125,11 @@ return array(
 			'validator'					=> 'Cookbook\Eav\Fields\Integer\IntegerFieldValidator',
 			'handler_name'				=> 'IntegerFieldHandler',
 			'can_have_default_value'	=> true,
-			'can_be_required' 			=> true,
 			'can_be_unique'				=> true,
-			'can_be_filter'				=> true,
 			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
 			'has_options'				=> false,
-			'is_relation'				=> false,
-			'is_asset'					=> false,
 			'has_multiple_values'		=> false,
 			'sortable'					=> true
 		),
@@ -146,13 +144,11 @@ return array(
 			'validator'					=> 'Cookbook\Eav\Fields\Decimal\DecimalFieldValidator',
 			'handler_name'				=> 'DecimalFieldHandler',
 			'can_have_default_value'	=> true,
-			'can_be_required' 			=> true,
 			'can_be_unique'				=> true,
-			'can_be_filter'				=> true,
 			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
 			'has_options'				=> false,
-			'is_relation'				=> false,
-			'is_asset'					=> false,
 			'has_multiple_values'		=> false,
 			'sortable'					=> true
 		),
@@ -166,14 +162,12 @@ return array(
 			'handler'					=> 'Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler',
 			'validator'					=> 'Cookbook\Eav\Fields\Datetime\DatetimeFieldValidator',
 			'handler_name'				=> 'DatetimeFieldHandler',
-			'can_have_default_value'	=> true,
-			'can_be_required' 			=> true,
+			'can_have_default_value'	=> false,
 			'can_be_unique'				=> true,
-			'can_be_filter'				=> true,
 			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
 			'has_options'				=> false,
-			'is_relation'				=> false,
-			'is_asset'					=> false,
 			'has_multiple_values'		=> false,
 			'sortable'					=> true
 		),
@@ -188,13 +182,11 @@ return array(
 			'validator'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldValidator',
 			'handler_name'				=> 'RelationFieldHandler',
 			'can_have_default_value'	=> false,
-			'can_be_required' 			=> true,
 			'can_be_unique'				=> false,
-			'can_be_filter'				=> true,
 			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
 			'has_options'				=> false,
-			'is_relation'				=> true,
-			'is_asset'					=> false,
 			'has_multiple_values'		=> false,
 			'sortable'					=> false
 		),
@@ -209,13 +201,11 @@ return array(
 			'validator'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldValidator',
 			'handler_name'				=> 'AssetFieldHandler',
 			'can_have_default_value'	=> false,
-			'can_be_required' 			=> true,
 			'can_be_unique'				=> false,
-			'can_be_filter'				=> true,
 			'can_be_localized'			=> true,
+			'can_be_filter'				=> false,
+			'can_be_searchable'			=> false,
 			'has_options'				=> false,
-			'is_relation'				=> false,
-			'is_asset'					=> true,
 			'has_multiple_values'		=> false,
 			'sortable'					=> false
 		),

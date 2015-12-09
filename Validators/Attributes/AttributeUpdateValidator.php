@@ -102,6 +102,7 @@ class AttributeUpdateValidator extends Validator
 			// 'unique'				=> 'boolean',
 			'required'				=> 'sometimes|boolean',
 			'filterable'			=> 'sometimes|boolean',
+			// 'searchable'			=> 'sometimes|boolean',
 			'data'					=> 'sometimes',
 			'options'				=> 'sometimes|array',
 			'translations'			=> 'sometimes|array'
@@ -137,11 +138,21 @@ class AttributeUpdateValidator extends Validator
 	{
 		$attribute = $this->attributeRepository->fetch($command->id);
 
+		$attributeSettings = $this->attributeManager->getFieldType($attribute->field_type);
+
 		$command->params['id'] = $command->id;
 
-		$validator = $this->newValidator($command->params, $this->rules);
+		$validator = $this->newValidator($command->params, $this->rules, true);
 
-		if( isset($command->params['options']) )
+		if( ! $attributeSettings['has_options'] )
+		{
+			if( ! empty($params['options']) )
+			{
+				$this->exception->addErrors(['options' => 'This attribute type can\'t have options.']);
+			}
+		}
+
+		if( isset($command->params['options']) && $attributeSettings['has_options'] )
 		{
 			$validator->each('options', $this->optionRules);
 		}
@@ -152,6 +163,23 @@ class AttributeUpdateValidator extends Validator
 		if( $this->exception->hasErrors() )
 		{
 			throw $this->exception;
+		}
+
+		if( ! $attributeSettings['can_have_default_value'] )
+		{
+			if( isset($params['default_value']) && ! is_null($params['default_value']) )
+			{
+				$this->exception->addErrors(['default_value' => 'This attribute type can\'t have default value.']);
+			}
+		}
+
+		if( ! $attributeSettings['can_be_filter'] )
+		{
+			if( ! empty($params['filterable']) )
+			{
+				$this->exception->addErrors(['filterable' => 'This attribute type can\'t be filterable.']);
+			}
+			$params['filterable'] = 0;
 		}
 		
 		$fieldValidator = $this->fieldValidatorFactory->make($attribute->field_type);
@@ -170,5 +198,6 @@ class AttributeUpdateValidator extends Validator
 		{
 			throw $this->exception;
 		}
+
 	}
 }

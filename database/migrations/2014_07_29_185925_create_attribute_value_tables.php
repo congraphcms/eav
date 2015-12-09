@@ -149,11 +149,10 @@ class CreateAttributeValueTables extends Migration {
 			$table->text('value')->nullable();
 		});
 
-
-		// 1.4 Create attribute_values_varchar table
+		// 1.4 Create attribute_values_fulltext table
 		// ---------------------------------------------------
 
-		Schema::create('attribute_values_varchar', function($table) {
+		Schema::create('attribute_values_fulltext', function($table) {
 
 			// primary key, autoincrement
 			$table->increments('id');
@@ -175,64 +174,95 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
-			$table->string('value')->nullable();
+			$table->text('value');
 		});
 
-		// 1.5 Create attribute_values_relations table
-		// ---------------------------------------------------
+		DB::statement('ALTER TABLE attribute_values_fulltext ADD FULLTEXT(value)');
 
-		Schema::create('attribute_values_relations', function($table) {
 
-			// primary key, autoincrement
-			$table->increments('id');
+		// // 1.4 Create attribute_values_varchar table
+		// // ---------------------------------------------------
 
-			// relations
+		// Schema::create('attribute_values_varchar', function($table) {
+
+		// 	// primary key, autoincrement
+		// 	$table->increments('id');
+
+		// 	// relations
 			
-			// Attribute ID
-			$table->integer('attribute_id');
-			// Entity ID
-			$table->integer('entity_id');
-			// Entity type ID
-			$table->integer('entity_type_id');
-			// Attribute Set ID
-			$table->integer('attribute_set_id');
-			// Language ID
-			$table->integer('locale_id');
+		// 	// Attribute ID
+		// 	$table->integer('attribute_id');
+		// 	// Entity ID
+		// 	$table->integer('entity_id');
+		// 	// Entity type ID
+		// 	$table->integer('entity_type_id');
+		// 	// Attribute Set ID
+		// 	$table->integer('attribute_set_id');
+		// 	// Language ID
+		// 	$table->integer('locale_id');
 
-			// Sort order
-			$table->integer('sort_order')->nullable()->default(0);
+		// 	// Sort order
+		// 	$table->integer('sort_order')->nullable()->default(0);
 
-			// Attribute value
-			$table->integer('value')->nullable();
-		});
+		// 	// Attribute value
+		// 	$table->string('value')->nullable();
+		// });
 
-		// 1.6 Create attribute_values_assets table
-		// ---------------------------------------------------
+		// // 1.5 Create attribute_values_relations table
+		// // ---------------------------------------------------
 
-		Schema::create('attribute_values_assets', function($table) {
+		// Schema::create('attribute_values_relations', function($table) {
 
-			// primary key, autoincrement
-			$table->increments('id');
+		// 	// primary key, autoincrement
+		// 	$table->increments('id');
 
-			// relations
+		// 	// relations
 			
-			// Attribute ID
-			$table->integer('attribute_id');
-			// Entity ID
-			$table->integer('entity_id');
-			// Entity type ID
-			$table->integer('entity_type_id');
-			// Attribute Set ID
-			$table->integer('attribute_set_id');
-			// Language ID
-			$table->integer('locale_id');
+		// 	// Attribute ID
+		// 	$table->integer('attribute_id');
+		// 	// Entity ID
+		// 	$table->integer('entity_id');
+		// 	// Entity type ID
+		// 	$table->integer('entity_type_id');
+		// 	// Attribute Set ID
+		// 	$table->integer('attribute_set_id');
+		// 	// Language ID
+		// 	$table->integer('locale_id');
 
-			// Sort order
-			$table->integer('sort_order')->nullable()->default(0);
+		// 	// Sort order
+		// 	$table->integer('sort_order')->nullable()->default(0);
 
-			// Attribute value
-			$table->integer('value')->nullable();
-		});
+		// 	// Attribute value
+		// 	$table->integer('value')->nullable();
+		// });
+
+		// // 1.6 Create attribute_values_assets table
+		// // ---------------------------------------------------
+
+		// Schema::create('attribute_values_assets', function($table) {
+
+		// 	// primary key, autoincrement
+		// 	$table->increments('id');
+
+		// 	// relations
+			
+		// 	// Attribute ID
+		// 	$table->integer('attribute_id');
+		// 	// Entity ID
+		// 	$table->integer('entity_id');
+		// 	// Entity type ID
+		// 	$table->integer('entity_type_id');
+		// 	// Attribute Set ID
+		// 	$table->integer('attribute_set_id');
+		// 	// Language ID
+		// 	$table->integer('locale_id');
+
+		// 	// Sort order
+		// 	$table->integer('sort_order')->nullable()->default(0);
+
+		// 	// Attribute value
+		// 	$table->integer('value')->nullable();
+		// });
 	}
 
 	/**

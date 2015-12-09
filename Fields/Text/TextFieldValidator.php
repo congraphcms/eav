@@ -31,14 +31,14 @@ class TextFieldValidator extends AbstractFieldValidator
 	 *
 	 * @var array
 	 */
-	protected $availableFilterOperations = ['e', 'ne', 'in', 'nin'];
+	protected $availableFilterOperations = ['e', 'ne', 'in', 'nin', 'm'];
 
 	/**
 	 * DB table for SQL
 	 *
 	 * @var array
 	 */
-	protected $table = 'attribute_values_varchar';
+	protected $table = 'attribute_values_text';
 
 
 }

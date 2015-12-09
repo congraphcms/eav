@@ -93,7 +93,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'attribute1',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => false,
 				'default_value' => '',
 				'unique' => false,
@@ -106,7 +106,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'attribute2',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => false,
 				'default_value' => null,
 				'unique' => false,
@@ -119,7 +119,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'attribute3',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => true,
 				'default_value' => null,
 				'unique' => true,
@@ -132,7 +132,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'attribute4',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => false,
 				'default_value' => null,
 				'unique' => false,
@@ -145,7 +145,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'attribute5',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => false,
 				'default_value' => '123',
 				'unique' => false,
@@ -158,7 +158,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'attribute6',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => false,
 				'default_value' => null,
 				'unique' => false,
@@ -171,7 +171,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'attribute7',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => false,
 				'default_value' => null,
 				'unique' => false,
@@ -184,19 +184,6 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'test_text_attribute',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
-				'localized' => false,
-				'default_value' => null,
-				'unique' => false,
-				'required' => false,
-				'filterable' => true,
-				'status' => 'user_defined',
-				'created_at' => date("Y-m-d H:i:s"),
-				'updated_at' => date("Y-m-d H:i:s")
-			],
-			[
-				'code' => 'test_textarea_attribute',
-				'field_type' => 'text_area',
 				'table' => 'attribute_values_text',
 				'localized' => false,
 				'default_value' => null,
@@ -207,6 +194,19 @@ class EavDbSeeder extends Seeder {
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
+			// [
+			// 	'code' => 'test_textarea_attribute',
+			// 	'field_type' => 'text_area',
+			// 	'table' => 'attribute_values_text',
+			// 	'localized' => false,
+			// 	'default_value' => null,
+			// 	'unique' => false,
+			// 	'required' => false,
+			// 	'filterable' => true,
+			// 	'status' => 'user_defined',
+			// 	'created_at' => date("Y-m-d H:i:s"),
+			// 	'updated_at' => date("Y-m-d H:i:s")
+			// ],
 			[
 				'code' => 'test_select_attribute',
 				'field_type' => 'select',
@@ -294,7 +294,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'value' => 'option1',
 				'label' => 'Option 1',
-				'attribute_id' => 10,
+				'attribute_id' => 9,
 				'default' => 0,
 				'locale' => 0,
 				'sort_order' => 0
@@ -302,7 +302,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'value' => 'option2',
 				'label' => 'Option 2',
-				'attribute_id' => 10,
+				'attribute_id' => 9,
 				'default' => 1,
 				'locale' => 0,
 				'sort_order' => 1
@@ -310,7 +310,7 @@ class EavDbSeeder extends Seeder {
 			[
 				'value' => 'option3',
 				'label' => 'Option 3',
-				'attribute_id' => 10,
+				'attribute_id' => 9,
 				'default' => 0,
 				'locale' => 0,
 				'sort_order' => 2
@@ -427,11 +427,11 @@ class EavDbSeeder extends Seeder {
 				'attribute_id' => 14,
 				'sort_order' => 6
 			],
-			[
-				'attribute_set_id' => 4,
-				'attribute_id' => 15,
-				'sort_order' => 7
-			]
+			// [
+			// 	'attribute_set_id' => 4,
+			// 	'attribute_id' => 15,
+			// 	'sort_order' => 7
+			// ]
 		]);
 
 		DB::table('entities')->truncate();
@@ -462,8 +462,102 @@ class EavDbSeeder extends Seeder {
 			]
 		]);
 
-		DB::table('attribute_values_varchar')->truncate();
-		DB::table('attribute_values_varchar')->insert([
+		// DB::table('attribute_values_varchar')->truncate();
+		// DB::table('attribute_values_varchar')->insert([
+		// 	[
+		// 		'entity_id' => 1,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 1,
+		// 		'attribute_id' => 1,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value1',
+		// 	],
+		// 	[
+		// 		'entity_id' => 1,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 1,
+		// 		'attribute_id' => 2,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value2',
+		// 	],
+		// 	[
+		// 		'entity_id' => 1,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 1,
+		// 		'attribute_id' => 3,
+		// 		'locale_id' => 1,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value3-en',
+		// 	],
+		// 	[
+		// 		'entity_id' => 1,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 1,
+		// 		'attribute_id' => 3,
+		// 		'locale_id' => 2,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value3-fr',
+		// 	],
+		// 	[
+		// 		'entity_id' => 2,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 1,
+		// 		'attribute_id' => 1,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value12',
+		// 	],
+		// 	[
+		// 		'entity_id' => 2,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 1,
+		// 		'attribute_id' => 2,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value22',
+		// 	],
+		// 	[
+		// 		'entity_id' => 2,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 1,
+		// 		'attribute_id' => 3,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value32',
+		// 	],
+		// 	[
+		// 		'entity_id' => 3,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 2,
+		// 		'attribute_id' => 3,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value3',
+		// 	],
+		// 	[
+		// 		'entity_id' => 3,
+		// 		'entity_type_id' => 1,
+		// 		'attribute_set_id' => 2,
+		// 		'attribute_id' => 4,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 'value4',
+		// 	],
+		// 	[
+		// 		'entity_id' => 4,
+		// 		'entity_type_id' => 4,
+		// 		'attribute_set_id' => 4,
+		// 		'attribute_id' => 8,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 'field text value',
+		// 	]
+		// ]);
+		
+		DB::table('attribute_values_text')->truncate();
+		DB::table('attribute_values_text')->insert([
 			[
 				'entity_id' => 1,
 				'entity_type_id' => 1,
@@ -555,19 +649,6 @@ class EavDbSeeder extends Seeder {
 				'value' => 'field text value',
 			]
 		]);
-		
-		DB::table('attribute_values_text')->truncate();
-		DB::table('attribute_values_text')->insert([
-			[
-				'entity_id' => 4,
-				'entity_type_id' => 4,
-				'attribute_set_id' => 4,
-				'attribute_id' => 9,
-				'locale_id' => 0,
-				'sort_order' => 0,
-				'value' => 'field text area value',
-			]
-		]);
 
 		DB::table('attribute_values_integer')->truncate();
 		DB::table('attribute_values_integer')->insert([
@@ -575,7 +656,7 @@ class EavDbSeeder extends Seeder {
 				'entity_id' => 4,
 				'entity_type_id' => 4,
 				'attribute_set_id' => 4,
-				'attribute_id' => 10,
+				'attribute_id' => 9,
 				'locale_id' => 0,
 				'sort_order' => 0,
 				'value' => 1,
@@ -584,7 +665,7 @@ class EavDbSeeder extends Seeder {
 				'entity_id' => 4,
 				'entity_type_id' => 4,
 				'attribute_set_id' => 4,
-				'attribute_id' => 11,
+				'attribute_id' => 10,
 				'locale_id' => 0,
 				'sort_order' => 0,
 				'value' => 11,
@@ -597,6 +678,15 @@ class EavDbSeeder extends Seeder {
 				'locale_id' => 0,
 				'sort_order' => 0,
 				'value' => 1,
+			],
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 13,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 1,
 			]
 		]);
 
@@ -606,7 +696,7 @@ class EavDbSeeder extends Seeder {
 				'entity_id' => 4,
 				'entity_type_id' => 4,
 				'attribute_set_id' => 4,
-				'attribute_id' => 12,
+				'attribute_id' => 11,
 				'locale_id' => 0,
 				'sort_order' => 0,
 				'value' => 11.1,
@@ -619,7 +709,7 @@ class EavDbSeeder extends Seeder {
 				'entity_id' => 4,
 				'entity_type_id' => 4,
 				'attribute_set_id' => 4,
-				'attribute_id' => 13,
+				'attribute_id' => 12,
 				'locale_id' => 0,
 				'sort_order' => 0,
 				'value' => Carbon::now()->toDateTimeString(),

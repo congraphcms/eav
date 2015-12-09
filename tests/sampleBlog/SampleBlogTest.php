@@ -6,11 +6,7 @@ use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
-require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
-require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
-require_once(__DIR__ . '/../database/seeders/WorkflowDbSeeder.php');
-require_once(__DIR__ . '/../database/seeders/SampleBlogSeeder.php');
+require_once(__DIR__ . '/../database/seeders/SampleBlogCommandSeeder.php');
 require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class SampleBlogTest extends Orchestra\Testbench\TestCase
@@ -44,12 +40,12 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Workflows/database/migrations'),
 		]);
 
-		$this->artisan('db:seed', [
-			'--class' => 'WorkflowDbSeeder'
-		]);
+		// $this->artisan('db:seed', [
+		// 	'--class' => 'WorkflowDbSeeder'
+		// ]);
 
 		$this->artisan('db:seed', [
-			'--class' => 'SampleBlogSeeder'
+			'--class' => 'SampleBlogCommandSeeder'
 		]);
 
 		
@@ -127,16 +123,79 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 		];
 	}
 
-	public function testGetAttributes()
+	// public function testSeeder()
+	// {
+	// 	fwrite(STDOUT, __METHOD__ . "\n");
+
+	// 	$app = $this->createApplication();
+	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		
+	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand([]));
+		
+		
+	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertEquals(3, count($result));
+	// 	$this->d->dump($result->toArray());
+
+	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
+		
+		
+	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertEquals(8, count($result));
+	// 	$this->d->dump($result->toArray());
+
+	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand([]));
+		
+		
+	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertEquals(3, count($result));
+	// 	$this->d->dump($result->toArray());
+
+	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand([]));
+		
+		
+	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertEquals(4, count($result));
+	// 	$this->d->dump($result->toArray());
+
+		
+	// }
+
+	public function testFullTextFieldSearch()
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
-
-
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
 
+		$params = [
+			'filter' => [
+				'fields.title' => [
+					'm' => 'strana',
+					'in' => 'Pocetna strana, Kontakt strana'
+				]
+			],
+			'locale' => 'sr_RS'
+		];
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand($params));
+		
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+		$this->d->dump($result->toArray());
+	}
+
+	public function testFullTextSearch()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$params = [
+			'filter' => [
+				's' => 'strana'
+			],
+			'locale' => 'sr_RS'
+		];
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand($params));
+		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->d->dump($result->toArray());
 	}

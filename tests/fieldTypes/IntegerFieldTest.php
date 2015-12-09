@@ -169,7 +169,7 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 		
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 11) );
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 10) );
 		
 		$this->d->dump($result->toArray());
 
@@ -189,7 +189,6 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 			'locale' => 'en_US',
 			'fields' => [
 				'test_text_attribute' => 'test value',
-				'test_textarea_attribute' => 'test value for textarea',
 				'test_select_attribute' => 'option2',
 				'test_integer_attribute' => 123
 			]
@@ -203,7 +202,6 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test value', $result->fields->test_text_attribute);
-		$this->assertEquals('test value for textarea', $result->fields->test_textarea_attribute);
 		$this->assertEquals('option2', $result->fields->test_select_attribute);
 		$this->assertEquals(123, $result->fields->test_integer_attribute);
 		$this->d->dump($result->toArray());
@@ -231,7 +229,6 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 		
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
-		$this->assertEquals('field text area value', $result->fields->test_textarea_attribute);
 		$this->assertEquals('option1', $result->fields->test_select_attribute);
 		$this->assertEquals(987, $result->fields->test_integer_attribute);
 		$this->d->dump($result->toArray());
@@ -250,7 +247,6 @@ class IntegerFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
-		$this->assertEquals('field text area value', $result->fields->test_textarea_attribute);
 		$this->assertEquals('option1', $result->fields->test_select_attribute);
 		$this->assertEquals(11, $result->fields->test_integer_attribute);
 

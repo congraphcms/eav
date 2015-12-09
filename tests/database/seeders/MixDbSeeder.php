@@ -93,7 +93,7 @@ class MixDbSeeder extends Seeder {
 			[
 				'code' => 'localized_text',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => true,
 				'default_value' => '123',
 				'unique' => false,
@@ -106,7 +106,7 @@ class MixDbSeeder extends Seeder {
 			[
 				'code' => 'simple_text',
 				'field_type' => 'text',
-				'table' => 'attribute_values_varchar',
+				'table' => 'attribute_values_text',
 				'localized' => false,
 				'default_value' => null,
 				'unique' => false,
@@ -367,8 +367,8 @@ class MixDbSeeder extends Seeder {
 			],
 		]);
 
-		DB::table('attribute_values_varchar')->truncate();
-		DB::table('attribute_values_varchar')->insert([
+		DB::table('attribute_values_text')->truncate();
+		DB::table('attribute_values_text')->insert([
 			[
 				'entity_id' => 1,
 				'entity_type_id' => 1,

@@ -68,7 +68,10 @@ class CreateAttributeTables extends Migration {
 			$table->boolean('required')->default(0);
 
 			// flag if entities will be filterable by this attribute
-			$table->boolean('filterable')->default(0);
+			$table->boolean('filterable')->default(1);
+
+			// flag if entities will be searchable (FullText Search) by this attribute
+			$table->boolean('searchable')->default(0);
 
 			// attribute status ('user-defined', 'admin', 'required', 'locked'...)
 			$table->string('status', 100)->default('user_defined');

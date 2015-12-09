@@ -87,17 +87,18 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		{
 			throw new \Exception('Failed to insert attribute set.');
 		}
-
+		$setAttributeParams = [];
 		// set relation to attribute set in all groups
 		for($i = 0; $i < count($attributes); $i++)
 		{
-			$attributes[$i]['attribute_id'] = $attributes[$i]['id'];
-			unset($attributes[$i]['id']);
-			$attributes[$i]['attribute_set_id'] = $attributeSetId;
-			$attributes[$i]['sort_order'] = $i;
+			$setAttributeParam = [];
+			$setAttributeParam['attribute_id'] = $attributes[$i]['id'];
+			$setAttributeParam['attribute_set_id'] = $attributeSetId;
+			$setAttributeParam['sort_order'] = $i;
+			$setAttributeParams[] = $setAttributeParam;
 		}
 
-		$this->insertSetAttributes($attributes);
+		$this->insertSetAttributes($setAttributeParams);
 
 		$attributeSet = $this->fetch($attributeSetId);
 
@@ -134,18 +135,19 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 		if( $attributes !== null)
 		{
-			// set relation to attribute set in all attributes
+			$setAttributeParams = [];
+			// set relation to attribute set in all groups
 			for($i = 0; $i < count($attributes); $i++)
 			{
-				$attributes[$i]['attribute_id'] = $attributes[$i]['id'];
-				unset($attributes[$i]['id']);
-				unset($attributes[$i]['type']);
-				$attributes[$i]['attribute_set_id'] = $attributeSetId;
-				$attributes[$i]['sort_order'] = $i;
+				$setAttributeParam = [];
+				$setAttributeParam['attribute_id'] = $attributes[$i]['id'];
+				$setAttributeParam['attribute_set_id'] = $attributeSetId;
+				$setAttributeParam['sort_order'] = $i;
+				$setAttributeParams[] = $setAttributeParam;
 			}
 
 			$this->deleteSetAttributes($attributeSetId);
-			$this->insertSetAttributes($attributes);
+			$this->insertSetAttributes($setAttributeParams);
 		}
 		
 		Trunk::forgetType('attribute-set');

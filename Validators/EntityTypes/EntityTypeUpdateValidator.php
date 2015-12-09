@@ -83,7 +83,7 @@ class EntityTypeUpdateValidator extends Validator
 	public function validate(RepositoryCommand $command)
 	{
 		$entityType = $this->entityTypeRepository->fetch($command->id);
-
+		$command->params['id'] = $command->id;
 		if(isset($command->params['default_point']))
 		{
 			$this->rules['default_point.id'] = ['required', 'exists:workflow_points,id'];

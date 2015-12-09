@@ -149,7 +149,7 @@ class EntityUpdateValidator extends Validator
 		$locale_id = (!empty($command->params['locale']))?$command->params['locale']:null;
 
 		$entity = $this->entityRepository->fetch($command->id, [], $locale_id);
-
+		$command->params['id'] = $command->id;
 		if( ! empty($locale_id) )
 		{
 			try
