@@ -35,16 +35,16 @@ use stdClass;
  *
  * Repository for entity database queries
  *
- * @uses   		Illuminate\Database\Connection
- * @uses   		Cookbook\Core\Repository\AbstractRepository
- * @uses   		Cookbook\Contracts\Eav\AttributeHandlerFactoryContract
- * @uses   		Cookbook\Eav\Managers\AttributeManager
+ * @uses        Illuminate\Database\Connection
+ * @uses        Cookbook\Core\Repository\AbstractRepository
+ * @uses        Cookbook\Contracts\Eav\AttributeHandlerFactoryContract
+ * @uses        Cookbook\Eav\Managers\AttributeManager
  *
- * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
- * @since 		0.1.0-alpha
- * @version  	0.1.0-alpha
+ * @author      Nikola Plavšić <nikolaplavsic@gmail.com>
+ * @copyright   Nikola Plavšić <nikolaplavsic@gmail.com>
+ * @package     cookbook/eav
+ * @since       0.1.0-alpha
+ * @version     0.1.0-alpha
  */
 class EntityRepository extends AbstractRepository implements EntityRepositoryContract//, UsesCache
 {
@@ -757,7 +757,21 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         }
 
         $query =  $this->db->table('entities')
-                        ->select(
+                        
+                        ->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id');
+        
+        $query = $this->parseFilters($query, $filter, $locale);
+
+        if (! empty($status)) {
+            $query = $this->filterStatus($query, $status, $locale_ids);
+        }
+
+        $total = $query->select($this->db->raw('count(DISTINCT entities.id) as count'));
+        $total = $query->get();
+        $total = $total[0]->count;
+
+        $query->groupBy('entities.id');
+        $query->select(
                             'entities.id as id',
                             'entities.entity_type_id as entity_type_id',
                             'entities.attribute_set_id as attribute_set_id',
@@ -768,22 +782,13 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                             $this->db->raw('"entity" as type'),
                             'entities.created_at as created_at',
                             'entities.updated_at as updated_at'
-                        )
-                        ->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id');
-        
-        $query = $this->parseFilters($query, $filter, $locale);
-
-        $query->groupBy('entities.id');
-
-        $total = $query->count();
+                        );
 
         $query = $this->parsePaging($query, $offset, $limit);
 
         $query = $this->parseSorting($query, $sort);
 
-        if (! empty($status)) {
-            $query = $this->filterStatus($query, $status, $locale_ids);
-        }
+        
 
         $entities = $query->get();
 
@@ -1283,7 +1288,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
     
     // protected function getValuesVarchar($entityIds, $locale = null)
     // {
-    // 	return $this->getValues('attribute_values_varchar', $entityIds, $locale);
+    //  return $this->getValues('attribute_values_varchar', $entityIds, $locale);
     // }
     
     protected function getValues($table, $entityIds, $locale = null)
