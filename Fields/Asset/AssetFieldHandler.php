@@ -75,6 +75,49 @@ class AssetFieldHandler extends AbstractFieldHandler {
 	}
 
 	/**
+	 * Insert value to database
+	 * 
+	 * Takes attribute value params and attribute definition
+	 * 
+	 * @param array $valueParams
+	 * @param object $attribute
+	 * 
+	 * @return boolean
+	 */
+	public function insert($valueParams, $attribute)
+	{
+		parent::insert($valueParams, $attribute);
+
+		// check if file is an image and create appropriate versions
+		
+		// get file/files
+		// check their type
+		// if type is image
+		//  - get needed versions from config
+		//  - check which versions already exist
+		//  - make versions that don't exist
+
+	}
+
+
+	/**
+	 * Update value in database
+	 * 
+	 * Takes attribute value params and attribute definition
+	 * 
+	 * @param array $valueParams
+	 * @param object $attribute
+	 * 
+	 * @return boolean
+	 */
+	public function update($valueParams, $attribute)
+	{
+		parent::update($valueParams, $attribute);
+
+		// check if file is an image and create appropriate versions
+	}
+
+	/**
 	 * Handle File Delete
 	 * 
 	 * @return void
