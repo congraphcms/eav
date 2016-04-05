@@ -162,6 +162,7 @@ class EntityGetValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
+
 		if( isset($command->params['locale']) )
 		{
 			try
@@ -371,11 +372,6 @@ class EntityGetValidator extends Validator
 		{
 			$this->validateSorting($command->params['sort']);
 		}
-		
-		// if( ! empty($command->params['include']) )
-		// {
-		// 	$this->validateInclude($command->params['include']);
-		// }
 	}
 
 	protected function validateFilters(&$filters)
@@ -398,6 +394,7 @@ class EntityGetValidator extends Validator
 					throw $e;
  				}
 			}
+
 			$fieldFilters = [];
 			foreach ($filters as $field => &$filter)
 			{
@@ -427,6 +424,8 @@ class EntityGetValidator extends Validator
 					throw $e;
 				}
 
+
+
 				if( ! is_array($filter) )
 				{
 					if( ! in_array('e', $this->availableFilters[$field]) )
@@ -441,7 +440,10 @@ class EntityGetValidator extends Validator
 					continue;
 				}
 
-				foreach ($filter as $operation => &$value) {
+
+
+				foreach ($filter as $operation => &$value)
+				{
 					if( ! in_array($operation, $this->availableFilters[$field]) )
 					{
 						$e = new BadRequestException();
@@ -482,7 +484,7 @@ class EntityGetValidator extends Validator
 					$attributeCodes[] = $attribute->code;
 				}
 
-				foreach ($fieldFilters as $code => $filter)
+				foreach ($fieldFilters as $code => $f)
 				{
 					if( ! in_array($code, $attributeCodes) )
 					{
@@ -494,6 +496,7 @@ class EntityGetValidator extends Validator
 					}
 				}
 			}
+			
 
 			return;
 		}
