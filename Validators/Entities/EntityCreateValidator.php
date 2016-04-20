@@ -298,7 +298,18 @@ class EntityCreateValidator extends Validator
 			}
 			else
 			{
-				$default_value = $attribute->default_value;
+				if($attributeSettings['has_multiple_values'])
+				{
+					$default_value = [];
+					if( !! $attribute->default_value )
+					{
+						$default_value[] = $attribute->default_value;
+					}
+				}
+				else
+				{
+					$default_value = $attribute->default_value;
+				}
 			}
 
 			if (! isset($command->params['fields'][$attribute->code]) )
@@ -398,7 +409,7 @@ class EntityCreateValidator extends Validator
 					foreach ($value as $v)
 					{
 						try {
-							$fieldValidator->validateValue($value, $attribute);
+							$fieldValidator->validateValue($v, $attribute);
 						} catch (ValidationException $e) {
 							$this->exception->setErrorKey('entity.fields.' . $attribute->code);
 							$this->exception->addErrors($e->getErrors());
