@@ -84,6 +84,7 @@ class AttributeSetUpdateValidator extends Validator
 		$this->rules = [
 			'code'					=> 'sometimes|required|unique:attribute_sets,code',
 			'name'					=> '',
+			'primary_attribute_id'	=> 'sometimes|exists:attributes,id',
 			'attributes'			=> 'sometimes|array'
 		];
 
@@ -127,14 +128,13 @@ class AttributeSetUpdateValidator extends Validator
 			throw $this->exception;
 		}
 
+		$primaryAttributeId = (isset($command->params['primary_attribute_id']))?$command->params['primary_attribute_id']:$attributeSet->primary_attribute_id;
+
+		$invalidPrimaryAttribute = true;
+
 		if( ! empty($command->params['attributes']) )
 		{
 			$entityType = $this->entityTypeRepository->fetch($attributeSet->entity_type_id);
-
-			if($entityType->localized)
-			{
-				return;
-			}
 
 			$attributeIds = [];
 			foreach ($command->params['attributes'] as $key => $value)
@@ -149,19 +149,40 @@ class AttributeSetUpdateValidator extends Validator
 					continue;
 				}
 				$attributeIds[$key] = $value['id'];
+
+				if($value['id'] == $primaryAttributeId)
+				{
+					$invalidPrimaryAttribute = false;
+				}
 			}
 
 			$attributes = $this->attributeRepository->get(['id' => ['in' => $attributeIds]]);
 
 			foreach ($attributes as $attribute)
 			{
-				if($attribute->localized)
+				if( $attribute->localized && ! $entityType->localized )
 				{
 					$key = array_search($attribute->id, $attributeIds);
 					$this->exception->setErrorKey('attribute-set.attributes.' . $key);
 					$this->exception->addErrors('Can\'t add localized attribute to entity type that isn\'t localized');
 				}
 			}
+		}
+		else
+		{
+			foreach ($attributeSet->attributes as $key => $value)
+			{
+				if($value->id == $primaryAttributeId)
+				{
+					$invalidPrimaryAttribute = false;
+				}
+			}
+		}
+
+		if($invalidPrimaryAttribute)
+		{
+			$this->exception->setErrorKey('attribute-set.primary_attribute_id');
+			$this->exception->addErrors('Invalid primary attribute chosen');
 		}
 		
 		if( $this->exception->hasErrors() )

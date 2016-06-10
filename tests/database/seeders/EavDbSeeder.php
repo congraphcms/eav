@@ -325,6 +325,7 @@ class EavDbSeeder extends Seeder {
 				'code' => 'attribute_set1',
 				'name' => 'Attribute Set 1',
 				'entity_type_id' => 1,
+				'primary_attribute_id' => 1,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -332,6 +333,7 @@ class EavDbSeeder extends Seeder {
 				'code' => 'attribute_set2',
 				'name' => 'Attribute Set 2',
 				'entity_type_id' => 1,
+				'primary_attribute_id' => 3,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -339,6 +341,7 @@ class EavDbSeeder extends Seeder {
 				'code' => 'attribute_set3',
 				'name' => 'Attribute Set 3',
 				'entity_type_id' => 1,
+				'primary_attribute_id' => 5,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -346,6 +349,7 @@ class EavDbSeeder extends Seeder {
 				'code' => 'test_fields_set',
 				'name' => 'Test Fields Set',
 				'entity_type_id' => 4,
+				'primary_attribute_id' => 8,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			]

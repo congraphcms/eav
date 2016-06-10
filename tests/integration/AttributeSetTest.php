@@ -139,6 +139,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 			'code' => 'test-attr-set',
 			'name' => 'Test Attr Set',
 			'entity_type_id' => 1,
+			'primary_attribute_id' => 2,
 			'attributes' => [
 				['id' => 1],
 				['id' => 2]
@@ -165,6 +166,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 			'code' => '',
 			'name' => 'Test Attr Set',
 			'entity_type_id' => 1,
+			'primary_attribute_id' => 2,
 			'attributes' => [
 				['id' => 1],
 				['id' => 2]
@@ -201,6 +203,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 		$params = [
+			'primary_attribute_id' => 7,
 			'attributes' => [
 				[
 					'id' => 6,
@@ -208,6 +211,10 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 				],
 				[
 					'id' => 7,
+					'type' => 'attributes'
+				],
+				[
+					'id' => 1,
 					'type' => 'attributes'
 				]
 			]
@@ -217,11 +224,16 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand($params, 1));
+		try{
+			$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand($params, 1));
+		} catch(\Exception $e) {
+			$this->d->dump($e->getErrors());
+		}
+		
 		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals(2, count($result->attributes));
+		$this->assertEquals(3, count($result->attributes));
 		$this->d->dump($result->toArray());
 	}
 

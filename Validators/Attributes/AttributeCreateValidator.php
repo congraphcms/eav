@@ -158,10 +158,6 @@ class AttributeCreateValidator extends Validator
 
 		if( ! $attributeSettings['can_have_default_value'] )
 		{
-			if( isset($params['default_value']) && ! is_null($params['default_value']) )
-			{
-				$this->exception->addErrors(['default_value' => 'This attribute type can\'t have default value.']);
-			}
 			$params['default_value'] = null;
 		}
 

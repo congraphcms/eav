@@ -50,6 +50,9 @@ class CreateAttributeSetTables extends Migration {
 			
 			// Attribute set name for internal use
 			$table->string('name', 100)->default('');
+
+			// Primary attribute ID
+			$table->integer('primary_attribute_id');
 			
 			// created_at and updated_at timestamps
 			$table->timestamp('created_at')->nullable();

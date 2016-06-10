@@ -345,6 +345,7 @@ class SampleBlogCommandSeeder extends Seeder {
                 'code' => 'page-default',
                 'name' => 'Page Default',
                 'entity_type_id' => $entityTypeResults[0]->id,
+                'primary_attribute_id' => $attributeResults[0]->id,
                 'attributes' => [
                     [
                         'id' => $attributeResults[0]->id,
@@ -376,6 +377,7 @@ class SampleBlogCommandSeeder extends Seeder {
                 'code' => 'article-default',
                 'name' => 'Article Default',
                 'entity_type_id' => $entityTypeResults[1]->id,
+                'primary_attribute_id' => $attributeResults[0]->id,
                 'attributes' => [
                     [
                         'id' => $attributeResults[0]->id,
@@ -407,6 +409,7 @@ class SampleBlogCommandSeeder extends Seeder {
                 'code' => 'category-default',
                 'name' => 'Category Default',
                 'entity_type_id' => $entityTypeResults[2]->id,
+                'primary_attribute_id' => $attributeResults[7]->id,
                 'attributes' => [
                     [
                         'id' => $attributeResults[7]->id,

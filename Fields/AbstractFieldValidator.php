@@ -108,10 +108,6 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	public function validateAttributeForInsert(array &$params)
 	{
 		$attributeSettings = $this->attributeManager->getFieldType($params['field_type']);
-		if( ! $attributeSettings['can_have_default_value'] && isset($params['default_value']) && ! is_null($params['default_value']) )
-		{
-			$this->exception->addErrors(['default_value' => 'This attribute type can\'t have default value.']);
-		}
 		if( ! $attributeSettings['can_be_unique'] && ! empty($params['unique']) )
 		{
 			$this->exception->addErrors(['unique' => 'This attribute type can\'t be unique.']);
@@ -142,10 +138,7 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	public function validateAttributeForUpdate(array &$params, $attribute)
 	{
 		$attributeSettings = $this->attributeManager->getFieldType($attribute->field_type);
-		if( ! $attributeSettings['can_have_default_value'] && isset($params['default_value']) && ! is_null($params['default_value']) )
-		{
-			$this->exception->addErrors(['default_value' => 'This attribute type can\'t have default value.']);
-		}
+
 		if( ! $attributeSettings['can_be_unique'] && ! empty($params['unique']) )
 		{
 			$this->exception->addErrors(['unique' => 'This attribute type can\'t be unique.']);

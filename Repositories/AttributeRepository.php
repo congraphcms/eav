@@ -525,6 +525,15 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			$attribute->options[] = $option;
 		}
 
+		if( isset($attribute->data) )
+		{
+			$attribute->data = json_decode($attribute->data);
+		}
+		else
+		{
+			$attribute->data = null;
+		}
+
 		unset($attribute->table);
 
 		// $translations = $this->db->table('attribute_translations')
@@ -604,6 +613,15 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 			$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
 			$attribute->created_at = Carbon::parse($attribute->created_at)->tz($timezone);
 			$attribute->updated_at = Carbon::parse($attribute->updated_at)->tz($timezone);
+
+			if( isset($attribute->data) )
+			{
+				$attribute->data = json_decode($attribute->data);
+			}
+			else
+			{
+				$attribute->data = null;
+			}
 			// $attribute->translations = [];
 		}
 
