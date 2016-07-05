@@ -266,6 +266,12 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         if (! empty($model['fields']) && is_array($model['fields'])) {
             $fields = $model['fields'];
         }
+
+        $status = null;
+        if (! empty($model['status'])) {
+            $status = $model['status'];
+        }
+        unset($model['status']);
         
 
         $fieldsForUpdate = [];
@@ -321,7 +327,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         if (isset($status)) {
             $point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
-            $this->updateStatus($entityID, $point->id, $locale_ids);
+            $this->updateStatus($id, $point[0]->id, $locale_ids);
         }
 
         $this->updateEntity($id);

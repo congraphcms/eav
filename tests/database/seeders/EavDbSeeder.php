@@ -40,9 +40,9 @@ class EavDbSeeder extends Seeder {
 				'plural_name' => 'Tests',
 				'multiple_sets' => 1,
 				'localized' => 1,
-				'workflow_id' => 1,
+				'workflow_id' => 2,
 				'default_point_id' => 1,
-				'localized_workflow' => 0,
+				'localized_workflow' => 1,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -461,6 +461,73 @@ class EavDbSeeder extends Seeder {
 			[
 				'entity_type_id' => 4,
 				'attribute_set_id' => 4,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			]
+		]);
+
+		DB::table('entity_statuses')->truncate();
+		DB::table('entity_statuses')->insert([
+			[
+				'entity_id' => 1,
+				'workflow_point_id' => 3,
+				'locale_id' => 1,
+				'state' => 'active',
+				'scheduled_at' => null,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_id' => 1,
+				'workflow_point_id' => 3,
+				'locale_id' => 2,
+				'state' => 'active',
+				'scheduled_at' => null,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_id' => 2,
+				'workflow_point_id' => 2,
+				'locale_id' => 1,
+				'state' => 'active',
+				'scheduled_at' => null,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_id' => 2,
+				'workflow_point_id' => 2,
+				'locale_id' => 2,
+				'state' => 'active',
+				'scheduled_at' => null,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_id' => 3,
+				'workflow_point_id' => 4,
+				'locale_id' => 1,
+				'state' => 'active',
+				'scheduled_at' => null,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_id' => 3,
+				'workflow_point_id' => 4,
+				'locale_id' => 2,
+				'state' => 'active',
+				'scheduled_at' => null,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'entity_id' => 4,
+				'workflow_point_id' => 1,
+				'locale_id' => 0,
+				'state' => 'active',
+				'scheduled_at' => null,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			]

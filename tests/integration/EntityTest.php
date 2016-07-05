@@ -202,6 +202,27 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$this->d->dump($result->toArray());
 	}
 
+	public function testUpdateStatus()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$params = [
+			'locale' => 'en_US',
+			'status' => 'published'
+		];
+		
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, 1));
+		
+		$this->d->dump($result->toArray());
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue(is_int($result->id));
+		$this->assertEquals($result->status, 'published');
+		
+	}
+
 	/**
 	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
 	 */

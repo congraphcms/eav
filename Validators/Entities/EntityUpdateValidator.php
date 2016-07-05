@@ -189,7 +189,7 @@ class EntityUpdateValidator extends Validator
 		foreach ($attributeSet->attributes as $attr)
 		{
 			$attribute = $this->attributeRepository->fetch($attr->id);
-			if ( ! array_key_exists($attribute->code, $command->params['fields']) )
+			if ( ! isset($command->params['fields']) || ! array_key_exists($attribute->code, $command->params['fields']) )
 			{
 				continue;
 			}
@@ -276,34 +276,37 @@ class EntityUpdateValidator extends Validator
 			}
 		}
 
-		foreach ($command->params['fields'] as $code => $value) {
-			if (! array_key_exists($code, $attributesByCode)) {
-				$this->exception->setErrorKey('entity.fields.' . $code);
-				$this->exception->addErrors(['Field doesn\'t exist.']);
-				continue;
-			}
+		if(isset($command->params['fields'])) {
+			foreach ($command->params['fields'] as $code => $value) {
+				if (! array_key_exists($code, $attributesByCode)) {
+					$this->exception->setErrorKey('entity.fields.' . $code);
+					$this->exception->addErrors(['Field doesn\'t exist.']);
+					continue;
+				}
 
-			if(is_array($value) && ! isset($locale) && $attributesByCode[$code]->localized)
-			{
-				foreach ($value as $loc => $value)
+				if(is_array($value) && ! isset($locale) && $attributesByCode[$code]->localized)
 				{
-					$fault = true;
-					foreach ($locales as $l)
+					foreach ($value as $loc => $value)
 					{
-						if($l->code == $loc)
+						$fault = true;
+						foreach ($locales as $l)
 						{
-							$fault = false;
+							if($l->code == $loc)
+							{
+								$fault = false;
+							}
 						}
-					}
 
-					if($fault)
-					{
-						$this->exception->setErrorKey('entity.fields.' . $code . '.' . $loc);
-						$this->exception->addErrors(['Locale doesn\'t exist.']);
+						if($fault)
+						{
+							$this->exception->setErrorKey('entity.fields.' . $code . '.' . $loc);
+							$this->exception->addErrors(['Locale doesn\'t exist.']);
+						}
 					}
 				}
 			}
 		}
+		
 
 		if ($this->exception->hasErrors()) {
 			throw $this->exception;
