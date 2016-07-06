@@ -252,7 +252,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			$this->db->table($this->table)->insert($valueParams);
 			if($attribute->searchable)
 			{
-				$this->db->table('attribute_values_fulltext')->insert($singleValueParams);
+				$this->db->table('attribute_values_fulltext')->insert($valueParams);
 			}
 		}
 	}
