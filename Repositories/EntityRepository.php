@@ -498,7 +498,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             foreach ($attributes as $attribute) {
                 if ($attribute->id == $field['attribute_id']) {
                     $fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-                    $fieldHandler->insert($field, $attribute);
+                    $fieldHandler->update($field, $attribute);
                 }
             }
         }

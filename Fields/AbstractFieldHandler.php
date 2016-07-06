@@ -208,6 +208,15 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				->where( 'locale_id', '=', $valueParams['locale_id'] )
 				->delete();
 
+		if($attribute->searchable)
+		{
+			$this->db->table('attribute_values_fulltext')
+				->where( 'attribute_id', '=', $valueParams['attribute_id'] )
+				->where( 'entity_id', '=', $valueParams['entity_id'] )
+				->where( 'locale_id', '=', $valueParams['locale_id'] )
+				->delete();
+		}
+
 		// if this field type has multiple values and 
 		// value is array give each value a sort_order
 		// and then insert them separately into database
