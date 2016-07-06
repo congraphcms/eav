@@ -56,16 +56,16 @@ class FileDbSeeder extends Seeder {
 			]
 		]);
 
-		DB::table('attribute_values_integer')->insert([
-			[
-				'entity_id' => 4,
-				'entity_type_id' => 4,
-				'attribute_set_id' => 4,
-				'attribute_id' => 15,
-				'locale_id' => 0,
-				'sort_order' => 0,
-				'value' => 1,
-			]
-		]);
+		// DB::table('attribute_values_integer')->insert([
+		// 	[
+		// 		'entity_id' => 4,
+		// 		'entity_type_id' => 4,
+		// 		'attribute_set_id' => 4,
+		// 		'attribute_id' => 15,
+		// 		'locale_id' => 0,
+		// 		'sort_order' => 0,
+		// 		'value' => 1,
+		// 	]
+		// ]);
 	}
 }

@@ -233,6 +233,7 @@ class EavDbSeeder extends Seeder {
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
+
 			[
 				'code' => 'test_decimal_attribute',
 				'field_type' => 'decimal',
@@ -275,6 +276,19 @@ class EavDbSeeder extends Seeder {
 			[
 				'code' => 'test_asset_attribute',
 				'field_type' => 'asset',
+				'table' => 'attribute_values_integer',
+				'localized' => false,
+				'default_value' => null,
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_boolean_attribute',
+				'field_type' => 'boolean',
 				'table' => 'attribute_values_integer',
 				'localized' => false,
 				'default_value' => null,
@@ -431,11 +445,11 @@ class EavDbSeeder extends Seeder {
 				'attribute_id' => 14,
 				'sort_order' => 6
 			],
-			// [
-			// 	'attribute_set_id' => 4,
-			// 	'attribute_id' => 15,
-			// 	'sort_order' => 7
-			// ]
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 15,
+				'sort_order' => 7
+			]
 		]);
 
 		DB::table('entities')->truncate();
@@ -758,6 +772,15 @@ class EavDbSeeder extends Seeder {
 				'locale_id' => 0,
 				'sort_order' => 0,
 				'value' => 1,
+			],
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 15,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => 0,
 			]
 		]);
 

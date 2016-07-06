@@ -67,6 +67,22 @@ return array(
 			'sortable'					=> true
 		),
 
+		'boolean' => array(
+			'label'						=> 'Boolean',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Boolean\BooleanFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Boolean\BooleanFieldValidator',
+			'handler_name'				=> 'BooleanFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_unique'				=> false,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
+			'has_options'				=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> true
+		),
+
 		// /**
 		//  * Simple text area
 		//  * 

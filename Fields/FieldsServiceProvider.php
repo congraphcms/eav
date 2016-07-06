@@ -112,6 +112,13 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Filesystem\FileRepositoryContract')
 			);
 		});
+		$this->app->bind('Cookbook\Eav\Fields\Boolean\BooleanFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Boolean\BooleanFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
 		$this->app->bind('Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler( 
 				$app['db']->connection(),
@@ -182,6 +189,13 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
 				$app->make('Cookbook\Contracts\Filesystem\FileRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Boolean\BooleanFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Boolean\BooleanFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
 		$this->app->bind('Cookbook\Eav\Fields\Datetime\DatetimeFieldValidator', function($app) {

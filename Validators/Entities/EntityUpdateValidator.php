@@ -223,7 +223,7 @@ class EntityUpdateValidator extends Validator
 							foreach ($value as $v)
 							{
 								try {
-									$fieldValidator->validateValue($value, $attribute);
+									$fieldValidator->validateValue($v, $attribute);
 								} catch (ValidationException $e) {
 									$this->exception->setErrorKey('entity.fields.' . $attribute->code . '.' . $l->code);
 									$this->exception->addErrors($e->getErrors());
@@ -257,7 +257,7 @@ class EntityUpdateValidator extends Validator
 					foreach ($value as $v)
 					{
 						try {
-							$fieldValidator->validateValue($value, $attribute);
+							$fieldValidator->validateValue($v, $attribute);
 						} catch (ValidationException $e) {
 							$this->exception->setErrorKey('entity.fields.' . $attribute->code);
 							$this->exception->addErrors($e->getErrors());
