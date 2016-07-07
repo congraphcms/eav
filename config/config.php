@@ -67,6 +67,22 @@ return array(
 			'sortable'					=> true
 		),
 
+		'tags' => array(
+			'label'						=> 'Tags',
+			'table' 					=> 'attribute_values_text',
+			'handler'					=> 'Cookbook\Eav\Fields\Text\TextFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Text\TextFieldValidator',
+			'handler_name'				=> 'TextFieldHandler',
+			'can_have_default_value'	=> true,
+			'can_be_unique'				=> true,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> true,
+			'has_options'				=> false,
+			'has_multiple_values'		=> true,
+			'sortable'					=> true
+		),
+
 		'boolean' => array(
 			'label'						=> 'Boolean',
 			'table' 					=> 'attribute_values_integer',
@@ -128,6 +144,21 @@ return array(
 			'can_be_searchable'			=> false,
 			'has_options'				=> true,
 			'has_multiple_values'		=> false,
+			'sortable'					=> true
+		),
+		'multiselect' => array(
+			'label'						=> 'Multiselect',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Select\SelectFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Select\SelectFieldValidator',
+			'handler_name'				=> 'SelectFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_unique'				=> false,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
+			'has_options'				=> true,
+			'has_multiple_values'		=> true,
 			'sortable'					=> true
 		),
 

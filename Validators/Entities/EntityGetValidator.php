@@ -124,7 +124,8 @@ class EntityGetValidator extends Validator
 			'entity_type_id',
 			'attribute_set',
 			'attribute_set_id',
-			'created_at'
+			'created_at',
+			'updated_at'
 		];
 
 		$this->availableFilters = [
