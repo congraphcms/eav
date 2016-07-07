@@ -960,28 +960,29 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
     protected function filterStatus($query, $status, $localeIds)
     {
-        $query->join('entity_statuses', 'entities.id', '=', 'entity_statuses.entity_id')
-              ->join('workflow_points', 'entity_statuses.workflow_point_id', '=', 'workflow_points.id')
-              ->where('entity_statuses.state', '=', 'active')
-              ->whereIn('entity_statuses.locale_id', $localeIds);
+        $query = $query->join('entity_statuses', 'entities.id', '=', 'entity_statuses.entity_id')
+                          ->join('workflow_points', 'entity_statuses.workflow_point_id', '=', 'workflow_points.id')
+                          ->where('entity_statuses.state', '=', 'active')
+                          ->whereIn('entity_statuses.locale_id', $localeIds)
+                          ->whereNotNull('workflow_points.status');
 
         if(! is_array($status) )
         {
-            $query->where('workflow_points.status', '=', $status);
+            $query = $query->where('workflow_points.status', '=', $status);
         } else {
             foreach ($status as $operator => $value) {
                 switch ($operator) {
                     case 'e':
-                        $query = $query->where($key, '=', $value);
+                        $query = $query->where('workflow_points.status', '=', $value);
                         break;
                     case 'ne':
-                        $query = $query->where($key, '!=', $value);
+                        $query = $query->where('workflow_points.status', '!=', $value);
                         break;
                     case 'in':
-                        $query = $query->whereIn($key, $value);
+                        $query = $query->whereIn('workflow_points.status', $value);
                         break;
                     case 'nin':
-                        $query = $query->whereNotIn($key, $value);
+                        $query = $query->whereNotIn('workflow_points.status', $value);
                         break;
                     
                     default:
@@ -1143,9 +1144,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             $query->whereIn('entity_statuses.locale_id', $localeIds);
         }
                     
-        if (! empty($status)) {
-            $query->whereIn('workflow_points.status', $status);
-        }
+        // if (! empty($status)) {
+        //     $query->whereIn('workflow_points.status', $status);
+        // }
         $statuses = $query->orderBy('entities.id')
                           ->get();
 
