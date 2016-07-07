@@ -372,6 +372,48 @@ class EntityGetValidator extends Validator
 		{
 			$this->validateSorting($command->params['sort']);
 		}
+
+		if( ! empty($command->params['status']) )
+		{
+			$this->validateStatus($command->params['status']);
+		}
+	}
+
+	protected function validateStatus(&$status)
+	{
+		if( ! is_array($status) )
+		{
+			return;
+		}
+
+		foreach ($status as $operation => &$value)
+		{
+			if( ! in_array($operation, ['e', 'ne', 'in', 'nin']) )
+			{
+				$e = new BadRequestException();
+				$e->setErrorKey('status');
+				$e->addErrors('Status operation is not allowed.');
+
+				throw $e;
+			}
+
+			if($operation == 'in' || $operation == 'nin')
+			{
+				if( ! is_array($value) )
+				{
+					$value = explode(',', strval($value));
+				}
+			}
+			else
+			{
+				if( is_array($value) || is_object($value))
+				{
+					$e = new BadRequestException();
+					$e->setErrorKey('status');
+					$e->addErrors('Invalid status.');
+				}
+			}
+		}
 	}
 
 	protected function validateFilters(&$filters)

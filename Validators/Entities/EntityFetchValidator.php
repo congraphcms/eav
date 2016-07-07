@@ -11,6 +11,7 @@
 namespace Cookbook\Eav\Validators\Entities;
 
 use Cookbook\Contracts\EAV\EntityRepositoryContract;
+use Cookbook\Contracts\Locales\LocaleRepositoryContract;
 use Cookbook\Core\Bus\RepositoryCommand;
 use Cookbook\Core\Exceptions\ValidationException;
 use Cookbook\Core\Validation\Validator;
@@ -38,13 +39,21 @@ class EntityFetchValidator extends Validator
 	protected $entityRepository;
 
 	/**
+	 * Repository for locales
+	 * 
+	 * @var Cookbook\Contracts\Locales\LocaleRepositoryContract
+	 */
+	protected $localeRepository;
+
+	/**
 	 * Create new EntityFetchValidator
 	 *
 	 * @return void
 	 */
-	public function __construct(EntityRepositoryContract $entityRepository)
+	public function __construct(EntityRepositoryContract $entityRepository, LocaleRepositoryContract $localeRepository)
 	{
 		$this->entityRepository = $entityRepository;
+		$this->localeRepository = $localeRepository;
 
 		parent::__construct();
 
@@ -64,6 +73,62 @@ class EntityFetchValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
-		// $entity = $this->entityRepository->fetch($command->id);
+		if( isset($command->params['locale']) )
+		{
+			try
+			{
+				$this->localeRepository->fetch($command->params['locale']);
+			}
+			catch(NotFoundException $e)
+			{
+				$e = new BadRequestException();
+				$e->setErrorKey('locale.');
+				$e->addErrors('Invalid locale.');
+
+				throw $e;
+			}
+		}
+
+		if( ! empty($command->params['status']) )
+		{
+			$this->validateStatus($command->params['status']);
+		}
+	}
+
+	protected function validateStatus(&$status)
+	{
+		if( ! is_array($status) )
+		{
+			return;
+		}
+
+		foreach ($status as $operation => &$value)
+		{
+			if( ! in_array($operation, ['e', 'ne', 'in', 'nin']) )
+			{
+				$e = new BadRequestException();
+				$e->setErrorKey('status');
+				$e->addErrors('Status operation is not allowed.');
+
+				throw $e;
+			}
+
+			if($operation == 'in' || $operation == 'nin')
+			{
+				if( ! is_array($value) )
+				{
+					$value = explode(',', strval($value));
+				}
+			}
+			else
+			{
+				if( is_array($value) || is_object($value))
+				{
+					$e = new BadRequestException();
+					$e->setErrorKey('status');
+					$e->addErrors('Invalid status.');
+				}
+			}
+		}
 	}
 }
