@@ -969,28 +969,28 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         {
             $query->where('workflow_points.status', '=', $status);
         } else {
-
-        }
-        foreach ($filter as $operator => $value) {
-            switch ($operator) {
-                case 'e':
-                    $query = $query->where($key, '=', $value);
-                    break;
-                case 'ne':
-                    $query = $query->where($key, '!=', $value);
-                    break;
-                case 'in':
-                    $query = $query->whereIn($key, $value);
-                    break;
-                case 'nin':
-                    $query = $query->whereNotIn($key, $value);
-                    break;
-                
-                default:
-                    throw new BadRequestException(['Filter operator not supported.']);
-                    break;
+            foreach ($status as $operator => $value) {
+                switch ($operator) {
+                    case 'e':
+                        $query = $query->where($key, '=', $value);
+                        break;
+                    case 'ne':
+                        $query = $query->where($key, '!=', $value);
+                        break;
+                    case 'in':
+                        $query = $query->whereIn($key, $value);
+                        break;
+                    case 'nin':
+                        $query = $query->whereNotIn($key, $value);
+                        break;
+                    
+                    default:
+                        throw new BadRequestException(['Status operator not supported.']);
+                        break;
+                }
             }
         }
+        
         return $query;
     }
 
