@@ -237,6 +237,21 @@ return array(
 			'has_multiple_values'		=> false,
 			'sortable'					=> false
 		),
+		'relation_collection' => array(
+			'label'						=> 'Relations',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldValidator',
+			'handler_name'				=> 'RelationFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_unique'				=> false,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
+			'has_options'				=> false,
+			'has_multiple_values'		=> true,
+			'sortable'					=> false
+		),
 
 		/**
 		 * Asset field
@@ -254,6 +269,21 @@ return array(
 			'can_be_searchable'			=> false,
 			'has_options'				=> false,
 			'has_multiple_values'		=> false,
+			'sortable'					=> false
+		),
+		'asset_collection' => array(
+			'label'						=> 'Assets',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldValidator',
+			'handler_name'				=> 'AssetFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_unique'				=> false,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> false,
+			'can_be_searchable'			=> false,
+			'has_options'				=> false,
+			'has_multiple_values'		=> true,
 			'sortable'					=> false
 		),
 

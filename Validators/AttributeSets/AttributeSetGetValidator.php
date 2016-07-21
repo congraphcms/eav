@@ -65,7 +65,8 @@ class AttributeSetGetValidator extends Validator
 			'code',
 			'name',
 			'entity_type_id',
-			'created_at'
+			'created_at',
+			'updated_at'
 		];
 
 		$this->availableFilters = [
@@ -73,7 +74,8 @@ class AttributeSetGetValidator extends Validator
 			'code'				=> ['e', 'ne', 'in', 'nin'],
 			'name'				=> ['e', 'ne', 'in', 'nin'],
 			'entity_type_id'	=> ['e', 'ne', 'in', 'nin'],
-			'created_at'		=> ['lt', 'lte', 'gt', 'gte']
+			'created_at'		=> ['lt', 'lte', 'gt', 'gte'],
+			'updated_at'		=> ['lt', 'lte', 'gt', 'gte']
 		];
 
 		$this->defaultSorting = ['-created_at'];

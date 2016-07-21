@@ -66,7 +66,8 @@ class EntityTypeGetValidator extends Validator
 			'endpoint',
 			'name',
 			'plural_name',
-			'created_at'
+			'created_at',
+			'updated_at'
 		];
 
 		$this->availableFilters = [
@@ -76,7 +77,8 @@ class EntityTypeGetValidator extends Validator
 			'name'				=> ['e', 'ne', 'in', 'nin'],
 			'plural_name'		=> ['e', 'ne', 'in', 'nin'],
 			'multiple_sets'		=> ['e', 'ne'],
-			'created_at'		=> ['lt', 'lte', 'gt', 'gte']
+			'created_at'		=> ['lt', 'lte', 'gt', 'gte'],
+			'updated_at'		=> ['lt', 'lte', 'gt', 'gte']
 		];
 
 		$this->defaultSorting = ['-created_at'];

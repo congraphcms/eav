@@ -74,6 +74,86 @@ class RelationFieldValidator extends AbstractFieldValidator
 	}
 
 	/**
+	 * Check for specific rules and validation on attribute insert
+	 * 
+	 * Called after standard attribute validation with referenced attribute params
+	 * depending on boolean value returned by this function attribute insert will continue or stop the execution
+	 * 
+	 * @param array $params
+	 * 
+	 * @return boolean
+	 */
+	public function validateAttributeForInsert(array &$params)
+	{
+		parent::validateAttributeForInsert($params);
+
+		if ( empty($params['data']) || !is_array($params['data']))
+		{
+			return;
+		}
+
+		$data = $params['data'];
+
+		if ( ! empty($data['allowed_types']) )
+		{
+			if( ! is_array($data['allowed_types']) )
+			{
+				$data['allowed_types'] = [$data['allowed_types']];
+			}
+
+			$this->sortAllowedTypes($data);
+		}
+		else
+		{
+			$data['allowed_types'] = false;
+		}
+
+		$params['data'] = $data;
+
+		return true;
+	}
+
+	/**
+	 * Check for specific rules and validation on attribute update
+	 * 
+	 * Called after standard attribute validation with referenced attribute params
+	 * depending on boolean value returned by this function attribute update will continue or stop the execution
+	 * 
+	 * @param array $params
+	 * 
+	 * @return boolean
+	 */
+	public function validateAttributeForUpdate(array &$params, $attribute)
+	{
+		parent::validateAttributeForUpdate($params, $attribute);
+
+		if ( empty($params['data']) || !is_array($params['data']))
+		{
+			return;
+		}
+
+		$data = $params['data'];
+
+		if ( ! empty($data['allowed_types']) )
+		{
+			if( ! is_array($data['allowed_types']) )
+			{
+				$data['allowed_types'] = [$data['allowed_types']];
+			}
+
+			$this->sortAllowedTypes($data);
+		}
+		else
+		{
+			$data['allowed_types'] = false;
+		}
+
+		$params['data'] = $data;
+
+		return;
+	}
+
+	/**
 	 * Validate attribute value
 	 * 
 	 * This function can be extended by specific attribute handler
@@ -111,5 +191,24 @@ class RelationFieldValidator extends AbstractFieldValidator
 		{
 			throw new ValidationException(['Entity doesn\'t exist.']);
 		}
+
+		if( ! empty($attribute->data->allowed_types) )
+		{
+			if( ! in_array($entity->entity_type_id, $attribute->data->allowed_types) )
+			{
+				throw new ValidationException(['Invalid file extension.']);
+			}
+		}
+	}
+
+	protected function sortAllowedTypes(array &$data)
+	{
+		$allowedTypes = $data['allowed_types'];
+
+		foreach ($allowedTypes as &$type) {
+			$type = trim(intval($type));
+		}
+
+		$data['allowed_types'] = $allowedTypes;
 	}
 }

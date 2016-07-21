@@ -94,18 +94,18 @@ class AssetFieldValidator extends AbstractFieldValidator
 
 		$data = $params['data'];
 
-		if ( ! empty($data['filetypes']) )
+		if ( ! empty($data['allowed_types']) )
 		{
-			if( ! is_array($data['filetypes']) )
+			if( ! is_array($data['allowed_types']) )
 			{
-				$data['filetypes'] = [$data['filetypes']];
+				$data['allowed_types'] = [$data['allowed_types']];
 			}
 
-			$this->sortFileTypes($data);
+			$this->sortAllowedTypes($data);
 		}
 		else
 		{
-			$data['filetypes'] = [];
+			$data['allowed_types'] = false;
 		}
 
 		$params['data'] = $data;
@@ -134,18 +134,18 @@ class AssetFieldValidator extends AbstractFieldValidator
 
 		$data = $params['data'];
 
-		if ( ! empty($data['filetypes']) )
+		if ( ! empty($data['allowed_types']) )
 		{
-			if( ! is_array($data['filetypes']) )
+			if( ! is_array($data['allowed_types']) )
 			{
-				$data['filetypes'] = [$data['filetypes']];
+				$data['allowed_types'] = [$data['allowed_types']];
 			}
 
-			$this->sortFileTypes($data);
+			$this->sortAllowedTypes($data);
 		}
 		else
 		{
-			$data['filetypes'] = [];
+			$data['allowed_types'] = false;
 		}
 
 		$params['data'] = $data;
@@ -165,7 +165,6 @@ class AssetFieldValidator extends AbstractFieldValidator
 	 */
 	public function validateValue($value, $attribute, $entity_id = 0)
 	{
-
 		parent::validateValue($value, $attribute, $entity_id);
 
 		if( ! $attribute->required && empty($value) )
@@ -175,7 +174,7 @@ class AssetFieldValidator extends AbstractFieldValidator
 
 		if( ! is_array($value) || ! isset($value['id']) || ! isset($value['type']))
 		{
-			throw new ValidationException(['Invalid relation object.']);
+			throw new ValidationException(['Invalid asset object.']);
 		}
 
 		if( $value['type'] != 'file')
@@ -192,9 +191,9 @@ class AssetFieldValidator extends AbstractFieldValidator
 			throw new ValidationException(['File doesn\'t exist.']);
 		}
 
-		if( ! empty($attribute->data['filetypes']) )
+		if( ! empty($attribute->data->allowed_types) )
 		{
-			if( ! in_array($file->extension, $attribute->data['filetypes']) )
+			if( ! in_array($file->mime_type, $attribute->data->allowed_types) )
 			{
 				throw new ValidationException(['Invalid file extension.']);
 			}
@@ -203,12 +202,12 @@ class AssetFieldValidator extends AbstractFieldValidator
 
 	protected function sortFileTypes(array &$data)
 	{
-		$filetypes = $data['filetypes'];
+		$allowedTypes = $data['allowed_types'];
 
-		foreach ($filetypes as &$type) {
+		foreach ($allowedTypes as &$type) {
 			$type = trim(strval($type));
 		}
 
-		$data['filetypes'] = $filetypes;
+		$data['allowed_types'] = $allowedTypes;
 	}
 }

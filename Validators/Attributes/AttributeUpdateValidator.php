@@ -104,8 +104,7 @@ class AttributeUpdateValidator extends Validator
 			'filterable'			=> 'sometimes|boolean',
 			// 'searchable'			=> 'sometimes|boolean',
 			'data'					=> 'sometimes',
-			'options'				=> 'sometimes|array',
-			'translations'			=> 'sometimes|array'
+			'options'				=> 'sometimes|array'
 		];
 
 		$this->optionRules = 
@@ -114,8 +113,7 @@ class AttributeUpdateValidator extends Validator
 			'locale' 				=> 'sometimes|required|integer',
 			'label'					=> 'required|max:250',
 			'value'					=> 'required|max:250',
-			'is_default'			=> 'boolean',
-			'sort_order' 			=> 'integer'
+			'default'				=> 'boolean'
 		];
 
 		parent::__construct();

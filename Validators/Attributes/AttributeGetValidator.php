@@ -65,7 +65,8 @@ class AttributeGetValidator extends Validator
 			'id',
 			'code',
 			'field_type',
-			'created_at'
+			'created_at',
+			'updated_at'
 		];
 
 		$this->availableFilters = [
@@ -77,7 +78,8 @@ class AttributeGetValidator extends Validator
 			'required'		=> ['e', 'ne'],
 			'filterable'	=> ['e', 'ne'],
 			'status'		=> ['e', 'ne', 'in', 'nin'],
-			'created_at'	=> ['lt', 'lte', 'gt', 'gte']
+			'created_at'	=> ['lt', 'lte', 'gt', 'gte'],
+			'updated_at'	=> ['lt', 'lte', 'gt', 'gte']
 		];
 
 		$this->defaultSorting = ['-created_at'];
