@@ -206,6 +206,7 @@ class MixDbSeeder extends Seeder {
 				'code' => 'set1',
 				'name' => 'Set 1',
 				'entity_type_id' => 1,
+				'primary_attribute_id' => 2,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -213,6 +214,7 @@ class MixDbSeeder extends Seeder {
 				'code' => 'set2',
 				'name' => 'Set 2',
 				'entity_type_id' => 2,
+				'primary_attribute_id' => 1,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -220,6 +222,7 @@ class MixDbSeeder extends Seeder {
 				'code' => 'set3',
 				'name' => 'Set 3',
 				'entity_type_id' => 3,
+				'primary_attribute_id' => 1,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
@@ -227,6 +230,7 @@ class MixDbSeeder extends Seeder {
 				'code' => 'set4',
 				'name' => 'Set 4',
 				'entity_type_id' => 4,
+				'primary_attribute_id' => 2,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			]

@@ -196,7 +196,7 @@ class RelationFieldValidator extends AbstractFieldValidator
 		{
 			if( ! in_array($entity->entity_type_id, $attribute->data->allowed_types) )
 			{
-				throw new ValidationException(['Invalid file extension.']);
+				throw new ValidationException(['Invalid relation type.']);
 			}
 		}
 	}

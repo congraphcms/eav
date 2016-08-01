@@ -587,13 +587,16 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
     protected function insertStatus($id, $pointId, $localeIds)
     {
+        $now = Carbon::now('UTC')->toDateTimeString();
         $statusParams = [];
         foreach ($localeIds as $localeId) {
             $statusParams[] = [
                 'entity_id' => $id,
                 'workflow_point_id' => $pointId,
                 'locale_id' => $localeId,
-                'state' => 'active'
+                'state' => 'active',
+                'created_at' => $now,
+                'updated_at' => $now
             ];
         }
         
@@ -683,12 +686,15 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                             'entity_types.localized as localized',
                             'entity_types.localized_workflow as localized_workflow',
                             'entity_types.workflow_id as workflow_id',
+                            'attributes.code as primary_field',
                             $this->db->raw('"entity" as type'),
                             'entities.created_at as created_at',
                             'entities.updated_at as updated_at'
                         )
                         ->where('entities.id', '=', $id)
-                        ->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id');
+                        ->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
+                        ->join('attribute_sets', 'entities.attribute_set_id', '=', 'attribute_sets.id')
+                        ->join('attributes', 'attribute_sets.primary_attribute_id', '=', 'attributes.id');
 
         if (! empty($status)) {
             $query = $this->filterStatus($query, $status, $locale_ids);
@@ -764,7 +770,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         $query =  $this->db->table('entities')
                         
-                        ->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id');
+                        ->join('entity_types', 'entities.entity_type_id', '=', 'entity_types.id')
+                        ->join('attribute_sets', 'entities.attribute_set_id', '=', 'attribute_sets.id')
+                        ->join('attributes', 'attribute_sets.primary_attribute_id', '=', 'attributes.id');
         
         $query = $this->parseFilters($query, $filter, $locale);
 
@@ -785,6 +793,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                             'entity_types.localized as localized',
                             'entity_types.localized_workflow as localized_workflow',
                             'entity_types.workflow_id as workflow_id',
+                            'attributes.code as primary_field',
                             $this->db->raw('"entity" as type'),
                             'entities.created_at as created_at',
                             'entities.updated_at as updated_at'
