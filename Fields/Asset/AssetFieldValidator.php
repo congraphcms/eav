@@ -200,7 +200,7 @@ class AssetFieldValidator extends AbstractFieldValidator
 		}
 	}
 
-	protected function sortFileTypes(array &$data)
+	protected function sortAllowedTypes(array &$data)
 	{
 		$allowedTypes = $data['allowed_types'];
 
