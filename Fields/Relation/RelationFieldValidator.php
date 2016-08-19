@@ -206,7 +206,7 @@ class RelationFieldValidator extends AbstractFieldValidator
 		$allowedTypes = $data['allowed_types'];
 
 		foreach ($allowedTypes as &$type) {
-			$type = trim(intval($type));
+			$type = intval(trim($type));
 		}
 
 		$data['allowed_types'] = $allowedTypes;
