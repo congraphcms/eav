@@ -125,9 +125,9 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\Core\CoreServiceProvider', 
-			'Cookbook\Locales\LocalesServiceProvider', 
-			'Cookbook\Eav\EavServiceProvider', 
+			'Cookbook\Core\CoreServiceProvider',
+			'Cookbook\Locales\LocalesServiceProvider',
+			'Cookbook\Eav\EavServiceProvider',
 			'Cookbook\Filesystem\FilesystemServiceProvider',
 			'Cookbook\Workflows\WorkflowsServiceProvider'
 		];
@@ -158,7 +158,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('datetime_attribute', $result->code);
-		
+
 	}
 
 	public function testUpdateAttribute()
@@ -171,15 +171,15 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		
+
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 12) );
-		
+
 		$this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals($result->code, 'datetime_attribute_changed');
-		
+
 	}
 
 	public function testCreateEntity()
@@ -201,7 +201,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		
+
 		try
 		{
 			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
@@ -210,7 +210,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		{
 			$this->d->dump($e->getErrors());
 		}
-		
+
 		$this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -218,8 +218,8 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('option2', $result->fields->test_select_attribute);
 		$this->assertEquals(123, $result->fields->test_integer_attribute);
 		$this->assertEquals(33.33, $result->fields->test_decimal_attribute);
-		$this->assertEquals('1987-08-19T09:00:00+0000', $result->toArray()['fields']['test_datetime_attribute']);
-		
+		$this->assertEquals('1987-08-19T09:00:00+00:00', $result->toArray()['fields']['test_datetime_attribute']);
+
 	}
 
 	public function testUpdateEntity()
@@ -235,18 +235,18 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 				'test_datetime_attribute' => '1987-08-19T11:00:00+0200'
 			]
 		];
-		
+
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, 4));
-		
-		
+
+
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
-		
+
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
 		$this->assertEquals('option1', $result->fields->test_select_attribute);
 		$this->assertEquals(11, $result->fields->test_integer_attribute);
 		$this->assertEquals(11.1, $result->fields->test_decimal_attribute);
-		$this->assertEquals('1987-08-19T09:00:00+0000', $result->toArray()['fields']['test_datetime_attribute']);
+		$this->assertEquals('1987-08-19T09:00:00+00:00', $result->toArray()['fields']['test_datetime_attribute']);
 		$this->d->dump($result->toArray());
 	}
 
