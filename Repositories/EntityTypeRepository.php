@@ -191,6 +191,11 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 			return $entityType;
 		}
 
+		if(!is_numeric($id))
+		{
+			return $this->fetchByCode($id, $include);
+		}
+
 		$entityType = $this->db->table('entity_types')->find($id);
 
 		if( empty($entityType) )
@@ -225,6 +230,68 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		
 		$result->setParams($params);
 		$meta = ['id' => $id, 'include' => $include];
+		$result->setMeta($meta);
+		$result->load($include);
+
+		return $result;
+	}
+
+	/**
+	 * Get entity type by Code
+	 * 
+	 * @param int $code - Unique Code of entity type to be fetched
+	 * 
+	 * @return stdClass
+	 */
+	protected function fetchByCode($code, $include = [])
+	{
+		$params = func_get_args();
+		$params['function'] = __METHOD__;
+		
+		if(Trunk::has($params, 'entity-type'))
+		{
+			$entityType = Trunk::get($id, 'entity-type');
+			$entityType->clearIncluded();
+			$entityType->load($include);
+			$meta = ['code' => $code, 'include' => $include];
+			$entityType->setMeta($meta);
+			return $entityType;
+		}
+
+		$entityType = $this->db->table('entity_types')->where('code', '=', $code)->first();
+
+		if( empty($entityType) )
+		{
+			throw new NotFoundException(['There is no entity type with that Code.']);
+		}
+
+		$attributeSets = $this->db->table('attribute_sets')
+								  ->select($this->db->raw('id as id, "attribute-set" as type'))
+								  ->where('entity_type_id', '=', $entityType->id)
+								  ->get();
+
+		$entityType->attribute_sets = $attributeSets;
+
+		$workflow = new stdClass();
+		$workflow->id = $entityType->workflow_id;
+		$workflow->type = 'workflow';
+		$point = new stdClass();
+		$point->id = $entityType->default_point_id;
+		$point->type = 'workflow-point';
+		$entityType->workflow = $workflow;
+		$entityType->default_point = $point;
+		
+
+		$entityType->type = 'entity-type';
+		$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+		$entityType->created_at = Carbon::parse($entityType->created_at)->tz($timezone);
+		$entityType->updated_at = Carbon::parse($entityType->updated_at)->tz($timezone);
+
+
+		$result = new Model($entityType);
+		
+		$result->setParams($params);
+		$meta = ['code' => $code, 'include' => $include];
 		$result->setMeta($meta);
 		$result->load($include);
 

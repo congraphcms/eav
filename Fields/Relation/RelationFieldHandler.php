@@ -50,7 +50,11 @@ class RelationFieldHandler extends AbstractFieldHandler {
 		{
 			return null;
 		}
-		$value = $value['id'];
+		if(is_array($value))
+		{
+			$value = $value['id'];
+		}
+		
 		return $value;
 	}
 
