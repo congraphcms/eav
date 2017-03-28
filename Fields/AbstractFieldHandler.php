@@ -444,11 +444,12 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				}
 			);
 		}
-		
 
 		if( ! is_array($filter) )
 		{
+
 			$filter = $this->parseValue($filter, $attribute);
+			
 			$query = $query->where('filter_' . $code . '.value', '=', $filter);
 		}
 		else
@@ -533,12 +534,19 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	public function sortEntities($query, $attribute, $direction, $locale = null)
 	{
 		$code = $attribute->code;
-		$query = $query->leftJoin($this->table . ' as sort_' . $code, 'sort_' . $code . '.entity_id', '=', 'entities.id');
-		$query = $query->where('sort_' . $code . '.attribute_id', '=', $attribute->id);
-		if( ! is_null($locale) && $attribute->localized )
-		{
-			$query->where('sort_' . $code . '.locale_id', '=', $locale->id);
-		}
+		$query = $query->leftJoin(
+			$this->table . ' as sort_' . $code, 
+			function($join) use($attribute, $locale)
+			{
+				$join->on('sort_' . $attribute->code . '.entity_id', '=', 'entities.id');
+				$join->on('sort_' . $attribute->code . '.attribute_id', '=', $this->db->raw($attribute->id));
+				if( ! is_null($locale) && $attribute->localized )
+				{
+					$join->on('sort_' . $attribute->code . '.locale_id', '=', $this->db->raw($locale->id));
+				}
+			}
+		);
+		
 		$query = $query->orderBy('sort_' . $code . '.value', $direction);
 
 		return $query;
