@@ -686,6 +686,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                             'entity_types.localized as localized',
                             'entity_types.localized_workflow as localized_workflow',
                             'entity_types.workflow_id as workflow_id',
+                            'attribute_sets.code as attribute_set_code',
                             'attributes.code as primary_field',
                             $this->db->raw('"entity" as type'),
                             'entities.created_at as created_at',
@@ -790,6 +791,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                             'entities.entity_type_id as entity_type_id',
                             'entities.attribute_set_id as attribute_set_id',
                             'entity_types.code as entity_type',
+                            'attribute_sets.code as attribute_set_code',
                             'entity_types.localized as localized',
                             'entity_types.localized_workflow as localized_workflow',
                             'entity_types.workflow_id as workflow_id',
@@ -804,7 +806,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         $query = $this->parseSorting($query, $sort);
 
         
-
+        // dd($query->toSql());
         $entities = $query->get();
 
         if (! $entities) {
@@ -945,6 +947,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
     protected function parseFulltextSearch($query, $search, $locale = null)
     {
+        $search = $search . '*';
         $query = $query->join('attribute_values_fulltext as fulltextsearch', function($join)
             {
                 $join->on('fulltextsearch.entity_id', '=', 'entities.id');
@@ -954,7 +957,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         {
             $query->whereIn('fulltextsearch.locale_id', [0, $locale->id]);
         }
-        $query = $query->whereRaw('MATCH (fulltextsearch.value) AGAINST (?)' , array($search));
+        $query = $query->whereRaw('MATCH (fulltextsearch.value) AGAINST (?  IN BOOLEAN MODE)' , array($search));
 
         return $query;
     }
@@ -1237,7 +1240,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             $formattedValue = $fieldHandler->formatValue($value->value, $attribute);
 
             if ($hasMultipleValues) {
-                $formattedValue = [$formattedValue];
+                if($formattedValue !== null){
+                    $formattedValue = [$formattedValue];
+                } else {
+                    $formattedValue = [];
+                }
             }
 
             if ($entitiesById[$value->entity_id]->localized && $attribute->localized && is_null($locale)) {

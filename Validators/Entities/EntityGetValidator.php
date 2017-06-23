@@ -116,6 +116,7 @@ class EntityGetValidator extends Validator
 		LocaleRepositoryContract $localeRepository
 	)
 	{
+
 		$this->attributeRepository = $attributeRepository;
 
 		$this->availableSorting = [
@@ -144,6 +145,7 @@ class EntityGetValidator extends Validator
 		parent::__construct();
 		
 		$this->fieldValidatorFactory = $fieldValidatorFactory;
+
 		$this->attributeManager = $attributeManager;
 		$this->attributeSetRepository = $attributeSetRepository;
 		$this->entityTypeRepository = $entityTypeRepository;
@@ -179,6 +181,7 @@ class EntityGetValidator extends Validator
 				throw $e;
 			}
 		}
+
 		if( ! empty($command->params['filter']) )
 		{
 			$this->validateFilters($command->params['filter']);
@@ -378,6 +381,7 @@ class EntityGetValidator extends Validator
 		{
 			$this->validateStatus($command->params['status']);
 		}
+		
 	}
 
 	protected function validateStatus(&$status)
@@ -600,6 +604,7 @@ class EntityGetValidator extends Validator
 		{
 			$attributes = $this->attributeRepository->get(['code' => ['in'=>$fieldSorting]]);
 			$attributesByCode = [];
+			$attributeCodes = [];
 			foreach ($attributes as $attribute)
 			{
 				$attributeSettings = $this->attributeManager->getFieldType($attribute->field_type);
@@ -614,7 +619,7 @@ class EntityGetValidator extends Validator
 
 				$attributeCodes[] = $attribute->code;
 			}
-
+			
 			foreach ($fieldSorting as $code)
 			{
 				if( ! in_array($code, $attributeCodes) )
