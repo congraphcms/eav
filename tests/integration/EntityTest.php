@@ -96,10 +96,10 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$app['config']->set('database.connections.testbench', [
 			'driver'   	=> 'mysql',
 			'host'      => '127.0.0.1',
-			'port'		=> '33060',
+			'port'		=> '3306',
 			'database'	=> 'cookbook_testbench',
-			'username'  => 'homestead',
-			'password'  => 'secret',
+			'username'  => 'root',
+			'password'  => '',
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',

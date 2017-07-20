@@ -13,11 +13,11 @@
     "require": {
         "php": ">=5.4.0",
         "illuminate/database": "5.*",
-        "cookbook/core": "dev-auth",
+        "cookbook/core": "dev-master",
         "cookbook/contracts": "dev-master",
-        "cookbook/filesystem": "dev-auth",
-        "cookbook/locales": "dev-auth",
-        "cookbook/workflows": "dev-auth"
+        "cookbook/filesystem": "dev-master",
+        "cookbook/locales": "dev-master",
+        "cookbook/workflows": "dev-master"
     },
 
     "repositories": [
