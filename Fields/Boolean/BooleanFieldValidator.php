@@ -12,6 +12,7 @@ namespace Cookbook\Eav\Fields\Boolean;
 
 use Cookbook\Eav\Fields\AbstractFieldValidator;
 use Cookbook\Eav\Managers\AttributeManager;
+use Cookbook\Core\Exceptions\ValidationException;
 
 /**
  * BooleanFieldValidator class
@@ -39,4 +40,29 @@ class BooleanFieldValidator extends AbstractFieldValidator
 	 * @var array
 	 */
 	protected $table = 'attribute_values_integer';
+
+
+	/**
+	 * Validate attribute value
+	 * 
+	 * This function can be extended by specific attribute handler
+	 * 
+	 * @param array $value
+	 * @param object $attribute
+	 * 
+	 * @return boolean
+	 */
+	public function validateValue($value, $attribute, $entity_id = 0)
+	{
+		$value = (int) $value;
+		// check if this attribute is required
+		if($attribute->required)
+		{
+			// if it's required and it's empty add an error
+			if(empty($value) && $value !== 0)
+			{
+				throw new ValidationException(['This field is required.']);
+			}
+		}
+	}
 }
