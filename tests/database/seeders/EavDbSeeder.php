@@ -298,6 +298,19 @@ class EavDbSeeder extends Seeder {
 				'status' => 'user_defined',
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_location_attribute',
+				'field_type' => 'location',
+				'table' => 'attribute_values_text',
+				'localized' => false,
+				'default_value' => null,
+				'unique' => false,
+				'required' => false,
+				'filterable' => false,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
 			]
 			
 		]);
@@ -449,6 +462,11 @@ class EavDbSeeder extends Seeder {
 				'attribute_set_id' => 4,
 				'attribute_id' => 15,
 				'sort_order' => 7
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 16,
+				'sort_order' => 8
 			]
 		]);
 
@@ -732,6 +750,15 @@ class EavDbSeeder extends Seeder {
 				'locale_id' => 0,
 				'sort_order' => 0,
 				'value' => 'field text value',
+			],
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 16,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => '{"lat":12,"lng":35}',
 			]
 		]);
 

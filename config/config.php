@@ -286,6 +286,21 @@ return array(
 			'has_multiple_values'		=> true,
 			'sortable'					=> false
 		),
+		'location' => array(
+			'label'						=> 'Location',
+			'table' 					=> 'attribute_values_text',
+			'handler'					=> 'Cookbook\Eav\Fields\Location\LocationFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Location\LocationFieldValidator',
+			'handler_name'				=> 'LocationFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_unique'				=> false,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> false,
+			'can_be_searchable'			=> false,
+			'has_options'				=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> false
+		),
 
 		// /**
 		//  * Rich text area

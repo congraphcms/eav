@@ -169,6 +169,13 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
+		$this->app->bind('Cookbook\Eav\Fields\Location\LocationFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Location\LocationFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
 	}
 
 	/**
@@ -243,6 +250,13 @@ class FieldsServiceProvider extends ServiceProvider {
 		});
 		$this->app->bind('Cookbook\Eav\Fields\Textarea\TextareaFieldValidator', function($app) {
 			return new \Cookbook\Eav\Fields\Textarea\TextareaFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Location\LocationFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Location\LocationFieldValidator( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
