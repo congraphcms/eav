@@ -1363,7 +1363,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         if (! is_null($locale)) {
             $query->whereIn($table . '.locale_id', [0, $locale->id]);
         }
-        $values = $query->orderBy('entities.id', 'set_attributes.sort_order', $table . '.sort_order')
+        $values = $query->orderBy($table . '.sort_order')
                         ->get();
 
         return $values;

@@ -195,7 +195,7 @@ class EntityGetValidator extends Validator
 				}
 				else
 				{
-					foreach ($command->params['filter']['type'] as $operator => $filter)
+					foreach ($command->params['filter']['type'] as $operation => $filter)
 					{
 						if( ! is_array($filter) )
 						{
@@ -230,7 +230,7 @@ class EntityGetValidator extends Validator
 					}
 					else
 					{
-						foreach ($command->params['filter']['type'] as $operator => $filter)
+						foreach ($command->params['filter']['type'] as $operation => $filter)
 						{
 							if($operation == 'in' || $operation == 'nin')
 							{
@@ -240,23 +240,24 @@ class EntityGetValidator extends Validator
 								}
 								foreach ($filter as $type)
 								{
-									if( ! is_array($command->params['filter']['entity_type_id']) )
+									if( ! isset($command->params['filter']['entity_type_id']) || ! is_array($command->params['filter']['entity_type_id']) )
 									{
 										$command->params['filter']['entity_type_id'] = [];
 									}
-									if( ! is_array($command->params['filter']['entity_type_id'][$operator]) )
+									if( ! isset($command->params['filter']['entity_type_id'][$operation]) || ! is_array($command->params['filter']['entity_type_id'][$operation]) )
 									{
-										$command->params['filter']['entity_type_id'][$operator] = [];
+										$command->params['filter']['entity_type_id'][$operation] = [];
 									}
 									if(array_key_exists($type, $entityTypesByCode))
 									{
-										$command->params['filter']['entity_type_id'][$operator] = array_merge($command->params['filter']['entity_type_id'][$operator], [$entityTypesByCode[$type]->id]);
+										$command->params['filter']['entity_type_id'][$operation] = array_merge($command->params['filter']['entity_type_id'][$operation], [$entityTypesByCode[$type]->id]);
 									}
 									else
 									{
-										$command->params['filter']['entity_type_id'][$operator] = array_merge($command->params['filter']['entity_type_id'][$operator], [0]);
+										$command->params['filter']['entity_type_id'][$operation] = array_merge($command->params['filter']['entity_type_id'][$operation], [0]);
 									}
 								}
+								continue;
 							}
 
 							if(array_key_exists($filter, $entityTypesByCode))
@@ -281,7 +282,7 @@ class EntityGetValidator extends Validator
 				}
 				else
 				{
-					foreach ($command->params['filter']['attribute_set'] as $operator => $filter)
+					foreach ($command->params['filter']['attribute_set'] as $operation => $filter)
 					{
 						if( ! is_array($filter) )
 						{
@@ -316,7 +317,7 @@ class EntityGetValidator extends Validator
 					}
 					else
 					{
-						foreach ($command->params['filter']['attribute_set'] as $operator => $filter)
+						foreach ($command->params['filter']['attribute_set'] as $operation => $filter)
 						{
 							if($operation == 'in' || $operation == 'nin')
 							{
@@ -330,17 +331,17 @@ class EntityGetValidator extends Validator
 									{
 										$command->params['filter']['attribute_set_id'] = [];
 									}
-									if( ! is_array($command->params['filter']['attribute_set_id'][$operator]) )
+									if( ! is_array($command->params['filter']['attribute_set_id'][$operation]) )
 									{
-										$command->params['filter']['attribute_set_id'][$operator] = [];
+										$command->params['filter']['attribute_set_id'][$operation] = [];
 									}
 									if(array_key_exists($attribute_set, $attributeSetsByCode))
 									{
-										$command->params['filter']['attribute_set_id'][$operator] = array_merge($command->params['filter']['attribute_set_id'][$operator], [$attributeSetsByCode[$attribute_set]->id]);
+										$command->params['filter']['attribute_set_id'][$operation] = array_merge($command->params['filter']['attribute_set_id'][$operation], [$attributeSetsByCode[$attribute_set]->id]);
 									}
 									else
 									{
-										$command->params['filter']['attribute_set_id'][$operator] = array_merge($command->params['filter']['attribute_set_id'][$operator], [0]);
+										$command->params['filter']['attribute_set_id'][$operation] = array_merge($command->params['filter']['attribute_set_id'][$operation], [0]);
 									}
 								}
 							}
