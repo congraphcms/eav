@@ -34,8 +34,8 @@ class EavDbSeeder extends Seeder {
 
 		DB::table('entity_types')->insert([
 			[
-				'code' => 'tests',
-				'endpoint' => 'tests',
+				'code' => 'cg_test_1',
+				'endpoint' => 'cg_test_1',
 				'name' => 'Test',
 				'plural_name' => 'Tests',
 				'multiple_sets' => 1,
@@ -47,8 +47,8 @@ class EavDbSeeder extends Seeder {
 				'updated_at' => date("Y-m-d H:i:s")
 			],
 			[
-				'code' => 'tests2',
-				'endpoint' => 'tests2',
+				'code' => 'cg_test_2',
+				'endpoint' => 'cg_test_2',
 				'name' => 'Test2',
 				'plural_name' => 'Tests2',
 				'multiple_sets' => 0,
@@ -60,8 +60,8 @@ class EavDbSeeder extends Seeder {
 				'updated_at' => date("Y-m-d H:i:s")
 			],
 			[
-				'code' => 'tests3',
-				'endpoint' => 'tests3',
+				'code' => 'cg_test_3',
+				'endpoint' => 'cg_test_3',
 				'name' => 'Test3',
 				'plural_name' => 'Tests3',
 				'multiple_sets' => 1,
@@ -73,8 +73,8 @@ class EavDbSeeder extends Seeder {
 				'updated_at' => date("Y-m-d H:i:s")
 			],
 			[
-				'code' => 'test_fields',
-				'endpoint' => 'test_fields',
+				'code' => 'cg_test_fields',
+				'endpoint' => 'cg_test_fields',
 				'name' => 'Test Field',
 				'plural_name' => 'Test Fields',
 				'multiple_sets' => 1,
@@ -194,19 +194,7 @@ class EavDbSeeder extends Seeder {
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
-			// [
-			// 	'code' => 'test_textarea_attribute',
-			// 	'field_type' => 'text_area',
-			// 	'table' => 'attribute_values_text',
-			// 	'localized' => false,
-			// 	'default_value' => null,
-			// 	'unique' => false,
-			// 	'required' => false,
-			// 	'filterable' => true,
-			// 	'status' => 'user_defined',
-			// 	'created_at' => date("Y-m-d H:i:s"),
-			// 	'updated_at' => date("Y-m-d H:i:s")
-			// ],
+			
 			[
 				'code' => 'test_select_attribute',
 				'field_type' => 'select',
@@ -311,7 +299,46 @@ class EavDbSeeder extends Seeder {
 				'status' => 'user_defined',
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
-			]
+			],
+			[
+				'code' => 'test_tags_attribute',
+				'field_type' => 'tags',
+				'table' => 'attribute_values_text',
+				'localized' => false,
+				'default_value' => null,
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_multiselect_attribute',
+				'field_type' => 'multiselect',
+				'table' => 'attribute_values_integer',
+				'localized' => false,
+				'default_value' => null,
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
+			[
+				'code' => 'test_assetcollection_attribute',
+				'field_type' => 'asset_collection',
+				'table' => 'attribute_values_integer',
+				'localized' => false,
+				'default_value' => null,
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
 			
 		]);
 
@@ -338,6 +365,30 @@ class EavDbSeeder extends Seeder {
 				'value' => 'option3',
 				'label' => 'Option 3',
 				'attribute_id' => 9,
+				'default' => 0,
+				'locale' => 0,
+				'sort_order' => 2
+			],
+			[
+				'value' => 'option1',
+				'label' => 'Option 1',
+				'attribute_id' => 18,
+				'default' => 0,
+				'locale' => 0,
+				'sort_order' => 0
+			],
+			[
+				'value' => 'option2',
+				'label' => 'Option 2',
+				'attribute_id' => 18,
+				'default' => 1,
+				'locale' => 0,
+				'sort_order' => 1
+			],
+			[
+				'value' => 'option3',
+				'label' => 'Option 3',
+				'attribute_id' => 18,
 				'default' => 0,
 				'locale' => 0,
 				'sort_order' => 2
@@ -379,7 +430,15 @@ class EavDbSeeder extends Seeder {
 				'primary_attribute_id' => 8,
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
-			]
+			],
+			[
+				'code' => 'attribute_set5',
+				'name' => 'Attribute Set 5',
+				'entity_type_id' => 2,
+				'primary_attribute_id' => 1,
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
 		]);
 
 		DB::table('set_attributes')->insert([
@@ -467,6 +526,31 @@ class EavDbSeeder extends Seeder {
 				'attribute_set_id' => 4,
 				'attribute_id' => 16,
 				'sort_order' => 8
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 17,
+				'sort_order' => 9
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 18,
+				'sort_order' => 10
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 19,
+				'sort_order' => 10
+			],
+			[
+				'attribute_set_id' => 5,
+				'attribute_id' => 1,
+				'sort_order' => 1
+			],
+			[
+				'attribute_set_id' => 5,
+				'attribute_id' => 2,
+				'sort_order' => 0
 			]
 		]);
 

@@ -104,7 +104,7 @@ class FieldsServiceProvider extends ServiceProvider {
 	*/
 	protected function registerFieldHandlers() {
 
-		$this->app->bind('Cookbook\Eav\Fields\Asset\AssetFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Asset\AssetFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Asset\AssetFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
@@ -112,35 +112,35 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Filesystem\FileRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Boolean\BooleanFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Boolean\BooleanFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Boolean\BooleanFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Decimal\DecimalFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Decimal\DecimalFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Decimal\DecimalFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Integer\IntegerFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Integer\IntegerFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Integer\IntegerFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Relation\RelationFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Relation\RelationFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Relation\RelationFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
@@ -148,28 +148,28 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Select\SelectFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Select\SelectFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Select\SelectFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Text\TextFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Text\TextFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Text\TextFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Textarea\TextareaFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Textarea\TextareaFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Textarea\TextareaFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Location\LocationFieldHandler', function($app) {
+		$this->app->singleton('Cookbook\Eav\Fields\Location\LocationFieldHandler', function($app) {
 			return new \Cookbook\Eav\Fields\Location\LocationFieldHandler( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),

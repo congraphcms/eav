@@ -8,11 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields\Text;
+namespace Cookbook\Eav\ElasticFields\Text;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Support\Facades\Config;
-use Cookbook\Eav\Fields\AbstractFieldHandler;
+use Cookbook\Eav\ElasticFields\AbstractFieldHandler;
+use stdClass;
 
 /**
  * TextFieldHandler class
@@ -28,13 +27,6 @@ use Cookbook\Eav\Fields\AbstractFieldHandler;
  */
 class TextFieldHandler extends AbstractFieldHandler {
 
-	/**
-	 * DB table for SQL
-	 *
-	 * @var array
-	 */
-	protected $table = 'attribute_values_text';
-	
 	/**
 	 * Parse value for database input
 	 * 

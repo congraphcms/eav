@@ -34,6 +34,7 @@ class EavServiceProvider extends ServiceProvider {
 	*/
 	public function register() {
 		$this->mergeConfigFrom(realpath(__DIR__ . '/config/config.php'), 'cb.eav');
+		$this->mergeConfigFrom(realpath(__DIR__ . '/config/elastic.php'), 'cb.elastic');
 		$this->registerServiceProviders();
 	}
 
@@ -45,6 +46,7 @@ class EavServiceProvider extends ServiceProvider {
 	public function boot() {
 		$this->publishes([
 			__DIR__.'/config/config.php' => config_path('cb.eav.php'),
+			__DIR__.'/config/elastic.php' => config_path('cb.elastic.php'),
 			__DIR__.'/database/migrations' => database_path('/migrations'),
 		]);
 	}
@@ -63,6 +65,10 @@ class EavServiceProvider extends ServiceProvider {
 		// -----------------------------------------------------------------------------
 		$this->app->register('Cookbook\Eav\Fields\FieldsServiceProvider');
 
+		// Elastic Fields
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\ElasticFields\FieldsServiceProvider');
+
 		// Commands
 		// -----------------------------------------------------------------------------
 		$this->app->register('Cookbook\Eav\Commands\CommandsServiceProvider');
@@ -74,6 +80,10 @@ class EavServiceProvider extends ServiceProvider {
 		// Validators
 		// -----------------------------------------------------------------------------
 		$this->app->register('Cookbook\Eav\Validators\ValidatorsServiceProvider');
+
+		// Services
+		// -----------------------------------------------------------------------------
+		$this->app->register('Cookbook\Eav\Services\ServicesServiceProvider');
 
 		// Repositories
 		// -----------------------------------------------------------------------------

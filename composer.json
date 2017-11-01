@@ -17,7 +17,8 @@
         "cookbook/contracts": "dev-master",
         "cookbook/filesystem": "dev-master",
         "cookbook/locales": "dev-master",
-        "cookbook/workflows": "dev-master"
+        "cookbook/workflows": "dev-master",
+        "elasticsearch/elasticsearch": "~5.0"
     },
 
     "repositories": [

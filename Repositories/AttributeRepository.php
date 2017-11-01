@@ -74,6 +74,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 */
 	protected $availableFieldTypes;
 
+	protected static $counter;
+
 	/**
 	 * Create new AttributeRepository
 	 * 
@@ -101,6 +103,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 
 		// get available field types
 		$this->availableFieldTypes = $this->attributeManager->getFieldTypes();
+
+		self::$counter = 0;
 	}
 
 // ----------------------------------------------------------------------------------------------
@@ -239,7 +243,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	{
 		// get the attribute
 		$attribute = $this->fetch($id);
-
+		var_dump("delete");
 		if(!$attribute)
 		{
 			throw new NotFoundException(['There is no attribute with that ID.']);
@@ -491,15 +495,15 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$params = func_get_args();
 		$params['function'] = __METHOD__;
 		
-		if(Trunk::has($params, 'attribute'))
-		{
-			$attribute = Trunk::get($id, 'attribute');
-			$attribute->clearIncluded();
-			$attribute->load($include);
-			$meta = ['id' => $id, 'include' => $include];
-			$attribute->setMeta($meta);
-			return $attribute;
-		}
+		// if(Trunk::has($params, 'attribute'))
+		// {
+		// 	$attribute = Trunk::get($id, 'attribute');
+		// 	$attribute->clearIncluded();
+		// 	$attribute->load($include);
+		// 	$meta = ['id' => $id, 'include' => $include];
+		// 	$attribute->setMeta($meta);
+		// 	return $attribute;
+		// }
 
 		$attribute = $this->db->table('attributes')->find($id);
 		
@@ -541,10 +545,9 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		// 						 ->get();
 
 		// $attribute->translations = $translations;
-
+		
 		$fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
 		$attribute = $fieldHandler->formatAttribute($attribute);
-
 		$attribute->type = 'attribute';
 
 		$timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';

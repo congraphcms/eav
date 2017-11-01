@@ -296,8 +296,14 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		try
+		{
+			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand([], 2));
+		}
+		catch (\Exception $e)
+		{
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand([], 1));
+		}
 
 		$this->assertEquals($result, 1);
 		$this->d->dump($result);

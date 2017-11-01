@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields;
+namespace Cookbook\Eav\ElasticFields;
 
 use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
 use Cookbook\Eav\Managers\AttributeManager;
@@ -82,12 +82,12 @@ class FieldHandlerFactory implements FieldHandlerFactoryContract
 	{
 		$fieldSettings = $this->attributeManager->getFieldType($attributeFieldType);
 
-		if(empty($fieldSettings['handler']))
+		if(empty($fieldSettings['elastic_handler']))
 		{
 			throw new \InvalidArgumentException('Field type must have defined handler.');
 		}
 
-		$handler = $fieldSettings['handler'];
+		$handler = $fieldSettings['elastic_handler'];
 
 		if(!in_array($handler, self::$handlers)){
 			self::$handlers[$handler] = $this->container->make($handler);

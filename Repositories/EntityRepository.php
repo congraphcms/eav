@@ -20,6 +20,7 @@ use Cookbook\Contracts\Locales\LocaleRepositoryContract;
 use Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract;
 use Cookbook\Core\Exceptions\Exception;
 use Cookbook\Core\Exceptions\NotFoundException;
+use Cookbook\Core\Exceptions\BadRequestException;
 use Cookbook\Core\Facades\Trunk;
 use Cookbook\Core\Repositories\AbstractRepository;
 use Cookbook\Core\Repositories\Collection;

@@ -52,7 +52,22 @@ class RepositoriesServiceProvider extends ServiceProvider {
 	public function register()
 	{
 		$this->registerRepositories();
+		$this->registerListeners();
 		
+	}
+
+	/**
+	 * Register Event Listeners
+	 *
+	 * @return void
+	 */
+	protected function registerListeners()
+	{
+		// $this->app['events']->listen('cb.after.entity.type.create', 'Cookbook\Eav\Repositories\EntityElasticRepository@onEntityTypeCreated');
+		// $this->app['events']->listen('cb.before.entity.type.update', 'Cookbook\Eav\Repositories\EntityElasticRepository@onBeforeEntityTypeUpdated');
+		// $this->app['events']->listen('cb.after.entity.type.update', 'Cookbook\Eav\Repositories\EntityElasticRepository@onEntityTypeUpdated');
+		// $this->app['events']->listen('cb.before.entity.type.delete', 'Cookbook\Eav\Repositories\EntityElasticRepository@onBeforeEntityTypeDeleted');
+		// $this->app['events']->listen('cb.after.entity.type.delete', 'Cookbook\Eav\Repositories\EntityElasticRepository@onEntityTypeDeleted');
 	}
 
 	/**
@@ -98,11 +113,29 @@ class RepositoriesServiceProvider extends ServiceProvider {
 			'Cookbook\Eav\Repositories\EntityTypeRepository', 'Cookbook\Contracts\Eav\EntityTypeRepositoryContract'
 		);
 
-		$this->app->singleton('Cookbook\Eav\Repositories\EntityRepository', function($app) {
+		// $this->app->singleton('Cookbook\Eav\Repositories\EntityRepository', function($app) {
+		// 	// var_dump('Contract for attribute repository resolving...');
+		// 	return new EntityRepository(
+		// 		$app['db']->connection(),
+		// 		$app->make('Cookbook\Contracts\Eav\FieldHandlerFactoryContract'),
+		// 		$app->make('Cookbook\Eav\Managers\AttributeManager'),
+		// 		$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
+		// 		$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+		// 		$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
+		// 		$app->make('Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract'),
+		// 		$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
+		// 	);
+		// });
+
+		// $this->app->alias(
+		// 	'Cookbook\Eav\Repositories\EntityRepository', 'Cookbook\Contracts\Eav\EntityRepositoryContract'
+		// );
+
+		$this->app->singleton('Cookbook\Eav\Repositories\EntityElasticRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
-			return new EntityRepository(
-				$app['db']->connection(),
-				$app->make('Cookbook\Contracts\Eav\FieldHandlerFactoryContract'),
+			return new EntityElasticRepository(
+				$app->make('Elasticsearch\ClientBuilder'),
+				$app->make('Cookbook\Eav\ElasticFields\FieldHandlerFactory'),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
@@ -113,7 +146,7 @@ class RepositoriesServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->alias(
-			'Cookbook\Eav\Repositories\EntityRepository', 'Cookbook\Contracts\Eav\EntityRepositoryContract'
+			'Cookbook\Eav\Repositories\EntityElasticRepository', 'Cookbook\Contracts\Eav\EntityRepositoryContract'
 		);
 	}
 
@@ -127,7 +160,7 @@ class RepositoriesServiceProvider extends ServiceProvider {
 			'attribute' => 'Cookbook\Eav\Repositories\AttributeRepository',
 			'attribute-set' => 'Cookbook\Eav\Repositories\AttributeSetRepository',
 			'entity-type' => 'Cookbook\Eav\Repositories\EntityTypeRepository',
-			'entity' => 'Cookbook\Eav\Repositories\EntityRepository',
+			'entity' => 'Cookbook\Eav\Repositories\EntityElasticRepository',
 		];
 
 		$this->app->make('Cookbook\Contracts\Core\ObjectResolverContract')->maps($mappings);
@@ -147,7 +180,7 @@ class RepositoriesServiceProvider extends ServiceProvider {
 			'Cookbook\Contracts\Eav\AttributeSetRepositoryContract',
 			'Cookbook\Eav\Repositories\EntityTypeRepository',
 			'Cookbook\Contracts\Eav\EntityTypeRepositoryContract',
-			'Cookbook\Eav\Repositories\EntityRepository',
+			'Cookbook\Eav\Repositories\EntityElasticRepository',
 			'Cookbook\Contracts\Eav\EntityRepositoryContract'
 		];
 	}

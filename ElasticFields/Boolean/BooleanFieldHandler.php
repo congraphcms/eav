@@ -8,16 +8,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields\Text;
+namespace Cookbook\Eav\ElasticFields\Boolean;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Support\Facades\Config;
-use Cookbook\Eav\Fields\AbstractFieldHandler;
+use Cookbook\Eav\ElasticFields\AbstractFieldHandler;
+use stdClass;
 
 /**
- * TextFieldHandler class
+ * BooleanFieldHandler class
  * 
- * Responsible for handling text field types
+ * Responsible for handling boolean field types
  * 
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
@@ -26,14 +25,7 @@ use Cookbook\Eav\Fields\AbstractFieldHandler;
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
-class TextFieldHandler extends AbstractFieldHandler {
-
-	/**
-	 * DB table for SQL
-	 *
-	 * @var array
-	 */
-	protected $table = 'attribute_values_text';
+class BooleanFieldHandler extends AbstractFieldHandler {
 	
 	/**
 	 * Parse value for database input
@@ -45,10 +37,24 @@ class TextFieldHandler extends AbstractFieldHandler {
 	 */
 	public function parseValue($value, $attribute)
 	{
-		if($value !== null)
+		if(is_null($value))
 		{
-			$value = strval($value);
+			return null;
 		}
+		$value = !!intval($value);
+		return $value;
+	}
+
+	/**
+	 * Format value for output
+	 * 
+	 * @param mixed $value
+	 * @param object $attribute
+	 * 
+	 * @return boolean
+	 */
+	public function formatValue($value, $attribute)
+	{
 		return $value;
 	}
 }
