@@ -243,7 +243,6 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	{
 		// get the attribute
 		$attribute = $this->fetch($id);
-		var_dump("delete");
 		if(!$attribute)
 		{
 			throw new NotFoundException(['There is no attribute with that ID.']);

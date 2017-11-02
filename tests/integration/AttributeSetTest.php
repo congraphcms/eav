@@ -336,7 +336,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand([]));
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->assertEquals(4, count($result));
+		// $this->assertEquals(4, count($result));
 		$this->d->dump($result->toArray());
 
 	}

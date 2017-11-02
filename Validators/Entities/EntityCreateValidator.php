@@ -165,7 +165,7 @@ class EntityCreateValidator extends Validator
 			if( is_string($command->params['entity_type']) )
 			{
 				$entityType = $this->entityTypeRepository->get(['code' => $command->params['entity_type']]);
-				if( empty($entityType) )
+				if( count($entityType) == 0 )
 				{
 					$this->exception->addErrors(['entity_type' => 'Invalid entity type.']);
 					throw $this->exception;
