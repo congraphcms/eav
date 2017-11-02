@@ -167,7 +167,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -188,7 +188,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 14) );
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -220,7 +220,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test value', $result->fields->test_text_attribute);
@@ -251,7 +251,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		];
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, 4));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 
@@ -264,7 +264,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('entity', $result->fields->test_relation_attribute->type);
 		$this->assertEquals(2, $result->fields->test_asset_attribute->id);
 		$this->assertEquals('file', $result->fields->test_asset_attribute->type);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testFetchEntity()
@@ -276,7 +276,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 4));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
@@ -289,7 +289,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('file', $result->fields->test_asset_attribute->type);
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand(['include' => 'fields.test_asset_attribute, fields.test_relation_attribute'], 4));
-		$this->d->dump($result->toArray(false, true));
+		// $this->d->dump($result->toArray(false, true));
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
@@ -312,10 +312,10 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Filesystem\Commands\Files\FileDeleteCommand([], 1));
-		$this->d->dump($result);
+		// $this->d->dump($result);
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 4));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertFalse(isset($result->fields->test_asset_attribute));
 	}
 

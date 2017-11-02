@@ -199,7 +199,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals($result->fields->attribute3['fr_FR'], 'changed value');
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testUpdateStatus()
@@ -216,7 +216,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, 1));
 		
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals($result->status, 'published');
@@ -251,8 +251,8 @@ class EntityTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityDeleteCommand([], 1));
 
-		$this->assertEquals(1, $result);
-		$this->d->dump($result);
+		$this->assertEquals(1, $result->id);
+		// $this->d->dump($result);
 		
 
 	}
@@ -281,7 +281,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand(['locale' => 'en_US'], 1));
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		
 
 	}
@@ -297,7 +297,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(4, count($result));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 	}
 
@@ -313,7 +313,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(3, count($result));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testGetFilters()
@@ -330,7 +330,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(1, count($result));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 	}
 

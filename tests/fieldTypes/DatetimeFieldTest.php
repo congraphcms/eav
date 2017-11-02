@@ -153,7 +153,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -174,7 +174,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 12) );
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -211,7 +211,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 			$this->d->dump($e->getErrors());
 		}
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test value', $result->fields->test_text_attribute);
@@ -247,7 +247,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals(11, $result->fields->test_integer_attribute);
 		$this->assertEquals(11.1, $result->fields->test_decimal_attribute);
 		$this->assertEquals('1987-08-19T09:00:00+00:00', $result->toArray()['fields']['test_datetime_attribute']);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testFetchEntity()
@@ -259,7 +259,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 4));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);

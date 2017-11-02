@@ -179,7 +179,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand($params));
 		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testFullTextSearch()
@@ -197,7 +197,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand($params));
 		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 

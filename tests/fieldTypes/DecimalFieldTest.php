@@ -150,7 +150,7 @@ class DecimalFieldTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -171,7 +171,7 @@ class DecimalFieldTest extends Orchestra\Testbench\TestCase
 		
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 11) );
 		
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -206,7 +206,7 @@ class DecimalFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('option2', $result->fields->test_select_attribute);
 		$this->assertEquals(123, $result->fields->test_integer_attribute);
 		$this->assertEquals(33.33, $result->fields->test_decimal_attribute);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 
@@ -234,7 +234,7 @@ class DecimalFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('option1', $result->fields->test_select_attribute);
 		$this->assertEquals(11, $result->fields->test_integer_attribute);
 		$this->assertEquals(44.44, $result->fields->test_decimal_attribute);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testFetchEntity()
@@ -246,7 +246,7 @@ class DecimalFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 4));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
@@ -265,41 +265,41 @@ class DecimalFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => '11.1']]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(1, count($result));
 		$this->assertEquals(11.1, $result[0]->fields->test_decimal_attribute);
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['in' => '11.1']]]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(1, count($result));
 		$this->assertEquals(11.1, $result[0]->fields->test_decimal_attribute);
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['nin' => '11.1']]]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(0, count($result));
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['lt' => '11.1']]]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(0, count($result));
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['lte' => '11.1']]]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(1, count($result));
 		$this->assertEquals(11.1, $result[0]->fields->test_decimal_attribute);
 
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['gt' => '11.1']]]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(0, count($result));
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['gte' => '11.1']]]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(1, count($result));
 		$this->assertEquals(11.1, $result[0]->fields->test_decimal_attribute);

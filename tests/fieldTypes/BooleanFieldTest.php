@@ -149,7 +149,7 @@ class BooleanFieldTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -171,7 +171,7 @@ class BooleanFieldTest extends Orchestra\Testbench\TestCase
 		
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 15) );
 		
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -206,7 +206,7 @@ class BooleanFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('option2', $result->fields->test_select_attribute);
 		$this->assertEquals(123, $result->fields->test_integer_attribute);
 		$this->assertEquals(1, $result->fields->test_boolean_attribute);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 
@@ -231,7 +231,7 @@ class BooleanFieldTest extends Orchestra\Testbench\TestCase
 		
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(1, $result->fields->test_boolean_attribute);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testFetchEntity()
@@ -243,7 +243,7 @@ class BooleanFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 4));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('field text value', $result->fields->test_text_attribute);
@@ -262,19 +262,19 @@ class BooleanFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_boolean_attribute' => '0']]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(1, count($result));
 		$this->assertEquals(0, $result[0]->fields->test_boolean_attribute);
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_boolean_attribute' => ['ne' => '1']]]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(1, count($result));
 		$this->assertEquals(0, $result[0]->fields->test_boolean_attribute);
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_boolean_attribute' => '1']]));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(0, count($result));
 	}

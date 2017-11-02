@@ -156,7 +156,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 
 		$this->assertEquals('tekstic', $result->fields->simple_text);
 		$this->assertEquals('option1', $result->fields->simple_select);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		// create nones entity but publish it
 		fwrite(STDOUT, 'create nones entity but publish it' . "\n");
@@ -187,7 +187,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 
 		$this->assertEquals('tekstic', $result->fields->simple_text);
 		$this->assertEquals('option1', $result->fields->simple_select);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		// create localized entity for one locale
 		fwrite(STDOUT, 'create localized entity for one locale' . "\n");
@@ -223,7 +223,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('option1_locale1', $result->fields->localized_select);
 		$this->assertEquals('option1', $result->fields->simple_select);
 		
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		// fetch half made entity (doesn't have all locales)
 		fwrite(STDOUT, 'fetch half made entity (doesn\'t have all locales)' . "\n");
@@ -245,7 +245,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('tekstic', $result->fields->simple_text);
 		$this->assertEquals(['en_US' => 'option1_locale1', 'fr_FR' => null], $result->fields->localized_select);
 		$this->assertEquals('option1', $result->fields->simple_select);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		// fetch locale that isn\'t made
 		fwrite(STDOUT, 'fetch locale that isn\'t made' . "\n");
@@ -267,7 +267,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('tekstic', $result->fields->simple_text);
 		$this->assertFalse(isset($result->localized_select));
 		$this->assertEquals('option1', $result->fields->simple_select);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		// create localized entity for all locales
 		fwrite(STDOUT, 'create localized entity for all locales' . "\n");
@@ -311,7 +311,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals(['en_US' => 'option1_locale1', 'fr_FR' => 'option1_locale2'], $result->fields->localized_select);
 		$this->assertEquals('option1', $result->fields->simple_select);
 		
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 }

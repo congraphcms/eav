@@ -53,6 +53,6 @@ class EntityDeleteHandler extends RepositoryCommandHandler
 	{
 		$entity = $this->repository->delete($command->id);
 
-		return $entity->id;
+		return $entity;
 	}
 }

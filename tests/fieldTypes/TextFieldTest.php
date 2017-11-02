@@ -150,7 +150,7 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -173,7 +173,7 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals($result->code, 'text_attribute_changed');
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testCreateEntity()
@@ -201,7 +201,7 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('test_value', $result->fields->attribute1);
 		$this->assertEquals('test_value2', $result->fields->attribute2);
 		$this->assertEquals('56', $result->fields->attribute3);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 
@@ -227,7 +227,7 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('changed value', $result->fields->attribute1);
 		$this->assertEquals('value2', $result->fields->attribute2);
 		$this->assertEquals('value3-en', $result->fields->attribute3);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testFetchEntity()
@@ -239,7 +239,7 @@ class TextFieldTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 1));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('value1', $result->fields->attribute1);

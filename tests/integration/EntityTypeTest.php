@@ -153,7 +153,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	/**
@@ -196,7 +196,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test_type_changed', $result->code);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	/**
@@ -227,8 +227,8 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeDeleteCommand([], 1) );
 
-		$this->assertEquals($result, 1);
-		$this->d->dump($result);
+		$this->assertEquals(1, $result->id);
+		// $this->d->dump($result);
 	}
 
 	/**
@@ -256,7 +256,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(1, $result->id);
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testFetchWithInclude()
@@ -272,13 +272,13 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(1, $result->id);
 		$this->assertEquals(3, count($result->attribute_sets));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		$arrayWithMeta = $result->toArray(true, false);
 		$this->assertEquals(1, $arrayWithMeta['meta']['id']);
 		$this->assertEquals('workflow, default_point, attribute_sets.attributes', $arrayWithMeta['meta']['include']);
 		$this->assertEquals(12, count($arrayWithMeta['included']));
 
-		$this->d->dump($arrayWithMeta);
+		// $this->d->dump($arrayWithMeta);
 	}
 
 	/**
@@ -304,7 +304,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(4, count($result));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 	}
 
@@ -320,7 +320,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(count($result), 2);
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 }

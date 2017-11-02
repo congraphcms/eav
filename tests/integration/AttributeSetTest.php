@@ -153,7 +153,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	/**
@@ -196,7 +196,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('attribute_set_changed', $result->code);
 		$this->assertEquals(3, count($result->attributes));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testUpdateSetAttributes()
@@ -234,7 +234,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(3, count($result->attributes));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	/**
@@ -263,8 +263,8 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand([], 1));
 
-		$this->assertEquals($result, 1);
-		$this->d->dump($result);
+		$this->assertEquals(1, $result->id);
+		// $this->d->dump($result);
 	}
 
 	/**
@@ -290,7 +290,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(3, count($result->attributes));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testFetchWithInclude()
@@ -304,14 +304,14 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(3, count($result->attributes));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$arrayWithMeta = $result->toArray(true, false);
 		$this->assertEquals(1, $arrayWithMeta['meta']['id']);
 		$this->assertEquals('attributes', $arrayWithMeta['meta']['include']);
 		$this->assertEquals(3, count($arrayWithMeta['included']));
 
-		$this->d->dump($arrayWithMeta);
+		// $this->d->dump($arrayWithMeta);
 
 	}
 
@@ -337,7 +337,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		// $this->assertEquals(4, count($result));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 	}
 
@@ -353,7 +353,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(2, count($result));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 }

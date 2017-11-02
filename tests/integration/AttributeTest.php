@@ -154,7 +154,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testCreateWithOptions()
@@ -201,7 +201,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue(is_int($result->id));
 		$this->assertTrue(is_array($result->options));
 		$this->assertFalse(empty($result->options));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	/**
@@ -246,7 +246,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('changed', $result->admin_label);
 		$this->assertEquals('changed_notice', $result->admin_notice);
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	public function testUpdateSameCode()
@@ -270,7 +270,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('changed', $result->admin_label);
 		$this->assertEquals('changed_notice', $result->admin_notice);
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 	/**
@@ -305,8 +305,8 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 		}
 
-		$this->assertEquals(2, $result);
-		$this->d->dump($result);
+		$this->assertEquals(2, $result->id);
+		// $this->d->dump($result);
 		
 
 	}
@@ -337,7 +337,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals($result->code, 'attribute1');
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		
 
 	}
@@ -353,7 +353,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		// $this->assertEquals(16, count($result));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 	}
 
@@ -370,7 +370,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals(3, count($result));
 
 		$arrayResult = $result->toArray();
-		$this->d->dump($arrayResult);
+		// $this->d->dump($arrayResult);
 
 		$arrayResultWithMeta = $result->toArray(true);
 		$this->assertEquals(['-code'], $arrayResultWithMeta['meta']['sort']);
@@ -380,7 +380,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals([], $arrayResultWithMeta['meta']['include']);
 		$this->assertEquals(3, $arrayResultWithMeta['meta']['count']);
 		// $this->assertEquals(16, $arrayResultWithMeta['meta']['total']);
-		$this->d->dump($arrayResultWithMeta);
+		// $this->d->dump($arrayResultWithMeta);
 	}
 
 	public function testGetFilters()
@@ -394,7 +394,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(1, count($result));
@@ -408,7 +408,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(3, count($result));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$filter = [ 'id' => ['nin'=>[5,6,7,1]] ];
 
@@ -417,7 +417,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		// $this->assertEquals(12, count($result));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$filter = [ 'id' => ['lt'=>3] ];
 
@@ -426,7 +426,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		// $this->assertEquals(2, count($result));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$filter = [ 'id' => ['lte'=>3] ];
 
@@ -435,7 +435,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		$this->assertEquals(3, count($result));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 
 		$filter = [ 'id' => ['ne'=>3] ];
 
@@ -444,7 +444,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
 		// $this->assertEquals(15, count($result));
 
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 }

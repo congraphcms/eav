@@ -78,6 +78,6 @@ class AttributeDeleteHandler extends RepositoryCommandHandler
 
 		$this->entityRepository->deleteByAttribute($attribute);
 
-		return $attribute->id;
+		return $attribute;
 	}
 }

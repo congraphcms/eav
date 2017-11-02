@@ -75,6 +75,6 @@ class EntityTypeDeleteHandler extends RepositoryCommandHandler
 
 		$this->entityRepository->deleteByEntityType($entityType);
 
-		return $entityType->id;
+		return $entityType;
 	}
 }
