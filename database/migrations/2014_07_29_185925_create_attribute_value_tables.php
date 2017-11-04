@@ -60,6 +60,13 @@ class CreateAttributeValueTables extends Migration {
 
 			// Attribute value
 			$table->dateTime('value')->nullable();
+
+			// create indexes
+			$table->index('entity_type_id');
+			$table->index('attribute_set_id');
+			$table->index('attribute_id');
+			$table->index('entity_id');
+			$table->index('locale_id');
 		});
 
 
@@ -89,6 +96,13 @@ class CreateAttributeValueTables extends Migration {
 
 			// Attribute value
 			$table->integer('value')->nullable();
+
+			// create indexes
+			$table->index('entity_type_id');
+			$table->index('attribute_set_id');
+			$table->index('attribute_id');
+			$table->index('entity_id');
+			$table->index('locale_id');
 		});
 
 
@@ -118,6 +132,13 @@ class CreateAttributeValueTables extends Migration {
 
 			// Attribute value
 			$table->decimal('value')->nullable();
+
+			// create indexes
+			$table->index('entity_type_id');
+			$table->index('attribute_set_id');
+			$table->index('attribute_id');
+			$table->index('entity_id');
+			$table->index('locale_id');
 		});
 
 
@@ -147,6 +168,13 @@ class CreateAttributeValueTables extends Migration {
 
 			// Attribute value
 			$table->text('value')->nullable();
+
+			// create indexes
+			$table->index('entity_type_id');
+			$table->index('attribute_set_id');
+			$table->index('attribute_id');
+			$table->index('entity_id');
+			$table->index('locale_id');
 		});
 
 		// 1.4 Create attribute_values_fulltext table
@@ -175,6 +203,13 @@ class CreateAttributeValueTables extends Migration {
 
 			// Attribute value
 			$table->text('value');
+
+			// create indexes
+			$table->index('entity_type_id');
+			$table->index('attribute_set_id');
+			$table->index('attribute_id');
+			$table->index('entity_id');
+			$table->index('locale_id');
 		});
 
 		DB::statement('ALTER TABLE attribute_values_fulltext ADD FULLTEXT(value)');

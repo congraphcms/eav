@@ -154,7 +154,7 @@ class EntityTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->d->dump($result->toArray());
+		// $this->d->dump($result->toArray());
 	}
 
 

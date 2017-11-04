@@ -57,6 +57,9 @@ class CreateAttributeSetTables extends Migration {
 			// created_at and updated_at timestamps
 			$table->timestamp('created_at')->nullable();
 			$table->timestamp('updated_at')->nullable();
+
+			// create indexes
+			$table->index('entity_type_id');
 		});
 
 
@@ -128,6 +131,10 @@ class CreateAttributeSetTables extends Migration {
 
 			// Order of the attribute in group
 			$table->integer('sort_order')->default(0);
+
+			// create indexes
+			$table->index('attribute_set_id');
+			$table->index('attribute_id');
 		});
 	}
 

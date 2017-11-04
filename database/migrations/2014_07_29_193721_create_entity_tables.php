@@ -52,6 +52,10 @@ class CreateEntityTables extends Migration {
 			// created_at and updated_at timestamps
 			$table->timestamp('created_at')->nullable();
 			$table->timestamp('updated_at')->nullable();
+
+			// create indexes
+			$table->index('entity_type_id');
+			$table->index('attribute_set_id');
 		});
 
 		// 1.1 Create enity_statuses table
@@ -82,6 +86,11 @@ class CreateEntityTables extends Migration {
 			// created_at and updated_at timestamps
 			$table->timestamp('created_at')->nullable();
 			$table->timestamp('updated_at')->nullable();
+
+			// create indexes
+			$table->index('locale_id');
+			$table->index('workflow_point_id');
+			$table->index('entity_id');
 		});
 
 
@@ -128,6 +137,10 @@ class CreateEntityTables extends Migration {
 			// created_at and updated_at timestamps
 			$table->timestamp('created_at')->nullable();
 			$table->timestamp('updated_at')->nullable();
+
+			// create indexes
+			$table->index('workflow_id');
+			$table->index('default_point_id');
 		});
 	}
 
