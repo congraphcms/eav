@@ -173,6 +173,17 @@ class MetaDataService//, UsesCache
         return false;
     }
 
+    public function getAttributeByIdOrCode($identifier)
+    {
+        $attribute = $this->getAttributeById($identifier);
+        if($attribute === false)
+        {
+            $attribute = $this->getAttributeByCode($identifier);
+        }
+
+        return $attribute;
+    }
+
     public function getEntityTypes()
     {
         if(self::$entityTypes === null)
@@ -207,6 +218,17 @@ class MetaDataService//, UsesCache
         }
 
         return false;
+    }
+
+    public function getEntityTypeByIdOrCode($identifier)
+    {
+        $type = $this->getEntityTypeById($identifier);
+        if($type === false)
+        {
+            $type = $this->getEntityTypeByCode($identifier);
+        }
+
+        return $type;
     }
 
     public function getAttributeSets()
@@ -245,6 +267,17 @@ class MetaDataService//, UsesCache
         return false;
     }
 
+    public function getAttributeSetByIdOrCode($identifier)
+    {
+        $set = $this->getAttributeSetById($identifier);
+        if($set === false)
+        {
+            $set = $this->getAttributeSetByCode($identifier);
+        }
+
+        return $set;
+    }
+
     public function getLocales()
     {
         if(self::$locales === null)
@@ -279,6 +312,17 @@ class MetaDataService//, UsesCache
         }
 
         return false;
+    }
+
+    public function getLocaleByIdOrCode($identifier)
+    {
+        $locale = $this->getLocaleById($identifier);
+        if($locale === false)
+        {
+            $locale = $this->getLocaleByCode($identifier);
+        }
+
+        return $locale;
     }
 
     public function getWorkflows()
@@ -317,6 +361,17 @@ class MetaDataService//, UsesCache
         return false;
     }
 
+    public function getWorkflowByIdOrName($identifier)
+    {
+        $workflow = $this->getWorkflowById($identifier);
+        if($workflow === false)
+        {
+            $workflow = $this->getWorkflowByName($identifier);
+        }
+
+        return $workflow;
+    }
+
     public function getWorkflowPoints()
     {
         if(self::$workflowPoints === null)
@@ -351,5 +406,16 @@ class MetaDataService//, UsesCache
         }
 
         return false;
+    }
+
+    public function getWorkflowPointByIdOrStatus($identifier)
+    {
+        $point = $this->getWorkflowPointById($identifier);
+        if($point === false)
+        {
+            $point = $this->getWorkflowPointByStatus($identifier);
+        }
+
+        return $point;
     }
 }
