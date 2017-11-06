@@ -9,6 +9,9 @@
  */
 
 return array(
+
+	'using_elastic': env('USING_ELASTIC', false),,
+
 	/**
 	 * List of data types supported by application
 	 * 
