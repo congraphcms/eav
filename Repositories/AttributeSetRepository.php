@@ -23,6 +23,7 @@ use Cookbook\Core\Facades\Trunk;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use stdClass;
 
@@ -101,6 +102,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		$this->insertSetAttributes($setAttributeParams);
 
 		$attributeSet = $this->fetch($attributeSetId);
+		Cache::forget('attributeSets');
 
 		return $attributeSet;
 		
@@ -152,6 +154,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		
 		Trunk::forgetType('attribute-set');
 		$attributeSet = $this->fetch($attributeSetId);
+		Cache::forget('attributeSets');
 
 		return $attributeSet;
 	}
@@ -181,6 +184,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		$this->db->table('attribute_sets')->where('id', '=', $id)->delete();
 
 		Trunk::forgetType('attribute-set');
+		Cache::forget('attributeSets');
 		return $attributeSet;
 	}
 
@@ -205,6 +209,8 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 
 			// delete the attribute set
 			$this->db->table('attribute_sets')->where('entity_type_id', '=', $entityType->id)->delete();
+
+			Cache::forget('attributeSets');
 		}
 	}
 
@@ -221,6 +227,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 	{
 		$this->deleteSetAttributesByAttribute($attribute->id);
 		Trunk::forgetType('attribute-set');
+		Cache::forget('attributeSets');
 	}
 
 

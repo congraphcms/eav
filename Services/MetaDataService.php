@@ -29,6 +29,7 @@ use Cookbook\Eav\Traits\ElasticQueryBuilderTrait;
 use Elasticsearch\ClientBuilder;
 // use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
 use stdClass;
 
 /**
@@ -50,14 +51,14 @@ use stdClass;
 class MetaDataService//, UsesCache
 {
 
-	/**
+    /**
      * Repository for handling attributes
      *
      * @var \Cookbook\Contracts\Eav\AttributeRepositoryContract
      */
     protected $attributeRepository;
 
-	/**
+    /**
      * Repository for handling attribute sets
      *
      * @var \Cookbook\Contracts\Eav\AttributeSetRepositoryContract
@@ -141,7 +142,10 @@ class MetaDataService//, UsesCache
     {
         if(self::$attributes === null)
         {
-            self::$attributes = $this->attributeRepository->get();
+            // self::$attributes = $this->attributeRepository->get();
+            self::$attributes = Cache::rememberForever('attributes', function() {
+                return $this->attributeRepository->get();
+            });
         }
 
         return self::$attributes;
@@ -188,7 +192,10 @@ class MetaDataService//, UsesCache
     {
         if(self::$entityTypes === null)
         {
-            self::$entityTypes = $this->entityTypeRepository->get();
+            // self::$entityTypes = $this->entityTypeRepository->get();
+            self::$entityTypes = Cache::rememberForever('entityTypes', function() {
+                return $this->entityTypeRepository->get();
+            });
         }
 
         return self::$entityTypes;
@@ -235,7 +242,10 @@ class MetaDataService//, UsesCache
     {
         if(self::$attributeSets === null)
         {
-            self::$attributeSets = $this->attributeSetRepository->get();
+            // self::$attributeSets = $this->attributeSetRepository->get();
+            self::$attributeSets = Cache::rememberForever('attributeSets', function() {
+                return $this->attributeSetRepository->get();
+            });
         }
 
         return self::$attributeSets;
@@ -282,7 +292,10 @@ class MetaDataService//, UsesCache
     {
         if(self::$locales === null)
         {
-            self::$locales = $this->localeRepository->get();
+            // self::$locales = $this->localeRepository->get();
+            self::$locales = Cache::rememberForever('locales', function() {
+                return $this->localeRepository->get();
+            });
         }
 
         return self::$locales;
@@ -329,7 +342,10 @@ class MetaDataService//, UsesCache
     {
         if(self::$workflows === null)
         {
-            self::$workflows = $this->workflowRepository->get();
+            // self::$workflows = $this->workflowRepository->get();
+            self::$workflows = Cache::rememberForever('workflows', function() {
+                return $this->workflowRepository->get();
+            });
         }
 
         return self::$workflows;
@@ -376,7 +392,10 @@ class MetaDataService//, UsesCache
     {
         if(self::$workflowPoints === null)
         {
-            self::$workflowPoints = $this->workflowPointRepository->get();
+            // self::$workflowPoints = $this->workflowPointRepository->get();
+            self::$workflowPoints = Cache::rememberForever('workflowPoints', function() {
+                return $this->workflowPointRepository->get();
+            });
         }
 
         return self::$workflowPoints;

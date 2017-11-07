@@ -23,6 +23,7 @@ use Cookbook\Core\Repositories\UsesCache;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 
@@ -166,6 +167,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$this->updateOptions($optionParams, $attribute);
 
 		$attribute = $this->fetch($attribute->id);
+		Cache::forget('attributes');
 
 		// and return newly created attribute
 		return $attribute;
@@ -225,6 +227,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		Trunk::forgetType('attribute');
 
 		$attribute = $this->fetch($id);
+		Cache::forget('attributes');
 
 		// and return attrubute
 		return $attribute;
@@ -255,6 +258,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		$this->db->table('attributes')->where('id', '=', $attribute->id)->delete();
 
 		Trunk::forgetType('attribute');
+		Cache::forget('attributes');
 
 		return $attribute;
 	}

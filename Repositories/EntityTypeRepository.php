@@ -24,6 +24,9 @@ use Cookbook\Core\Repositories\Model;
 
 use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
 
+
+use Illuminate\Support\Facades\Cache;
+
 use Carbon\Carbon;
 
 use stdClass;
@@ -93,6 +96,8 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 
 		$entityType = $this->fetch($entityTypeID);
 
+		Cache::forget('entityTypes');
+
 		return $entityType;
 		
 	}
@@ -127,6 +132,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		$this->db->table('entity_types')->where('id', '=', $id)->update($entityTypeParams);
 
 		Trunk::forgetType('entity-type');
+		Cache::forget('entityTypes');
 
 		return $this->fetch($id);
 		
@@ -156,6 +162,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 					->delete();
 
 		Trunk::forgetType('entity-type');
+		Cache::forget('entityTypes');
 
 		return $entityType;
 	}
