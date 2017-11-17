@@ -163,7 +163,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 		$params = [
 			'code' => 'code',
-			'field_type' => 'text',
+			'field_type' => 'select',
 			'localized' => false,
 			'default_value' => '',
 			'unique' => false,
@@ -233,7 +233,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$params = [
-			'code' => 'attribute_updated',
+			// 'code' => 'attribute_updated',
 			'admin_label' => 'changed',
 			'admin_notice' => 'changed_notice'
 		];
@@ -242,7 +242,7 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals('attribute_updated', $result->code);
+		// $this->assertEquals('attribute_updated', $result->code);
 		$this->assertEquals('changed', $result->admin_label);
 		$this->assertEquals('changed_notice', $result->admin_notice);
 
@@ -271,23 +271,6 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('changed_notice', $result->admin_notice);
 
 		// $this->d->dump($result->toArray());
-	}
-
-	/**
-	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
-	 */
-	public function testUpdateException()
-	{
-		fwrite(STDOUT, __METHOD__ . "\n");
-
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$params = [
-			'code' => ''
-		];
-
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 1) );
 	}
 
 	public function testDeleteAttribute()

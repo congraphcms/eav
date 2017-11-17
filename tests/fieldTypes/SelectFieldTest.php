@@ -191,7 +191,7 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'code' => 'select_attribute_changed',
+			'admin_label' => 'select_attribute_changed',
 			'options' => [
 				[
 					'id' => 1,
@@ -215,7 +215,7 @@ class SelectFieldTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'select_attribute_changed');
+		$this->assertEquals($result->admin_label, 'select_attribute_changed');
 		$this->assertTrue(is_array($result->options));
 		$this->assertEquals(2, count($result->options));
 		$this->assertEquals('option_changed', $result->options[0]->value);

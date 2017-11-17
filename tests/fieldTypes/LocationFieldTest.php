@@ -159,7 +159,7 @@ class LocationFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'code' => 'location_attribute_changed'
+			'admin_label' => 'location_attribute_changed'
 		];
 
 		$app = $this->createApplication();
@@ -171,7 +171,7 @@ class LocationFieldTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'location_attribute_changed');
+		$this->assertEquals($result->admin_label, 'location_attribute_changed');
 
 	}
 

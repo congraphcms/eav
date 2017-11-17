@@ -166,7 +166,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'code' => 'datetime_attribute_changed'
+			'admin_label' => 'datetime_attribute_changed'
 		];
 
 		$app = $this->createApplication();
@@ -178,7 +178,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'datetime_attribute_changed');
+		$this->assertEquals($result->admin_label, 'datetime_attribute_changed');
 
 	}
 

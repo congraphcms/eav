@@ -163,7 +163,7 @@ class DecimalFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'code' => 'decimal_attribute_changed'
+			'admin_label' => 'decimal_attribute_changed'
 		];
 
 		$app = $this->createApplication();
@@ -175,7 +175,7 @@ class DecimalFieldTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'decimal_attribute_changed');
+		$this->assertEquals($result->admin_label, 'decimal_attribute_changed');
 		
 	}
 

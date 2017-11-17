@@ -140,7 +140,7 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 						
 					}
 
-					if ($entity instanceof \Cookbook\Core\Repositories\Model && $takeFromEntity && property_exists($entity, $code))
+					if ($entity instanceof \Cookbook\Core\Repositories\Model && $takeFromEntity && property_exists($entity->fields, $code))
 					{
 						// var_dump('calculate from entity - ' . $localeCode . ' - ' . $locale);
 						// var_dump($entity->fields->$code);

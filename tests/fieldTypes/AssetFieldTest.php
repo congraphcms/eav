@@ -180,7 +180,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'code' => 'asset_attribute_changed'
+			'admin_label' => 'asset_attribute_changed'
 		];
 
 		$app = $this->createApplication();
@@ -192,7 +192,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'asset_attribute_changed');
+		$this->assertEquals($result->admin_label, 'asset_attribute_changed');
 
 	}
 

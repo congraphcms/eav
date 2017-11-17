@@ -162,7 +162,7 @@ class RelationFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'code' => 'relation_attribute_changed'
+			'admin_label' => 'relation_attribute_changed'
 		];
 
 		$app = $this->createApplication();
@@ -174,7 +174,7 @@ class RelationFieldTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->code, 'relation_attribute_changed');
+		$this->assertEquals($result->admin_label, 'relation_attribute_changed');
 
 	}
 
