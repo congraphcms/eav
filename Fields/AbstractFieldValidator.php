@@ -117,6 +117,11 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 			$this->exception->addErrors(['localized' => 'This attribute type can\'t be localized.']);
 		}
 
+		if( ! $attributeSettings['has_options'] && ! empty($params['options']) )
+		{
+			$this->exception->addErrors(['options' => 'This attribute type can\'t have options.']);
+		}
+
 		if($this->exception->hasErrors())
 		{
 			throw $this->exception;

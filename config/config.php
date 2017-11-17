@@ -295,6 +295,23 @@ return array(
 			'has_multiple_values'		=> false,
 			'sortable'					=> false
 		),
+
+		'compound' => array(
+			'label'						=> 'Compound',
+			'table' 					=> 'attribute_values_text',
+			'handler'					=> 'Cookbook\Eav\Fields\Compound\CompoundFieldHandler',
+			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Compound\CompoundFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Compound\CompoundFieldValidator',
+			'handler_name'				=> 'CompoundFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_unique'				=> false,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> true,
+			'has_options'				=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> true
+		),
 	)
 
 );

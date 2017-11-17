@@ -173,12 +173,18 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             $status = $model['status'];
         }
 
-        unset($model['fields']);
-        unset($model['locale']);
-        unset($model['status']);
+        // unset($model['fields']);
+        // unset($model['locale']);
+        // unset($model['status']);
 
+        $entityParams = [
+            'entity_type_id' => $model['entity_type_id'],
+            'attribute_set_id' => $model['attribute_set_id']
+        ];
         // insert entity
-        $entityID = $this->insertEntity($model);
+        $entityID = $this->insertEntity($entityParams);
+
+        $model['id'] = $entityID;
 
         foreach ($attributes as $attribute) {
             $fieldForInsert = [];
@@ -208,7 +214,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             }
         }
 
-        $this->insertFields($fieldsForInsert, $attributes);
+        $this->insertFields($fieldsForInsert, $attributes, $model, null);
 
         $entityType = $this->entityTypeRepository->fetch($model['entity_type_id']);
 
@@ -272,7 +278,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         if (! empty($model['status'])) {
             $status = $model['status'];
         }
-        unset($model['status']);
+        // unset($model['status']);
         
 
         $fieldsForUpdate = [];
@@ -309,7 +315,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             }
         }
 
-        $this->updateFields($fieldsForUpdate, $attributes);
+        $this->updateFields($fieldsForUpdate, $attributes, $model, $entity);
 
         $entityType = $this->entityTypeRepository->fetch($entity->entity_type_id);
 
@@ -473,13 +479,13 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
      *
      * @return void
      */
-    protected function insertFields(array $fields, $attributes)
+    protected function insertFields(array $fields, $attributes, $params, $entity)
     {
         foreach ($fields as $field) {
             foreach ($attributes as $attribute) {
                 if ($attribute->id == $field['attribute_id']) {
                     $fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-                    $fieldHandler->insert($field, $attribute);
+                    $fieldHandler->insert($field, $attribute, $params, $entity);
                 }
             }
         }
@@ -493,13 +499,13 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
      *
      * @return boolean
      */
-    protected function updateFields(array $fields, $attributes)
+    protected function updateFields(array $fields, $attributes, $params, $entity)
     {
         foreach ($fields as $field) {
             foreach ($attributes as $attribute) {
                 if ($attribute->id == $field['attribute_id']) {
                     $fieldHandler = $this->fieldHandlerFactory->make($attribute->field_type);
-                    $fieldHandler->update($field, $attribute);
+                    $fieldHandler->update($field, $attribute, $params, $entity);
                 }
             }
         }

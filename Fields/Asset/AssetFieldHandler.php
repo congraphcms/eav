@@ -44,7 +44,7 @@ class AssetFieldHandler extends AbstractFieldHandler {
 	 * 
 	 * @return boolean
 	 */
-	public function parseValue($value, $attribute)
+	public function parseValue($value, $attribute, $locale, $params, $entity)
 	{
 		if(empty($value))
 		{
@@ -84,9 +84,9 @@ class AssetFieldHandler extends AbstractFieldHandler {
 	 * 
 	 * @return boolean
 	 */
-	public function insert($valueParams, $attribute)
+	public function insert($valueParams, $attribute, $params, $entity)
 	{
-		parent::insert($valueParams, $attribute);
+		parent::insert($valueParams, $attribute, $params, $entity);
 
 		// check if file is an image and create appropriate versions
 		
@@ -110,9 +110,9 @@ class AssetFieldHandler extends AbstractFieldHandler {
 	 * 
 	 * @return boolean
 	 */
-	public function update($valueParams, $attribute)
+	public function update($valueParams, $attribute, $params, $entity)
 	{
-		parent::update($valueParams, $attribute);
+		parent::update($valueParams, $attribute, $params, $entity);
 
 		// check if file is an image and create appropriate versions
 	}

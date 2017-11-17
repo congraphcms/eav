@@ -43,7 +43,7 @@ class TextFieldHandler extends AbstractFieldHandler {
 	 * 
 	 * @return boolean
 	 */
-	public function parseValue($value, $attribute)
+	public function parseValue($value, $attribute, $locale, $params, $entity)
 	{
 		if($value !== null)
 		{

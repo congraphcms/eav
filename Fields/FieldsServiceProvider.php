@@ -64,6 +64,8 @@ class FieldsServiceProvider extends ServiceProvider {
 	protected function registerListeners()
 	{
 		$this->app['events']->listen('cb.after.file.delete', 'Cookbook\Eav\Fields\Asset\AssetFieldHandler@onFileDelete');
+		$this->app['events']->listen('cb.before.entity.update', 'Cookbook\Eav\Fields\Compound\CompoundFieldHandler@onBeforeEntityUpdate');
+		$this->app['events']->listen('cb.after.entity.update', 'Cookbook\Eav\Fields\Compound\CompoundFieldHandler@onAfterEntityUpdate');
 	}
 
 	/**
@@ -176,6 +178,14 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
+		$this->app->singleton('Cookbook\Eav\Fields\Compound\CompoundFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Compound\CompoundFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+			);
+		});
 	}
 
 	/**
@@ -257,6 +267,13 @@ class FieldsServiceProvider extends ServiceProvider {
 		});
 		$this->app->bind('Cookbook\Eav\Fields\Location\LocationFieldValidator', function($app) {
 			return new \Cookbook\Eav\Fields\Location\LocationFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Compound\CompoundFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Compound\CompoundFieldValidator( 
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')

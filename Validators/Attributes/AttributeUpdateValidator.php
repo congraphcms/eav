@@ -93,7 +93,7 @@ class AttributeUpdateValidator extends Validator
 
 		$this->rules = [
 			// 'id'					=> 'required|exists:attributes,id',
-			'code'					=> ['sometimes', 'required', 'unique:attributes,code', 'regex:/^[0-9a-zA-Z-_]*$/'],
+			// 'code'					=> ['sometimes', 'required', 'unique:attributes,code', 'regex:/^[0-9a-zA-Z-_]*$/'],
 			'admin_label'			=> 'sometimes|max:100',
 			'admin_notice'			=> 'sometimes|max:1000',
 			// 'field_type' 			=> 'required|in:' . implode(array_keys($this->availableFieldTypes), ','),

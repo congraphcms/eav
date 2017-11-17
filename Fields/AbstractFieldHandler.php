@@ -15,6 +15,7 @@ use Cookbook\Contracts\Eav\FieldHandlerContract;
 use Cookbook\Core\Traits\ErrorManagerTrait;
 use Cookbook\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\Event;
 
 /**
  * Abstract Field Handler class
@@ -92,9 +93,22 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * 
 	 * @return boolean
 	 */
-	public function parseValue($value, $attribute)
+	public function parseValue($value, $attribute, $locale, $params, $entity)
 	{
 		return $value;
+	}
+
+	/**
+	 * Parse value for database input
+	 * 
+	 * @param mixed $value
+	 * @param object $attribute
+	 * 
+	 * @return boolean
+	 */
+	public function parseFilter($filter, $attribute)
+	{
+		return $this->parseValue($filter, $attribute, null, null, null);
 	}
 
 	/**
@@ -145,7 +159,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * 
 	 * @return boolean
 	 */
-	public function insert($valueParams, $attribute)
+	public function insert($valueParams, $attribute, $params, $entity)
 	{
 		$attributeSettings = $this->attributeManager->getFieldTypes()[$attribute->field_type];
 
@@ -156,15 +170,28 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				$valueParams['value'] = [$valueParams['value']];
 			}
 
+			foreach ($valueParams['value'] as &$value)
+			{
+				$parsedValue = $this->parseValue($value, $attribute, $valueParams['locale_id'], $params, $entity);
+				$value = $parsedValue;
+			}
+		}
+		else
+		{
+			$parsedValue = $this->parseValue($valueParams['value'], $attribute, $valueParams['locale_id'], $params, $entity);
+			$valueParams['value'] = $parsedValue;
+		}
+
+		Event::fire('cb.before.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
+
+		if($attributeSettings['has_multiple_values'])
+		{
 			// sort_order counter
 			$sort_order = 0;
-
 			foreach ($valueParams['value'] as $value)
 			{
 				$singleValueParams = $valueParams;
-				$parsedValue = $this->parseValue($value, $attribute);
-				$singleValueParams['value'] = $parsedValue;
-				// give it a sort_order
+				$singleValueParams['value'] = $value;
 				$singleValueParams['sort_order'] = $sort_order++;
 				$this->db->table($this->table)->insert($singleValueParams);
 				if($attribute->searchable)
@@ -175,14 +202,14 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		}
 		else
 		{
-			$parsedValue = $this->parseValue($valueParams['value'], $attribute);
-			$valueParams['value'] = $parsedValue;
 			$this->db->table($this->table)->insert($valueParams);
 			if($attribute->searchable)
 			{
 				$this->db->table('attribute_values_fulltext')->insert($valueParams);
 			}
 		}
+
+		Event::fire('cb.after.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
 	}
 
 
@@ -196,10 +223,31 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * 
 	 * @return boolean
 	 */
-	public function update($valueParams, $attribute)
+	public function update($valueParams, $attribute, $params, $entity)
 	{
 
 		$attributeSettings = $this->attributeManager->getFieldTypes()[$attribute->field_type];
+
+		if($attributeSettings['has_multiple_values'])
+		{
+			if( ! is_array($valueParams['value']) )
+			{
+				$valueParams['value'] = [$valueParams['value']];
+			}
+
+			foreach ($valueParams['value'] as &$value)
+			{
+				$parsedValue = $this->parseValue($value, $attribute, $valueParams['locale_id'], $params, $entity);
+				$value = $parsedValue;
+			}
+		}
+		else
+		{
+			$parsedValue = $this->parseValue($valueParams['value'], $attribute, $valueParams['locale_id'], $params, $entity);
+			$valueParams['value'] = $parsedValue;
+		}
+
+		Event::fire('cb.before.entity.field.update', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
 
 		// delete all values for provided entity, attribute and language
 		$this	->db->table( $this->table )
@@ -222,21 +270,12 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		// and then insert them separately into database
 		if($attributeSettings['has_multiple_values'])
 		{
-			if( ! is_array($valueParams['value']) )
-			{
-				$valueParams['value'] = [$valueParams['value']];
-			}
-
 			// sort_order counter
 			$sort_order = 0;
-
-
 			foreach ($valueParams['value'] as $value)
 			{
 				$singleValueParams = $valueParams;
-				$parsedValue = $this->parseValue($value, $attribute);
-				$singleValueParams['value'] = $parsedValue;
-				// give it a sort_order
+				$singleValueParams['value'] = $value;
 				$singleValueParams['sort_order'] = $sort_order++;
 				$this->db->table($this->table)->insert($singleValueParams);
 				if($attribute->searchable)
@@ -247,14 +286,14 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		}
 		else
 		{
-			$parsedValue = $this->parseValue($valueParams['value'], $attribute);
-			$valueParams['value'] = $parsedValue;
 			$this->db->table($this->table)->insert($valueParams);
 			if($attribute->searchable)
 			{
 				$this->db->table('attribute_values_fulltext')->insert($valueParams);
 			}
 		}
+
+		Event::fire('cb.after.entity.field.update', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
 	}
 
 	/**
@@ -448,7 +487,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		if( ! is_array($filter) )
 		{
 
-			$filter = $this->parseValue($filter, $attribute);
+			$filter = $this->parseFilter($filter, $attribute);
 			
 			$query = $query->where('filter_' . $code . '.value', '=', $filter);
 		}
@@ -475,12 +514,12 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			{
 				foreach ($value as &$singleValue)
 				{
-					$singleValue = $this->parseValue($singleValue, $attribute);
+					$singleValue = $this->parseFilter($singleValue, $attribute);
 				}
 			}
 			else
 			{
-				$value = $this->parseValue($value, $attribute);
+				$value = $this->parseFilter($value, $attribute);
 			}
 			
 			switch ($operator) 
