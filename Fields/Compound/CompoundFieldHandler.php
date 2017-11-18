@@ -217,6 +217,20 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 	}
 
 	/**
+	 * Parse value for database input
+	 * 
+	 * @param mixed $value
+	 * @param object $attribute
+	 * 
+	 * @return boolean
+	 */
+	public function parseFilter($filter, $attribute)
+	{
+		return strval($filter);
+	}
+
+
+	/**
 	 * Insert value to database
 	 * 
 	 * Takes attribute value params and attribute definition
