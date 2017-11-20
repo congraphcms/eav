@@ -245,6 +245,42 @@ return array(
 		),
 
 		/**
+		 * Node field
+		 */
+		'node' => array(
+			'label'						=> 'Node',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Node\NodeFieldHandler',
+			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Node\NodeFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Node\NodeFieldValidator',
+			'handler_name'				=> 'NodeFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_unique'				=> false,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
+			'has_options'				=> false,
+			'has_multiple_values'		=> false,
+			'sortable'					=> false
+		),
+		'node_collection' => array(
+			'label'						=> 'Nodes',
+			'table' 					=> 'attribute_values_integer',
+			'handler'					=> 'Cookbook\Eav\Fields\Node\NodeFieldHandler',
+			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Node\NodeFieldHandler',
+			'validator'					=> 'Cookbook\Eav\Fields\Node\NodeFieldValidator',
+			'handler_name'				=> 'NodeFieldHandler',
+			'can_have_default_value'	=> false,
+			'can_be_unique'				=> false,
+			'can_be_localized'			=> true,
+			'can_be_filter'				=> true,
+			'can_be_searchable'			=> false,
+			'has_options'				=> false,
+			'has_multiple_values'		=> true,
+			'sortable'					=> false
+		),
+
+		/**
 		 * Asset field
 		 */
 		'asset' => array(

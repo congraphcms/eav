@@ -66,6 +66,8 @@ class FieldsServiceProvider extends ServiceProvider {
 		$this->app['events']->listen('cb.after.file.delete', 'Cookbook\Eav\Fields\Asset\AssetFieldHandler@onFileDelete');
 		$this->app['events']->listen('cb.before.entity.update', 'Cookbook\Eav\Fields\Compound\CompoundFieldHandler@onBeforeEntityUpdate');
 		$this->app['events']->listen('cb.after.entity.update', 'Cookbook\Eav\Fields\Compound\CompoundFieldHandler@onAfterEntityUpdate');
+		$this->app['events']->listen('cb.before.entity.get', 'Cookbook\Eav\Fields\Node\NodeFieldHandler@onBeforeEntityGet');
+		$this->app['events']->listen('cb.before.entity.fetch', 'Cookbook\Eav\Fields\Node\NodeFieldHandler@onBeforeEntityGet');
 	}
 
 	/**
@@ -186,6 +188,14 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
+		$this->app->singleton('Cookbook\Eav\Fields\Node\NodeFieldHandler', function($app) {
+			return new \Cookbook\Eav\Fields\Node\NodeFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+			);
+		});
 	}
 
 	/**
@@ -277,6 +287,14 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app['db']->connection(),
 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
 				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Cookbook\Eav\Fields\Node\NodeFieldValidator', function($app) {
+			return new \Cookbook\Eav\Fields\Node\NodeFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
 
