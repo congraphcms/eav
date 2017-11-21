@@ -162,6 +162,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	public function insert($valueParams, $attribute, $params, $entity)
 	{
 		$attributeSettings = $this->attributeManager->getFieldTypes()[$attribute->field_type];
+		// var_dump($valueParams['value']);
 
 		if($attributeSettings['has_multiple_values'])
 		{
@@ -181,18 +182,19 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			$parsedValue = $this->parseValue($valueParams['value'], $attribute, $valueParams['locale_id'], $params, $entity);
 			$valueParams['value'] = $parsedValue;
 		}
-
+		// var_dump($valueParams['value']);
 		Event::fire('cb.before.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
 
 		if($attributeSettings['has_multiple_values'])
 		{
 			// sort_order counter
 			$sort_order = 0;
-			foreach ($valueParams['value'] as $value)
+			foreach ($valueParams['value'] as $v)
 			{
 				$singleValueParams = $valueParams;
-				$singleValueParams['value'] = $value;
+				$singleValueParams['value'] = $v;
 				$singleValueParams['sort_order'] = $sort_order++;
+				var_dump($singleValueParams);
 				$this->db->table($this->table)->insert($singleValueParams);
 				if($attribute->searchable)
 				{
@@ -272,10 +274,10 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		{
 			// sort_order counter
 			$sort_order = 0;
-			foreach ($valueParams['value'] as $value)
+			foreach ($valueParams['value'] as $v)
 			{
 				$singleValueParams = $valueParams;
-				$singleValueParams['value'] = $value;
+				$singleValueParams['value'] = $v;
 				$singleValueParams['sort_order'] = $sort_order++;
 				$this->db->table($this->table)->insert($singleValueParams);
 				if($attribute->searchable)

@@ -213,6 +213,37 @@ class RelationFieldTest extends Orchestra\Testbench\TestCase
 
 	}
 
+	public function testCreateMultipleEntity()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$params = [
+			'entity_type' => 'test_fields',
+			'attribute_set' => ['id' => 4],
+			'locale' => 'en_US',
+			'fields' => [
+				'test_relation_collection_attribute' => [
+					['id' => 2, 'type' => 'entity'],
+					['id' => 1, 'type' => 'entity']
+				]
+			]
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+		// $this->d->dump($result->toArray());
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue(is_int($result->id));
+		$this->assertTrue(is_array($result->fields->test_relation_collection_attribute));
+		$this->assertEquals(2, $result->fields->test_relation_collection_attribute[0]->id);
+		$this->assertEquals(1, $result->fields->test_relation_collection_attribute[1]->id);
+		$this->assertEquals('entity', $result->fields->test_relation_collection_attribute[0]->type);
+		$this->assertEquals('entity', $result->fields->test_relation_collection_attribute[1]->type);
+
+	}
+
 
 	public function testUpdateEntity()
 	{

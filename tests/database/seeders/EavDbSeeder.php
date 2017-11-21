@@ -485,6 +485,21 @@ class EavDbSeeder extends Seeder {
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
+			[
+				'code' => 'test_relation_collection_attribute',
+				'field_type' => 'relation_collection',
+				'table' => 'attribute_values_integer',
+				'localized' => false,
+				'default_value' => null,
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'searchable' => false,
+				'data' => json_encode([]),
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
 			
 		]);
 
@@ -678,6 +693,11 @@ class EavDbSeeder extends Seeder {
 				'attribute_set_id' => 4,
 				'attribute_id' => 23,
 				'sort_order' => 14
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 24,
+				'sort_order' => 15
 			],
 			[
 				'attribute_set_id' => 5,
