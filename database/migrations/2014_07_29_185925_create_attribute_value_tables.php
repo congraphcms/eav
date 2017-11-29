@@ -202,7 +202,7 @@ class CreateAttributeValueTables extends Migration {
 			$table->integer('sort_order')->nullable()->default(0);
 
 			// Attribute value
-			$table->text('value');
+			$table->text('value')->nullable();
 
 			// create indexes
 			$table->index('entity_type_id');
