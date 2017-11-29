@@ -194,7 +194,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				$singleValueParams = $valueParams;
 				$singleValueParams['value'] = $v;
 				$singleValueParams['sort_order'] = $sort_order++;
-				var_dump($singleValueParams);
+				// var_dump($singleValueParams);
 				$this->db->table($this->table)->insert($singleValueParams);
 				if($attribute->searchable)
 				{

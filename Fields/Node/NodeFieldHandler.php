@@ -167,6 +167,7 @@ class NodeFieldHandler extends AbstractFieldHandler {
 
 	public function onBeforeEntityGet($command)
 	{
+
 		$attributes = MetaData::getAttributes();
 		$include = (isset($command->params['include']))?$command->params['include']: [];
 
@@ -175,9 +176,9 @@ class NodeFieldHandler extends AbstractFieldHandler {
 			$include = explode(',', strval($include));
 		}
 
-		foreach ($include as &$relation)
+		foreach ($include as &$r)
 		{
-			$relation = ltrim(rtrim($relation));
+			$r = ltrim(rtrim($r));
 		}
 
 		foreach ($attributes as $attribute)

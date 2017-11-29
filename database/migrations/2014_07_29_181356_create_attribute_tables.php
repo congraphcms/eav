@@ -73,6 +73,9 @@ class CreateAttributeTables extends Migration {
 			// flag if entities will be searchable (FullText Search) by this attribute
 			$table->boolean('searchable')->default(0);
 
+			// flag if entities will be searchable (FullText Search) by this attribute
+			$table->float('search_boost')->default(1);
+
 			// attribute status ('user-defined', 'admin', 'required', 'locked'...)
 			$table->string('status', 100)->default('user_defined');
 
