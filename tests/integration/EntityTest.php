@@ -5,6 +5,7 @@ use Cookbook\Core\Exceptions\ValidationException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/LocaleDbSeeder.php');
@@ -157,6 +158,46 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		// $this->d->dump($result->toArray());
 	}
 
+	public function testCreateManualTimestamp()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+
+		$params = [
+			'entity_type' => ['id' => 1],
+			'attribute_set' => ['id' => 1],
+			'locale' => 'en_US',
+			'fields' => [
+				'attribute1' => '234',
+				'attribute2' => '',
+				'attribute3' => 'english'
+			],
+			'created_at' => '1995-08-19T11:00:00+02:00',
+			'updated_at' => '1996-08-19T11:00:00+02:00'
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		Config::set('cb.eav.allow_manual_timestamps', true);
+
+		try
+		{
+			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+		}
+		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		{
+			$this->d->dump($e->getErrors());
+		}
+		
+
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue(is_int($result->id));
+		$this->assertEquals('1995-08-19T09:00:00+00:00', $result->toArray()['created_at']);
+		$this->assertEquals('1996-08-19T09:00:00+00:00', $result->toArray()['updated_at']);
+		// $this->d->dump($result->toArray());
+	}
+
 
 	/**
 	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
@@ -221,6 +262,36 @@ class EntityTest extends Orchestra\Testbench\TestCase
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals($result->status, 'published');
 		
+	}
+
+	public function testUpdateManualTimestamp()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$params = [
+			'created_at' => '1995-08-19T11:00:00+02:00',
+			'updated_at' => '1996-08-19T11:00:00+02:00'
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		Config::set('cb.eav.allow_manual_timestamps', true);
+		
+		try
+		{
+			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, 1));
+		}
+		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		{
+			$this->d->dump($e->getErrors());
+		}
+		
+
+		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue(is_int($result->id));
+		$this->assertEquals('1995-08-19T09:00:00+00:00', $result->toArray()['created_at']);
+		$this->assertEquals('1996-08-19T09:00:00+00:00', $result->toArray()['updated_at']);
+		// $this->d->dump($result->toArray());
 	}
 
 	/**

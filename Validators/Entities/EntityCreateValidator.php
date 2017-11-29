@@ -131,7 +131,9 @@ class EntityCreateValidator extends Validator
 			'attribute_set.id'      => ['sometimes', 'exists:attribute_sets,id'],
 			'locale'             	=> 'sometimes',
 			'status'				=> ['sometimes', 'exists:workflow_points,status'],
-			'fields'                => 'array'
+			'fields'                => 'array',
+			'created_at'			=> ['sometimes', 'date_format:Y-m-d\TH:i:sP'],
+			'updated_at'			=> ['sometimes', 'date_format:Y-m-d\TH:i:sP']
 		];
 
 		parent::__construct();

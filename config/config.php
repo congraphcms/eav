@@ -12,6 +12,9 @@ return array(
 
 	'using_elastic' => env('USING_ELASTIC', false),
 
+	'allow_manual_timestamps' => env('ALLOW_MANUAL_TIMESTAMPS', FALSE),
+
+
 	/**
 	 * List of data types supported by application
 	 * 

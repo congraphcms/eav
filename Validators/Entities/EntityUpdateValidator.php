@@ -126,6 +126,8 @@ class EntityUpdateValidator extends Validator
 			'locale'             	=> 'sometimes',
 			'fields'                => 'array',
 			'status'				=> ['sometimes', 'exists:workflow_points,status'],
+			'created_at'			=> ['sometimes', 'date_format:Y-m-d\TH:i:sP'],
+			'updated_at'			=> ['sometimes', 'date_format:Y-m-d\TH:i:sP']
 		];
 
 		parent::__construct();

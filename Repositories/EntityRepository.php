@@ -181,8 +181,23 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             'entity_type_id' => $model['entity_type_id'],
             'attribute_set_id' => $model['attribute_set_id']
         ];
+        $timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+
+        if(Config::get('cb.eav.allow_manual_timestamps'))
+        {
+            if(!empty($model['created_at']))
+            {
+                $entityParams['created_at'] = Carbon::parse($model['created_at'])->tz($timezone)->toDateTimeString();
+            }
+
+            if(!empty($model['updated_at']))
+            {
+                $entityParams['updated_at'] = Carbon::parse($model['updated_at'])->tz($timezone)->toDateTimeString();
+            }
+        }
         // insert entity
         $entityID = $this->insertEntity($entityParams);
+        $entity = $this->db->table('entities')->find($entityID);
 
         $model['id'] = $entityID;
 
@@ -233,9 +248,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         if (isset($status)) {
             $point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
-            $this->insertStatus($entityID, $point[0]->id, $locale_ids);
+            $this->insertStatus($entity, $point[0]->id, $locale_ids);
         } else {
-            $this->insertStatus($entityID, $entityType->default_point->id, $locale_ids);
+            $this->insertStatus($entity, $entityType->default_point->id, $locale_ids);
         }
 
         $entity = $this->fetch($entityID, [], $locale_id);
@@ -283,6 +298,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         $fieldsForUpdate = [];
         $attributes = [];
+        $locales = $this->localeRepository->get();
 
         if (! empty($fields)) {
             $attributes = $this->attributeRepository->get(['code' => ['in' => array_keys($fields)]]);
@@ -300,7 +316,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                 $fieldForUpdate['value'] = (isset($fields[$attribute->code]))?$fields[$attribute->code]:$attribute->default_value;
                 $fieldsForUpdate[] = $fieldForUpdate;
             } else {
-                $locales = $this->localeRepository->get();
+                
 
                 foreach ($fields[$attribute->code] as $lcode => $value) {
                     $localizedFieldForUpdate = $fieldForUpdate;
@@ -337,7 +353,22 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             $this->updateStatus($id, $point[0]->id, $locale_ids);
         }
 
-        $this->updateEntity($id);
+        $entityParams = [];
+        $timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
+        if(Config::get('cb.eav.allow_manual_timestamps'))
+        {
+            if(!empty($model['created_at']))
+            {
+                $entityParams['created_at'] = Carbon::parse($model['created_at'])->tz($timezone)->toDateTimeString();
+            }
+
+            if(!empty($model['updated_at']))
+            {
+                $entityParams['updated_at'] = Carbon::parse($model['updated_at'])->tz($timezone)->toDateTimeString();
+            }
+        }
+
+        $this->updateEntity($id, $entityParams);
 
         Trunk::forgetType('entity');
         $entity = $this->fetch($id, [], $locale_id);
@@ -447,7 +478,15 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
      */
     protected function insertEntity($params)
     {
-        $params['created_at'] = $params['updated_at'] = Carbon::now('UTC')->toDateTimeString();
+        if(empty($params['created_at']))
+        {
+            $params['created_at'] = Carbon::now('UTC')->toDateTimeString();
+        }
+        
+        if(empty($params['updated_at']))
+        {
+            $params['updated_at'] = $params['created_at'];
+        }
 
         // insert entity in database
         $entityId = $this->db->table('entities')->insertGetId($params);
@@ -464,9 +503,13 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
      *
      * @param int $id
      */
-    protected function updateEntity($id)
+    protected function updateEntity($id, $params)
     {
-        $params['updated_at'] = Carbon::now('UTC')->toDateTimeString();
+        if(empty($params['updated_at']))
+        {
+            $params['updated_at'] = Carbon::now('UTC')->toDateTimeString();
+        }
+        
 
         $this->db->table('entities')->where('id', '=', $id)->update($params);
     }
@@ -592,18 +635,18 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         }
     }
 
-    protected function insertStatus($id, $pointId, $localeIds)
+    protected function insertStatus($entity, $pointId, $localeIds)
     {
-        $now = Carbon::now('UTC')->toDateTimeString();
+        // $now = Carbon::now('UTC')->toDateTimeString();
         $statusParams = [];
         foreach ($localeIds as $localeId) {
             $statusParams[] = [
-                'entity_id' => $id,
+                'entity_id' => $entity->id,
                 'workflow_point_id' => $pointId,
                 'locale_id' => $localeId,
                 'state' => 'active',
-                'created_at' => $now,
-                'updated_at' => $now
+                'created_at' => $entity->created_at,
+                'updated_at' => $entity->updated_at
             ];
         }
         
@@ -612,9 +655,10 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
     protected function updateStatus($id, $pointId, $localeIds)
     {
+        $now = Carbon::now('UTC')->toDateTimeString();
         $updateParams = [
             'state' => 'history',
-            'updated_at' => Carbon::now('UTC')->toDateTimeString()
+            'updated_at' => $now
         ];
 
         $this->db->table('entity_statuses')
@@ -629,7 +673,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                 'entity_id' => $id,
                 'workflow_point_id' => $pointId,
                 'locale_id' => $localeId,
-                'state' => 'active'
+                'state' => 'active',
+                'created_at' => $now,
+                'updated_at' => $now
             ];
         }
 
