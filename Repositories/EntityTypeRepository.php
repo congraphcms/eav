@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,21 +8,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Repositories;
+namespace Congraph\Eav\Repositories;
 
 
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
 
-use Cookbook\Core\Exceptions\Exception;
-use Cookbook\Core\Exceptions\NotFoundException;
-use Cookbook\Core\Repositories\AbstractRepository;
-use Cookbook\Core\Repositories\UsesCache;
-use Cookbook\Core\Facades\Trunk;
-use Cookbook\Core\Repositories\Collection;
-use Cookbook\Core\Repositories\Model;
+use Congraph\Core\Exceptions\Exception;
+use Congraph\Core\Exceptions\NotFoundException;
+use Congraph\Core\Repositories\AbstractRepository;
+use Congraph\Core\Repositories\UsesCache;
+use Congraph\Core\Facades\Trunk;
+use Congraph\Core\Repositories\Collection;
+use Congraph\Core\Repositories\Model;
 
-use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
 
 
 use Illuminate\Support\Facades\Cache;
@@ -38,12 +38,12 @@ use stdClass;
  * Repository for entity type database queries
  * 
  * @uses   		Illuminate\Database\Connection
- * @uses   		Cookbook\Core\Repository\AbstractRepository
- * @uses   		Cookbook\Contracts\Eav\AttributeSetRepositoryContract
+ * @uses   		Congraph\Core\Repository\AbstractRepository
+ * @uses   		Congraph\Contracts\Eav\AttributeSetRepositoryContract
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */

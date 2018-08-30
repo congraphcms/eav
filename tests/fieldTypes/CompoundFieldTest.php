@@ -1,6 +1,6 @@
 <?php
 
-use Cookbook\Core\Exceptions\ValidationException;
+use Congraph\Core\Exceptions\ValidationException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -29,17 +29,17 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Filesystem/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Workflows/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
 		]);
 
 		$this->artisan('db:seed', [
@@ -95,7 +95,7 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			'driver'   	=> 'mysql',
 			'host'      => '127.0.0.1',
 			'port'		=> '3306',
-			'database'	=> 'cookbook_testbench',
+			'database'	=> 'congraph_testbench',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',
@@ -113,7 +113,7 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
 
 		// $app['config']->set(
-		// 	'Cookbook::eav', $config
+		// 	'Congraph::eav', $config
 		// );
 
 		// var_dump('CONFIG SETTED');
@@ -122,11 +122,11 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\Core\CoreServiceProvider',
-			'Cookbook\Locales\LocalesServiceProvider',
-			'Cookbook\Eav\EavServiceProvider',
-			'Cookbook\Filesystem\FilesystemServiceProvider',
-			'Cookbook\Workflows\WorkflowsServiceProvider'
+			'Congraph\Core\CoreServiceProvider',
+			'Congraph\Locales\LocalesServiceProvider',
+			'Congraph\Eav\EavServiceProvider',
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
 		];
 	}
 
@@ -158,9 +158,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$this->d->dump($e->getErrors());
 			$this->fail('Unexpected validation exception thrown.');
@@ -168,7 +168,7 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('compound_attribute', $result->code);
 		$this->assertEquals('compound', $result->field_type);
@@ -211,9 +211,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$this->d->dump($e->getErrors());
 			$this->fail('Unexpected validation exception thrown.');
@@ -221,7 +221,7 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('compound_attribute', $result->code);
 		$this->assertEquals('compound', $result->field_type);
@@ -249,10 +249,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -295,10 +295,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -327,10 +327,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -359,10 +359,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -393,10 +393,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -429,10 +429,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -466,10 +466,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -503,10 +503,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -540,10 +540,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -578,10 +578,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -615,10 +615,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -656,10 +656,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -705,10 +705,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -746,10 +746,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
 			$this->fail('Expected exception not thrown.');
 		}
-		catch(\Cookbook\Core\Exceptions\ValidationException $e)
+		catch(\Congraph\Core\Exceptions\ValidationException $e)
 		{
 			$errors = $e->getErrors();
 			// $this->d->dump($errors);
@@ -772,11 +772,11 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand($params, 20) );
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeUpdateCommand($params, 20) );
 
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('compound', $result->field_type);
 		$this->assertEquals($result->admin_label, 'compound attribute');
@@ -801,9 +801,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		// $this->d->dump($result->toArray());
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test1', $result->fields->test_compound_text1_attribute);
 		$this->assertEquals('test2', $result->fields->test_compound_text2_attribute);
@@ -831,9 +831,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		// $this->d->dump($result->toArray());
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test1', $result->fields->test_compound_text1_attribute);
 		$this->assertEquals('test2', $result->fields->test_compound_text2_attribute);
@@ -859,9 +859,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			]
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		// $this->d->dump($result->toArray());
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test1', $result->fields->test_compound_text1_attribute);
 		$this->assertEquals('test2', $result->fields->test_compound_text2_attribute);
@@ -892,9 +892,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			]
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		// $this->d->dump($result->toArray());
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test1', $result->fields->test_compound_text1_attribute);
 		$this->assertEquals('test2', $result->fields->test_compound_text2_attribute);
@@ -907,10 +907,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			]
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('changed', $result->fields->test_compound_text1_attribute);
@@ -944,9 +944,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			]
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		// $this->d->dump($result->toArray());
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test1', $result->fields->test_compound_text1_attribute);
 		$this->assertEquals('test2', $result->fields->test_compound_text2_attribute);
@@ -958,10 +958,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			]
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('changed', $result->fields->test_compound_text1_attribute);
@@ -980,10 +980,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			]
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('changed-again', $result->fields->test_compound_text1_attribute);
@@ -1000,10 +1000,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			]
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('changed-again', $result->fields->test_compound_text1_attribute);
@@ -1011,11 +1011,11 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('changed-again test2', $result->fields->test_compound_attribute);
 		$this->assertEquals('changed-again to-en', $result->fields->test_localized_compound_attribute);
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], $result->id));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand([], $result->id));
 
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertEquals('changed-again', $result->fields->test_compound_text1_attribute);
 		$this->assertEquals('test2', $result->fields->test_compound_text2_attribute);
 		$this->assertEquals('changed-again test2', $result->fields->test_compound_attribute);
@@ -1029,10 +1029,10 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 			]
 		];
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, $result->id));
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('back', $result->fields->test_compound_text1_attribute);
@@ -1040,11 +1040,11 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('back test2', $result->fields->test_compound_attribute);
 		$this->assertEquals('back to-en', $result->fields->test_localized_compound_attribute);
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], $result->id));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand([], $result->id));
 
 		// $this->d->dump($result->toArray());
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertEquals('back', $result->fields->test_compound_text1_attribute);
 		$this->assertEquals('test2', $result->fields->test_compound_text2_attribute);
 		$this->assertEquals('back test2', $result->fields->test_compound_attribute);
@@ -1061,9 +1061,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], 4));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand([], 4));
 	// 	// $this->d->dump($result->toArray());
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 	// 	$this->assertTrue(is_int($result->id));
 	// 	$this->assertEquals('field text value', $result->fields->test_text_attribute);
 	// 	$this->assertEquals('option1', $result->fields->test_select_attribute);
@@ -1072,9 +1072,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 	// 	$this->assertEquals(1, $result->fields->test_relation_attribute->id);
 	// 	$this->assertEquals('entity', $result->fields->test_relation_attribute->type);
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand(['include' => 'fields.test_relation_attribute'], 4));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand(['include' => 'fields.test_relation_attribute'], 4));
 	// 	// $this->d->dump($result->toArray(true, true));
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 	// 	$this->assertTrue(is_int($result->id));
 	// 	$this->assertEquals('field text value', $result->fields->test_text_attribute);
 	// 	$this->assertEquals('option1', $result->fields->test_select_attribute);
@@ -1085,9 +1085,9 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 	// 	$this->assertEquals('tests', $result->toArray()['fields']['test_relation_attribute']['entity_type']);
 
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand(['include' => 'fields.test_relation_attribute', 'locale' => 'en_US'], 4));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand(['include' => 'fields.test_relation_attribute', 'locale' => 'en_US'], 4));
 	// 	// $this->d->dump($result->toArray(true, true));
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 	// 	$this->assertTrue(is_int($result->id));
 	// 	$this->assertEquals('field text value', $result->fields->test_text_attribute);
 	// 	$this->assertEquals('option1', $result->fields->test_select_attribute);
@@ -1106,43 +1106,43 @@ class CompundFieldTest extends Orchestra\Testbench\TestCase
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => '11.1']]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => '11.1']]));
 	// 	$this->d->dump($result->toArray());
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(1, count($result));
 	// 	$this->assertEquals(11.1, $result[0]->fields->test_decimal_attribute);
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['in' => '11.1']]]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['in' => '11.1']]]));
 	// 	$this->d->dump($result->toArray());
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(1, count($result));
 	// 	$this->assertEquals(11.1, $result[0]->fields->test_decimal_attribute);
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['nin' => '11.1']]]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['nin' => '11.1']]]));
 	// 	$this->d->dump($result->toArray());
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(0, count($result));
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['lt' => '11.1']]]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['lt' => '11.1']]]));
 	// 	$this->d->dump($result->toArray());
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(0, count($result));
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['lte' => '11.1']]]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['lte' => '11.1']]]));
 	// 	$this->d->dump($result->toArray());
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(1, count($result));
 	// 	$this->assertEquals(11.1, $result[0]->fields->test_decimal_attribute);
 
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['gt' => '11.1']]]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['gt' => '11.1']]]));
 	// 	$this->d->dump($result->toArray());
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(0, count($result));
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['gte' => '11.1']]]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['filter' => ['fields.test_decimal_attribute' => ['gte' => '11.1']]]));
 	// 	$this->d->dump($result->toArray());
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(1, count($result));
 	// 	$this->assertEquals(11.1, $result[0]->fields->test_decimal_attribute);
 	// }

@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,19 +8,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Repositories;
+namespace Congraph\Eav\Repositories;
 
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
-use Cookbook\Core\Exceptions\Exception;
-use Cookbook\Core\Exceptions\NotFoundException;
-use Cookbook\Core\Facades\Trunk;
-use Cookbook\Core\Repositories\AbstractRepository;
-use Cookbook\Core\Repositories\Collection;
-use Cookbook\Core\Repositories\Model;
-use Cookbook\Core\Repositories\UsesCache;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\AttributeSetRepositoryContract;
+use Congraph\Contracts\Eav\FieldHandlerFactoryContract;
+use Congraph\Core\Exceptions\Exception;
+use Congraph\Core\Exceptions\NotFoundException;
+use Congraph\Core\Facades\Trunk;
+use Congraph\Core\Repositories\AbstractRepository;
+use Congraph\Core\Repositories\Collection;
+use Congraph\Core\Repositories\Model;
+use Congraph\Core\Repositories\UsesCache;
+use Congraph\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
@@ -33,14 +33,14 @@ use Carbon\Carbon;
  * Repository for attribute database queries
  * 
  * @uses   		Illuminate\Database\Connection
- * @uses   		Cookbook\Core\Repository\AbstractRepository
+ * @uses   		Congraph\Core\Repository\AbstractRepository
  * @uses 		Illuminate\Contracts\Validation\Factory
- * @uses   		Cookbook\Contracts\Eav\FieldHandlerFactoryContract
- * @uses   		Cookbook\Eav\Managers\AttributeManager
+ * @uses   		Congraph\Contracts\Eav\FieldHandlerFactoryContract
+ * @uses   		Congraph\Eav\Managers\AttributeManager
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -57,7 +57,7 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * Factory for attribute handlers,
 	 * makes appropriate attriubte handler depending on attribute data type
 	 * 
-	 * @var Cookbook\Contracts\Eav\FieldHandlerFactoryContract
+	 * @var Congraph\Contracts\Eav\FieldHandlerFactoryContract
 	 */
 	protected $fieldHandlerFactory;
 
@@ -82,8 +82,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 	 * 
 	 * @param Illuminate\Database\Connection $db
 	 * @param Illuminate\Contracts\Validation\Factory
-	 * @param Cookbook\Eav\Handlers\FieldHandlerFactoryContract $fieldHandlerFactory
-	 * @param Cookbook\Eav\Managers\AttributeManager $attributeManager
+	 * @param Congraph\Eav\Handlers\FieldHandlerFactoryContract $fieldHandlerFactory
+	 * @param Congraph\Eav\Managers\AttributeManager $attributeManager
 	 * 
 	 * @return void
 	 */

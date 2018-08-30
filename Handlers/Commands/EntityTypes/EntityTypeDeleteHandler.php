@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Handlers\Commands\EntityTypes;
+namespace Congraph\Eav\Handlers\Commands\EntityTypes;
 
 
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Contracts\Eav\EntityRepositoryContract;
-use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
-use Cookbook\Core\Bus\RepositoryCommand;
-use Cookbook\Core\Bus\RepositoryCommandHandler;
+use Congraph\Contracts\Eav\AttributeSetRepositoryContract;
+use Congraph\Contracts\Eav\EntityRepositoryContract;
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
+use Congraph\Core\Bus\RepositoryCommand;
+use Congraph\Core\Bus\RepositoryCommandHandler;
 
 /**
  * EntityTypeDeleteHandler class
@@ -25,7 +25,7 @@ use Cookbook\Core\Bus\RepositoryCommandHandler;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -35,14 +35,14 @@ class EntityTypeDeleteHandler extends RepositoryCommandHandler
 	/**
 	 * Repository for handling attribute sets
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
+	 * @var Congraph\Contracts\Eav\AttributeSetRepositoryContract
 	 */
 	protected $attributeSetRepository;
 
 	/**
 	 * Repository for handling entities
 	 * 
-	 * @var Cookbook\Contracts\Eav\EntityRepositoryContract
+	 * @var Congraph\Contracts\Eav\EntityRepositoryContract
 	 */
 	protected $entityRepository;
 
@@ -63,7 +63,7 @@ class EntityTypeDeleteHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Cookbook\Core\Bus\RepositoryCommand $command
+	 * @param Congraph\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @return void
 	 */

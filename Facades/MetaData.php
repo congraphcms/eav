@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Facades;
+namespace Congraph\Eav\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -20,6 +20,6 @@ class MetaData extends Facade {
      */
     protected static function getFacadeAccessor()
     {
-        return 'Cookbook\Eav\Services\MetaDataService'; // the IoC binding.
+        return 'Congraph\Eav\Services\MetaDataService'; // the IoC binding.
     }
 }

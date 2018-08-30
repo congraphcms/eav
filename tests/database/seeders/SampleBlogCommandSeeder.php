@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -23,7 +23,7 @@ use Carbon\Carbon;
  * 
  * @author      Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright   Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package     cookbook/eav
+ * @package     congraph/eav
  * @since       0.1.0-alpha
  * @version     0.1.0-alpha
  */
@@ -31,7 +31,7 @@ class SampleBlogCommandSeeder extends Seeder {
 
     public function run()
     {
-        $bus = App::make('Cookbook\Core\Bus\CommandDispatcher');
+        $bus = App::make('Congraph\Core\Bus\CommandDispatcher');
 
 
         // WORKFLOWS
@@ -49,7 +49,7 @@ class SampleBlogCommandSeeder extends Seeder {
         $workflowResults = [];
         foreach ($workflows as $workflow)
         {
-            $result = $bus->dispatch(new Cookbook\Workflows\Commands\Workflows\WorkflowCreateCommand($workflow));
+            $result = $bus->dispatch(new Congraph\Workflows\Commands\Workflows\WorkflowCreateCommand($workflow));
             $workflowResults[] = $result;
         }
 
@@ -103,7 +103,7 @@ class SampleBlogCommandSeeder extends Seeder {
         $workflowPointResults = [];
         foreach ($workflowPoints as $workflowPoint)
         {
-            $result = $bus->dispatch(new Cookbook\Workflows\Commands\WorkflowPoints\WorkflowPointCreateCommand($workflowPoint));
+            $result = $bus->dispatch(new Congraph\Workflows\Commands\WorkflowPoints\WorkflowPointCreateCommand($workflowPoint));
             $workflowPointResults[] = $result;
         }
 
@@ -148,7 +148,7 @@ class SampleBlogCommandSeeder extends Seeder {
         $workflowPointResults = [$workflowPointResults[0]];
         foreach ($workflowPointUpdates as $workflowPoint)
         {
-            $result = $bus->dispatch(new Cookbook\Workflows\Commands\WorkflowPoints\WorkflowPointUpdateCommand($workflowPoint, $workflowPoint['id']));
+            $result = $bus->dispatch(new Congraph\Workflows\Commands\WorkflowPoints\WorkflowPointUpdateCommand($workflowPoint, $workflowPoint['id']));
             $workflowPointResults[] = $result;
         }
 
@@ -168,7 +168,7 @@ class SampleBlogCommandSeeder extends Seeder {
         $localeResults = [];
         foreach ($locales as $locale)
         {
-            $result = $bus->dispatch(new Cookbook\Locales\Commands\Locales\LocaleCreateCommand($locale));
+            $result = $bus->dispatch(new Congraph\Locales\Commands\Locales\LocaleCreateCommand($locale));
             $localeResults[] = $result;
         }
 
@@ -212,7 +212,7 @@ class SampleBlogCommandSeeder extends Seeder {
         $entityTypeResults = [];
         foreach ($entityTypes as $entityType)
         {
-            $result = $bus->dispatch(new Cookbook\Eav\Commands\EntityTypes\EntityTypeCreateCommand($entityType));
+            $result = $bus->dispatch(new Congraph\Eav\Commands\EntityTypes\EntityTypeCreateCommand($entityType));
             $entityTypeResults[] = $result;
         }
 
@@ -334,7 +334,7 @@ class SampleBlogCommandSeeder extends Seeder {
         $attributeResults = [];
         foreach ($attributes as $attribute)
         {
-            $result = $bus->dispatch(new Cookbook\Eav\Commands\Attributes\AttributeCreateCommand($attribute));
+            $result = $bus->dispatch(new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($attribute));
             $attributeResults[] = $result;
         }
 
@@ -422,7 +422,7 @@ class SampleBlogCommandSeeder extends Seeder {
         $attributeSetResults = [];
         foreach ($attributeSets as $attributeSet)
         {
-            $result = $bus->dispatch(new Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand($attributeSet));
+            $result = $bus->dispatch(new Congraph\Eav\Commands\AttributeSets\AttributeSetCreateCommand($attributeSet));
             $attributeSetResults[] = $result;
         }
 
@@ -529,7 +529,7 @@ class SampleBlogCommandSeeder extends Seeder {
         $entityResults = [];
         foreach ($entities as $entity)
         {
-            $result = $bus->dispatch(new Cookbook\Eav\Commands\Entities\EntityCreateCommand($entity));
+            $result = $bus->dispatch(new Congraph\Eav\Commands\Entities\EntityCreateCommand($entity));
             $entityResults[] = $result;
         }
     }

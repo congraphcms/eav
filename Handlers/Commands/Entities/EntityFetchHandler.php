@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Handlers\Commands\Entities;
+namespace Congraph\Eav\Handlers\Commands\Entities;
 
 
-use Cookbook\Contracts\Eav\EntityRepositoryContract;
-use Cookbook\Core\Bus\RepositoryCommandHandler;
-use Cookbook\Core\Bus\RepositoryCommand;
+use Congraph\Contracts\Eav\EntityRepositoryContract;
+use Congraph\Core\Bus\RepositoryCommandHandler;
+use Congraph\Core\Bus\RepositoryCommand;
 
 /**
  * EntityFetchHandler class
@@ -23,7 +23,7 @@ use Cookbook\Core\Bus\RepositoryCommand;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -33,7 +33,7 @@ class EntityFetchHandler extends RepositoryCommandHandler
 	/**
 	 * Create new EntityFetchHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\EntityRepositoryContract $repository
+	 * @param Congraph\Contracts\Eav\EntityRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
@@ -45,7 +45,7 @@ class EntityFetchHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Cookbook\Core\Bus\RepositoryCommand $command
+	 * @param Congraph\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @return void
 	 */

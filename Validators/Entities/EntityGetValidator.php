@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,18 +8,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Validators\Entities;
+namespace Congraph\Eav\Validators\Entities;
 
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
-use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
-use Cookbook\Contracts\Locales\LocaleRepositoryContract;
-use Cookbook\Core\Bus\RepositoryCommand;
-use Cookbook\Core\Exceptions\BadRequestException;
-use Cookbook\Core\Exceptions\NotFoundException;
-use Cookbook\Core\Validation\Validator;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\AttributeSetRepositoryContract;
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
+use Congraph\Contracts\Eav\FieldValidatorFactoryContract;
+use Congraph\Contracts\Locales\LocaleRepositoryContract;
+use Congraph\Core\Bus\RepositoryCommand;
+use Congraph\Core\Exceptions\BadRequestException;
+use Congraph\Core\Exceptions\NotFoundException;
+use Congraph\Core\Validation\Validator;
+use Congraph\Eav\Managers\AttributeManager;
 
 
 /**
@@ -30,7 +30,7 @@ use Cookbook\Eav\Managers\AttributeManager;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -61,28 +61,28 @@ class EntityGetValidator extends Validator
 	/**
 	 * Repository for attributes
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 * @var Congraph\Contracts\Eav\AttributeRepositoryContract
 	 */
 	protected $attributeRepository;
 
 	/**
 	 * Repository for attribute sets
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 * @var Congraph\Contracts\Eav\AttributeRepositoryContract
 	 */
 	protected $attributeSetRepository;
 
 	/**
 	 * Repository for entities
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 * @var Congraph\Contracts\Eav\AttributeRepositoryContract
 	 */
 	protected $entityTypeRepository;
 
 	/**
 	 * Repository for locales
 	 * 
-	 * @var Cookbook\Contracts\Locales\LocaleRepositoryContract
+	 * @var Congraph\Contracts\Locales\LocaleRepositoryContract
 	 */
 	protected $localeRepository;
 	
@@ -90,14 +90,14 @@ class EntityGetValidator extends Validator
 	 * Factory for field validators,
 	 * makes appropriate field validator depending on field type
 	 *
-	 * @var Cookbook\Contracts\Eav\FieldValidatorFactoryContract
+	 * @var Congraph\Contracts\Eav\FieldValidatorFactoryContract
 	 */
 	protected $fieldValidatorFactory;
 
 	/**
 	 * Helper for attributes
 	 * 
-	 * @var Cookbook\Eav\Managers\AttributeManager
+	 * @var Congraph\Eav\Managers\AttributeManager
 	 */
 	protected $attributeManager;
 	
@@ -156,7 +156,7 @@ class EntityGetValidator extends Validator
 	/**
 	 * Validate RepositoryCommand
 	 * 
-	 * @param Cookbook\Core\Bus\RepositoryCommand $command
+	 * @param Congraph\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories

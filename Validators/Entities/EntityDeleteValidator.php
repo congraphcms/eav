@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Validators\Entities;
+namespace Congraph\Eav\Validators\Entities;
 
-use Cookbook\Contracts\EAV\EntityRepositoryContract;
-use Cookbook\Core\Bus\RepositoryCommand;
-use Cookbook\Core\Exceptions\ValidationException;
-use Cookbook\Core\Validation\Validator;
+use Congraph\Contracts\EAV\EntityRepositoryContract;
+use Congraph\Core\Bus\RepositoryCommand;
+use Congraph\Core\Exceptions\ValidationException;
+use Congraph\Core\Validation\Validator;
 
 /**
  * EntityDeleteValidator class
@@ -23,7 +23,7 @@ use Cookbook\Core\Validation\Validator;
  *
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -33,7 +33,7 @@ class EntityDeleteValidator extends Validator
 	/**
 	 * Repository for entities
 	 * 
-	 * @var Cookbook\Contracts\Eav\EntityRepositoryContract
+	 * @var Congraph\Contracts\Eav\EntityRepositoryContract
 	 */
 	protected $entityRepository;
 
@@ -55,7 +55,7 @@ class EntityDeleteValidator extends Validator
 	/**
 	 * Validate RepositoryCommand
 	 *
-	 * @param Cookbook\Core\Bus\RepositoryCommand $command
+	 * @param Congraph\Core\Bus\RepositoryCommand $command
 	 *
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories

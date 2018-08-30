@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields;
+namespace Congraph\Eav\Fields;
 
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Contracts\Eav\FieldValidatorContract;
-use Cookbook\Core\Exceptions\ValidationException;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\FieldValidatorContract;
+use Congraph\Core\Exceptions\ValidationException;
+use Congraph\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 
 /**
@@ -21,12 +21,12 @@ use Illuminate\Database\Connection;
  * 
  * Base class for all feild validators
  * 
- * @uses  		Cookbook\Contracts\Eav\FieldValidatorContract
- * @uses  		Cookbook\Eav\Managers\AttributeManager
+ * @uses  		Congraph\Contracts\Eav\FieldValidatorContract
+ * @uses  		Congraph\Eav\Managers\AttributeManager
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -43,14 +43,14 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	/**
 	 * Repository for attributes
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 * @var Congraph\Contracts\Eav\AttributeRepositoryContract
 	 */
 	public $attributeRepository;
 
 	/**
 	 * validation exception that will be thrown if validation fails
 	 *
-	 * @var Cookbook\Core\Exceptions\ValidationException
+	 * @var Congraph\Core\Exceptions\ValidationException
 	 */
 	protected $exception;
 
@@ -80,7 +80,7 @@ abstract class AbstractFieldValidator implements FieldValidatorContract
 	 * Create new AbstractAttributeValidator
 	 * 
 	 * @param Illuminate\Database\Connection 			$db
-	 * @param Cookbook\Eav\Managers\AttributeManager 	$attributeManager
+	 * @param Congraph\Eav\Managers\AttributeManager 	$attributeManager
 	 * @param string 									$table
 	 *  
 	 * @return void

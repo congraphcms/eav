@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields\Node;
+namespace Congraph\Eav\Fields\Node;
 
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Contracts\Eav\EntityRepositoryContract;
-use Cookbook\Core\Exceptions\NotFoundException;
-use Cookbook\Core\Exceptions\ValidationException;
-use Cookbook\Eav\Fields\AbstractFieldValidator;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\EntityRepositoryContract;
+use Congraph\Core\Exceptions\NotFoundException;
+use Congraph\Core\Exceptions\ValidationException;
+use Congraph\Eav\Fields\AbstractFieldValidator;
+use Congraph\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 
 /**
@@ -25,7 +25,7 @@ use Illuminate\Database\Connection;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -42,7 +42,7 @@ class NodeFieldValidator extends AbstractFieldValidator
 	/**
 	 * Repository for entities
 	 *
-	 * @var Cookbook\Contracts\Eav\EntityRepositoryContract
+	 * @var Congraph\Contracts\Eav\EntityRepositoryContract
 	 */
 	protected $entityRepository;
 
@@ -57,7 +57,7 @@ class NodeFieldValidator extends AbstractFieldValidator
 	 * Create new NodeFieldValidator
 	 * 
 	 * @param Illuminate\Database\Connection 			$db
-	 * @param Cookbook\Eav\Managers\AttributeManager 	$attributeManager
+	 * @param Congraph\Eav\Managers\AttributeManager 	$attributeManager
 	 * @param string 									$table
 	 *  
 	 * @return void

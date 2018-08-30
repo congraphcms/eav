@@ -1,7 +1,7 @@
 <?php
 
 // include_once(realpath(__DIR__.'/../LaravelMocks.php'));
-use Cookbook\Core\Exceptions\ValidationException;
+use Congraph\Core\Exceptions\ValidationException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -27,17 +27,17 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Filesystem/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Workflows/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
 		]);
 
 		// $this->artisan('db:seed', [
@@ -88,7 +88,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 			'driver'   	=> 'mysql',
 			'host'      => '127.0.0.1',
 			'port'		=> '3306',
-			'database'	=> 'cookbook_testbench',
+			'database'	=> 'congraph_testbench',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',
@@ -106,7 +106,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
 
 		// $app['config']->set(
-		// 	'Cookbook::eav', $config
+		// 	'Congraph::eav', $config
 		// );
 
 		// var_dump('CONFIG SETTED');
@@ -115,11 +115,11 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\Core\CoreServiceProvider', 
-			'Cookbook\Locales\LocalesServiceProvider', 
-			'Cookbook\Eav\EavServiceProvider', 
-			'Cookbook\Filesystem\FilesystemServiceProvider',
-			'Cookbook\Workflows\WorkflowsServiceProvider'
+			'Congraph\Core\CoreServiceProvider', 
+			'Congraph\Locales\LocalesServiceProvider', 
+			'Congraph\Eav\EavServiceProvider', 
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
 		];
 	}
 
@@ -130,31 +130,31 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 		
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand([]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeGetCommand([]));
 		
 		
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(3, count($result));
 	// 	$this->d->dump($result->toArray());
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Attributes\AttributeGetCommand([]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand([]));
 		
 		
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(8, count($result));
 	// 	$this->d->dump($result->toArray());
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand([]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetGetCommand([]));
 		
 		
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(3, count($result));
 	// 	$this->d->dump($result->toArray());
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand([]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand([]));
 		
 		
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(4, count($result));
 	// 	$this->d->dump($result->toArray());
 
@@ -176,9 +176,9 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 			],
 			'locale' => 'sr_RS'
 		];
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand($params));
 		
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		// $this->d->dump($result->toArray());
 	}
 
@@ -194,15 +194,15 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 			],
 			'locale' => 'sr_RS'
 		];
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand($params));
 		
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		// $this->d->dump($result->toArray());
 	}
 
 
 	// /**
-	//  * @expectedException \Cookbook\Core\Exceptions\ValidationException
+	//  * @expectedException \Congraph\Core\Exceptions\ValidationException
 	//  */
 	// public function testCreateException()
 	// {
@@ -218,7 +218,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 	// }
 
 	// public function testUpdateEntity()
@@ -236,17 +236,17 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// 		]
 	// 	];
 		
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, 1));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, 1));
 		
 		
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 	// 	$this->assertTrue(is_int($result->id));
 	// 	$this->assertEquals($result->fields->attribute3['fr_FR'], 'changed value');
 	// 	$this->d->dump($result->toArray());
 	// }
 
 	// /**
-	//  * @expectedException \Cookbook\Core\Exceptions\ValidationException
+	//  * @expectedException \Congraph\Core\Exceptions\ValidationException
 	//  */
 	// public function testUpdateException()
 	// {
@@ -261,7 +261,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// 		]
 	// 	];
 		
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityUpdateCommand($params, 1));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, 1));
 	// }
 
 	// public function testDeleteEntity()
@@ -271,7 +271,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityDeleteCommand([], 1));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityDeleteCommand([], 1));
 
 	// 	$this->assertEquals(1, $result);
 	// 	$this->d->dump($result);
@@ -280,7 +280,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// }
 
 	// /**
-	//  * @expectedException \Cookbook\Core\Exceptions\NotFoundException
+	//  * @expectedException \Congraph\Core\Exceptions\NotFoundException
 	//  */
 	// public function testDeleteException()
 	// {
@@ -289,7 +289,7 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityDeleteCommand([], 133));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityDeleteCommand([], 133));
 	// }
 	
 	// public function testFetchEntity()
@@ -300,8 +300,8 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand(['locale' => 'en_US'], 1));
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand(['locale' => 'en_US'], 1));
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 	// 	$this->assertTrue(is_int($result->id));
 	// 	$this->d->dump($result->toArray());
 		
@@ -315,9 +315,9 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand([]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand([]));
 
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(4, count($result));
 	// 	$this->d->dump($result->toArray());
 
@@ -330,9 +330,9 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 	// 	$app = $this->createApplication();
 	// 	$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['locale' => 'en_US', 'sort' => ['fields.attribute3'], 'limit' => 3, 'offset' => 0]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['locale' => 'en_US', 'sort' => ['fields.attribute3'], 'limit' => 3, 'offset' => 0]));
 
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(3, count($result));
 
 	// 	$this->d->dump($result->toArray());
@@ -347,9 +347,9 @@ class SampleBlogTest extends Orchestra\Testbench\TestCase
 
 	// 	$filter = [ 'fields.attribute3' => 'value3-en' ];
 
-	// 	$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityGetCommand(['filter' => $filter, 'locale' => 'en_US', 'sort' => ['fields.attribute1']]));
+	// 	$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityGetCommand(['filter' => $filter, 'locale' => 'en_US', 'sort' => ['fields.attribute1']]));
 		
-	// 	$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+	// 	$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 	// 	$this->assertEquals(1, count($result));
 
 	// 	$this->d->dump($result->toArray());

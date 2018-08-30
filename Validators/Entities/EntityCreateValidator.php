@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,18 +8,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Validators\Entities;
+namespace Congraph\Eav\Validators\Entities;
 
-use Cookbook\Contracts\EAV\AttributeRepositoryContract;
-use Cookbook\Contracts\EAV\AttributeSetRepositoryContract;
-use Cookbook\Contracts\EAV\EntityTypeRepositoryContract;
-use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
-use Cookbook\Contracts\Locales\LocaleRepositoryContract;
-use Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract;
-use Cookbook\Core\Bus\RepositoryCommand;
-use Cookbook\Core\Exceptions\ValidationException;
-use Cookbook\Core\Validation\Validator;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\EAV\AttributeRepositoryContract;
+use Congraph\Contracts\EAV\AttributeSetRepositoryContract;
+use Congraph\Contracts\EAV\EntityTypeRepositoryContract;
+use Congraph\Contracts\Eav\FieldValidatorFactoryContract;
+use Congraph\Contracts\Locales\LocaleRepositoryContract;
+use Congraph\Contracts\Workflows\WorkflowPointRepositoryContract;
+use Congraph\Core\Bus\RepositoryCommand;
+use Congraph\Core\Exceptions\ValidationException;
+use Congraph\Core\Validation\Validator;
+use Congraph\Eav\Managers\AttributeManager;
 
 /**
  * EntityCreateValidator class
@@ -29,7 +29,7 @@ use Cookbook\Eav\Managers\AttributeManager;
  *
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -40,49 +40,49 @@ class EntityCreateValidator extends Validator
 	 * Factory for field validators,
 	 * makes appropriate field validator depending on field type
 	 *
-	 * @var Cookbook\Contracts\Eav\FieldValidatorFactoryContract
+	 * @var Congraph\Contracts\Eav\FieldValidatorFactoryContract
 	 */
 	protected $fieldValidatorFactory;
 
 	/**
 	 * Repository for entity types
 	 * 
-	 * @var Cookbook\Contracts\Eav\EntityTypeRepositoryContract
+	 * @var Congraph\Contracts\Eav\EntityTypeRepositoryContract
 	 */
 	protected $entityTypeRepository;
 
 	/**
 	 * Repository for attribute sets
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeSetRepositoryContract
+	 * @var Congraph\Contracts\Eav\AttributeSetRepositoryContract
 	 */
 	protected $attributeSetRepository;
 
 	/**
 	 * Repository for attributes
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 * @var Congraph\Contracts\Eav\AttributeRepositoryContract
 	 */
 	protected $attributeRepository;
 
 	/**
 	 * Repository for handling locales
 	 * 
-	 * @var Cookbook\Contracts\Locales\LocaleRepositoryContract
+	 * @var Congraph\Contracts\Locales\LocaleRepositoryContract
 	 */
 	protected $localeRepository;
 
 	/**
 	 * Repository for handling locales
 	 * 
-	 * @var Cookbook\Contracts\Locales\LocaleRepositoryContract
+	 * @var Congraph\Contracts\Locales\LocaleRepositoryContract
 	 */
 	protected $workflowPointRepository;
 
 	/**
 	 * Attribute config manager
 	 * 
-	 * @var Cookbook\Eav\Managers\AttributeManager
+	 * @var Congraph\Eav\Managers\AttributeManager
 	 */
 	protected $attributeManager;
 
@@ -145,7 +145,7 @@ class EntityCreateValidator extends Validator
 	/**
 	 * Validate RepositoryCommand
 	 *
-	 * @param Cookbook\Core\Bus\RepositoryCommand $command
+	 * @param Congraph\Core\Bus\RepositoryCommand $command
 	 *
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories

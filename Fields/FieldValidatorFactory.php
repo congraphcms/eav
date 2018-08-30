@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields;
+namespace Congraph\Eav\Fields;
 
-use Cookbook\Contracts\Eav\FieldValidatorFactoryContract;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\FieldValidatorFactoryContract;
+use Congraph\Eav\Managers\AttributeManager;
 use Illuminate\Contracts\Container\Container;
 
 /**
@@ -19,13 +19,13 @@ use Illuminate\Contracts\Container\Container;
  * 
  * Used to create suitable validator for different field types
  *
- * @uses  		Cookbook\Contracts\Eav\FieldValidatorFactoryContract
- * @uses  		Cookbook\Eav\Managers\AttributeManager
+ * @uses  		Congraph\Contracts\Eav\FieldValidatorFactoryContract
+ * @uses  		Congraph\Eav\Managers\AttributeManager
  * @uses 		Illuminate\Container\Container
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -42,7 +42,7 @@ class FieldValidatorFactory implements FieldValidatorFactoryContract
 	/**
 	 * AttributeManager
 	 * 
-	 * @var Cookbook\Eav\Fields\AttributeManager
+	 * @var Congraph\Eav\Fields\AttributeManager
 	 */
 	public $attributeManager;
 
@@ -67,7 +67,7 @@ class FieldValidatorFactory implements FieldValidatorFactoryContract
 	 * 
 	 * @param string $attributeFieldType - field type of attribute
 	 * 
-	 * @return Cookbook\Eav\Fields\AbstractFieldValidator
+	 * @return Congraph\Eav\Fields\AbstractFieldValidator
 	 * 
 	 * @throws InvalidArgumentException
 	 */
