@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,25 +8,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Repositories;
+namespace Congraph\Eav\Repositories;
 
 use Carbon\Carbon;
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Contracts\Eav\EntityRepositoryContract;
-use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
-use Cookbook\Contracts\Eav\FieldHandlerFactoryContract;
-use Cookbook\Contracts\Locales\LocaleRepositoryContract;
-use Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract;
-use Cookbook\Core\Exceptions\Exception;
-use Cookbook\Core\Exceptions\NotFoundException;
-use Cookbook\Core\Exceptions\BadRequestException;
-use Cookbook\Core\Facades\Trunk;
-use Cookbook\Core\Repositories\AbstractRepository;
-use Cookbook\Core\Repositories\Collection;
-use Cookbook\Core\Repositories\Model;
-use Cookbook\Core\Repositories\UsesCache;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\AttributeSetRepositoryContract;
+use Congraph\Contracts\Eav\EntityRepositoryContract;
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
+use Congraph\Contracts\Eav\FieldHandlerFactoryContract;
+use Congraph\Contracts\Locales\LocaleRepositoryContract;
+use Congraph\Contracts\Workflows\WorkflowPointRepositoryContract;
+use Congraph\Core\Exceptions\Exception;
+use Congraph\Core\Exceptions\NotFoundException;
+use Congraph\Core\Exceptions\BadRequestException;
+use Congraph\Core\Facades\Trunk;
+use Congraph\Core\Repositories\AbstractRepository;
+use Congraph\Core\Repositories\Collection;
+use Congraph\Core\Repositories\Model;
+use Congraph\Core\Repositories\UsesCache;
+use Congraph\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
 use stdClass;
@@ -37,23 +37,23 @@ use stdClass;
  * Repository for entity database queries
  *
  * @uses        Illuminate\Database\Connection
- * @uses        Cookbook\Core\Repository\AbstractRepository
- * @uses        Cookbook\Contracts\Eav\AttributeHandlerFactoryContract
- * @uses        Cookbook\Eav\Managers\AttributeManager
+ * @uses        Congraph\Core\Repository\AbstractRepository
+ * @uses        Congraph\Contracts\Eav\AttributeHandlerFactoryContract
+ * @uses        Congraph\Eav\Managers\AttributeManager
  *
  * @author      Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright   Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package     cookbook/eav
+ * @package     congraph/eav
  * @since       0.1.0-alpha
  * @version     0.1.0-alpha
  */
-class EntityRepository extends AbstractRepository implements EntityRepositoryContract//, UsesCache
+class EntityRepository extends AbstractRepository implements EntityRepositoryContract //, UsesCache
 {
     /**
      * Factory for field handlers,
      * makes appropriate field handler depending on attribute data type
      *
-     * @var \Cookbook\Contracts\Eav\FieldHandlerFactoryContract
+     * @var \Congraph\Contracts\Eav\FieldHandlerFactoryContract
      */
     protected $fieldHandlerFactory;
 
@@ -61,42 +61,42 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
     /**
      * Helper for attributes
      *
-     * @var \Cookbook\Eav\Managers\AttributeManager
+     * @var \Congraph\Eav\Managers\AttributeManager
      */
     protected $attributeManager;
     
     /**
      * Repository for handling attribute sets
      *
-     * @var \Cookbook\Contracts\Eav\AttributeSetRepositoryContract
+     * @var \Congraph\Contracts\Eav\AttributeSetRepositoryContract
      */
     protected $attributeSetRepository;
 
     /**
      * Repository for handling attributes
      *
-     * @var \Cookbook\Contracts\Eav\AttributeRepositoryContract
+     * @var \Congraph\Contracts\Eav\AttributeRepositoryContract
      */
     protected $attributeRepository;
 
     /**
      * Repository for handling entity types
      *
-     * @var \Cookbook\Contracts\Eav\AttributeRepositoryContract
+     * @var \Congraph\Contracts\Eav\AttributeRepositoryContract
      */
     protected $entityTypeRepository;
 
     /**
      * Repository for handling locales
      *
-     * @var \Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract
+     * @var \Congraph\Contracts\Workflows\WorkflowPointRepositoryContract
      */
     protected $workflowPointRepository;
 
     /**
      * Repository for handling locales
      *
-     * @var \Cookbook\Contracts\Locales\LocaleRepositoryContract
+     * @var \Congraph\Contracts\Locales\LocaleRepositoryContract
      */
     protected $localeRepository;
 
@@ -106,20 +106,21 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
      * Create new EntityRepository
      *
      * @param Illuminate\Database\Connection $db
-     * @param Cookbook\Eav\Handlers\AttributeHandlerFactoryContract $attributeHandlerFactory
-     * @param Cookbook\Eav\Managers\AttributeManager $attributeManager
+     * @param Congraph\Eav\Handlers\AttributeHandlerFactoryContract $attributeHandlerFactory
+     * @param Congraph\Eav\Managers\AttributeManager $attributeManager
      *
      * @return void
      */
-    public function __construct(Connection $db,
+    public function __construct(
+        Connection $db,
                                 FieldHandlerFactoryContract $fieldHandlerFactory,
                                 AttributeManager $attributeManager,
                                 AttributeSetRepositoryContract $attributeSetRepository,
                                 AttributeRepositoryContract $attributeRepository,
                                 EntityTypeRepositoryContract $entityTypeRepository,
                                 WorkflowPointRepositoryContract $workflowPointRepository,
-                                LocaleRepositoryContract $localeRepository)
-    {
+                                LocaleRepositoryContract $localeRepository
+    ) {
 
         // AbstractRepository constructor
         parent::__construct($db);
@@ -183,15 +184,12 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         ];
         $timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
 
-        if(Config::get('cb.eav.allow_manual_timestamps'))
-        {
-            if(!empty($model['created_at']))
-            {
+        if (Config::get('cb.eav.allow_manual_timestamps')) {
+            if (!empty($model['created_at'])) {
                 $entityParams['created_at'] = Carbon::parse($model['created_at'])->tz($timezone)->toDateTimeString();
             }
 
-            if(!empty($model['updated_at']))
-            {
+            if (!empty($model['updated_at'])) {
                 $entityParams['updated_at'] = Carbon::parse($model['updated_at'])->tz($timezone)->toDateTimeString();
             }
         }
@@ -316,8 +314,6 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                 $fieldForUpdate['value'] = (isset($fields[$attribute->code]))?$fields[$attribute->code]:$attribute->default_value;
                 $fieldsForUpdate[] = $fieldForUpdate;
             } else {
-                
-
                 foreach ($fields[$attribute->code] as $lcode => $value) {
                     $localizedFieldForUpdate = $fieldForUpdate;
                     foreach ($locales as $l) {
@@ -355,15 +351,12 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         $entityParams = [];
         $timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
-        if(Config::get('cb.eav.allow_manual_timestamps'))
-        {
-            if(!empty($model['created_at']))
-            {
+        if (Config::get('cb.eav.allow_manual_timestamps')) {
+            if (!empty($model['created_at'])) {
                 $entityParams['created_at'] = Carbon::parse($model['created_at'])->tz($timezone)->toDateTimeString();
             }
 
-            if(!empty($model['updated_at']))
-            {
+            if (!empty($model['updated_at'])) {
                 $entityParams['updated_at'] = Carbon::parse($model['updated_at'])->tz($timezone)->toDateTimeString();
             }
         }
@@ -478,13 +471,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
      */
     protected function insertEntity($params)
     {
-        if(empty($params['created_at']))
-        {
+        if (empty($params['created_at'])) {
             $params['created_at'] = Carbon::now('UTC')->toDateTimeString();
         }
         
-        if(empty($params['updated_at']))
-        {
+        if (empty($params['updated_at'])) {
             $params['updated_at'] = $params['created_at'];
         }
 
@@ -505,8 +496,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
      */
     protected function updateEntity($id, $params)
     {
-        if(empty($params['updated_at']))
-        {
+        if (empty($params['updated_at'])) {
             $params['updated_at'] = Carbon::now('UTC')->toDateTimeString();
         }
         
@@ -907,53 +897,44 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         $public = false;
         $fulltextSearch = null;
         foreach ($filters as $key => $filter) {
-            if ($key == 'entity_type' || $key == 'type')
-            {
+            if ($key == 'entity_type' || $key == 'type') {
                 $key = 'entity_types.code';
             }
-            if ($key == 'type_id')
-            {
+            if ($key == 'type_id') {
                 $key = 'entity_type_id';
             }
 
-            if ($key == 's')
-            {
+            if ($key == 's') {
                 $fulltextSearch = strval($filter);
                 continue;
             }
 
-            if (strpos($key, '.') == false)
-            {
+            if (strpos($key, '.') == false) {
                 $key = 'entities.' . $key;
             }
 
-            if (substr($key, 0, 7) === "fields.")
-            {
+            if (substr($key, 0, 7) === "fields.") {
                 $code = substr($key, 7);
                 $fieldFilters[$code] = $filter;
                 continue;
             }
 
-            if (! is_array($filter))
-            {
+            if (! is_array($filter)) {
                 $query = $query->where($key, '=', $filter);
                 continue;
             }
 
             $query = $this->parseFilterOperator($query, $key, $filter);
         }
-        if (! empty($fieldFilters))
-        {
+        if (! empty($fieldFilters)) {
             $attributes = $this->attributeRepository->get(['code' => ['in'=>array_keys($fieldFilters)]]);
 
-            foreach ($attributes as $attribute)
-            {
+            foreach ($attributes as $attribute) {
                 $query = $this->parseFieldFilter($query, $attribute, $fieldFilters[$attribute->code], $locale);
             }
         }
 
-        if( ! empty($fulltextSearch) )
-        {
+        if (! empty($fulltextSearch)) {
             $query = $this->parseFulltextSearch($query, $fulltextSearch, $locale);
         }
 
@@ -1001,16 +982,16 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
     protected function parseFulltextSearch($query, $search, $locale = null)
     {
         $search = $search . '*';
-        $query = $query->join('attribute_values_fulltext as fulltextsearch', function($join)
-            {
+        $query = $query->join(
+            'attribute_values_fulltext as fulltextsearch',
+            function ($join) {
                 $join->on('fulltextsearch.entity_id', '=', 'entities.id');
             }
         );
-        if( ! is_null($locale) )
-        {
+        if (! is_null($locale)) {
             $query->whereIn('fulltextsearch.locale_id', [0, $locale->id]);
         }
-        $query = $query->whereRaw('MATCH (fulltextsearch.value) AGAINST (?  IN BOOLEAN MODE)' , array($search));
+        $query = $query->whereRaw('MATCH (fulltextsearch.value) AGAINST (?  IN BOOLEAN MODE)', array($search));
 
         return $query;
     }
@@ -1031,8 +1012,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                           ->whereIn('entity_statuses.locale_id', $localeIds)
                           ->whereNotNull('workflow_points.status');
 
-        if(! is_array($status) )
-        {
+        if (! is_array($status)) {
             $query = $query->where('workflow_points.status', '=', $status);
         } else {
             foreach ($status as $operator => $value) {
@@ -1060,7 +1040,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         return $query;
     }
 
-    protected function parseSorting($query, $sort)
+    protected function parseSorting($query, $sort, $sortPrefix = '')
     {
         if (! empty($sort)) {
             $sort = (is_array($sort))? $sort: [$sort];
@@ -1293,7 +1273,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             $formattedValue = $fieldHandler->formatValue($value->value, $attribute);
 
             if ($hasMultipleValues) {
-                if($formattedValue !== null){
+                if ($formattedValue !== null) {
                     $formattedValue = [$formattedValue];
                 } else {
                     $formattedValue = [];
