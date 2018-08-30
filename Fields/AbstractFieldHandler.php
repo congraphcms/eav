@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields;
+namespace Congraph\Eav\Fields;
 
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Contracts\Eav\FieldHandlerContract;
-use Cookbook\Core\Traits\ErrorManagerTrait;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\FieldHandlerContract;
+use Congraph\Core\Traits\ErrorManagerTrait;
+use Congraph\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Event;
 
@@ -22,13 +22,13 @@ use Illuminate\Support\Facades\Event;
  * 
  * Base class for all feild handlers
  * 
- * @uses  		Cookbook\Core\Traits\ErrorManagerTrait
- * @uses  		Cookbook\Eav\Managers\AttributeManager
+ * @uses  		Congraph\Core\Traits\ErrorManagerTrait
+ * @uses  		Congraph\Eav\Managers\AttributeManager
  * @uses 		Illuminate\Database\Connection
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -53,7 +53,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	/**
 	 * Repository for attributes
 	 * 
-	 * @var Cookbook\Contracts\Eav\AttributeRepositoryContract
+	 * @var Congraph\Contracts\Eav\AttributeRepositoryContract
 	 */
 	public $attributeRepository;
 
@@ -69,7 +69,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	 * Create new AbstractAttributeHandler
 	 * 
 	 * @param Illuminate\Database\Connection 			$db
-	 * @param Cookbook\Eav\Managers\AttributeManager 	$attributeManager
+	 * @param Congraph\Eav\Managers\AttributeManager 	$attributeManager
 	 * @param string 									$table
 	 *  
 	 * @return void

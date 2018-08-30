@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Handlers\Commands\AttributeSets;
+namespace Congraph\Eav\Handlers\Commands\AttributeSets;
 
 
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Core\Bus\RepositoryCommandHandler;
-use Cookbook\Core\Bus\RepositoryCommand;
+use Congraph\Contracts\Eav\AttributeSetRepositoryContract;
+use Congraph\Core\Bus\RepositoryCommandHandler;
+use Congraph\Core\Bus\RepositoryCommand;
 
 /**
  * AttributeSetFetchHandler class
@@ -23,7 +23,7 @@ use Cookbook\Core\Bus\RepositoryCommand;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -33,7 +33,7 @@ class AttributeSetFetchHandler extends RepositoryCommandHandler
 	/**
 	 * Create new AttributeSetFetchHandler
 	 * 
-	 * @param Cookbook\Contracts\Eav\AttributeSetRepositoryContract $repository
+	 * @param Congraph\Contracts\Eav\AttributeSetRepositoryContract $repository
 	 * 
 	 * @return void
 	 */
@@ -45,7 +45,7 @@ class AttributeSetFetchHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Cookbook\Core\Bus\RepositoryCommand $command
+	 * @param Congraph\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @return void
 	 */

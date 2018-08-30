@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields;
+namespace Congraph\Eav\Fields;
 
 use Illuminate\Support\ServiceProvider;
 
-use Cookbook\Eav\Fields\Text\TextFieldHandler;
+use Congraph\Eav\Fields\Text\TextFieldHandler;
 
 /**
  * FieldsServiceProvider service provider for handlers
@@ -23,7 +23,7 @@ use Cookbook\Eav\Fields\Text\TextFieldHandler;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -63,11 +63,11 @@ class FieldsServiceProvider extends ServiceProvider {
 	*/
 	protected function registerListeners()
 	{
-		$this->app['events']->listen('cb.after.file.delete', 'Cookbook\Eav\Fields\Asset\AssetFieldHandler@onFileDelete');
-		$this->app['events']->listen('cb.before.entity.update', 'Cookbook\Eav\Fields\Compound\CompoundFieldHandler@onBeforeEntityUpdate');
-		$this->app['events']->listen('cb.after.entity.update', 'Cookbook\Eav\Fields\Compound\CompoundFieldHandler@onAfterEntityUpdate');
-		$this->app['events']->listen('cb.before.entity.get', 'Cookbook\Eav\Fields\Node\NodeFieldHandler@onBeforeEntityGet');
-		$this->app['events']->listen('cb.before.entity.fetch', 'Cookbook\Eav\Fields\Node\NodeFieldHandler@onBeforeEntityGet');
+		$this->app['events']->listen('cb.after.file.delete', 'Congraph\Eav\Fields\Asset\AssetFieldHandler@onFileDelete');
+		$this->app['events']->listen('cb.before.entity.update', 'Congraph\Eav\Fields\Compound\CompoundFieldHandler@onBeforeEntityUpdate');
+		$this->app['events']->listen('cb.after.entity.update', 'Congraph\Eav\Fields\Compound\CompoundFieldHandler@onAfterEntityUpdate');
+		$this->app['events']->listen('cb.before.entity.get', 'Congraph\Eav\Fields\Node\NodeFieldHandler@onBeforeEntityGet');
+		$this->app['events']->listen('cb.before.entity.fetch', 'Congraph\Eav\Fields\Node\NodeFieldHandler@onBeforeEntityGet');
 	}
 
 	/**
@@ -77,27 +77,27 @@ class FieldsServiceProvider extends ServiceProvider {
 	*/
 	protected function registerFactories() {
 		$this 	->app
-				->singleton('Cookbook\Eav\Fields\FieldHandlerFactory', function($app){
+				->singleton('Congraph\Eav\Fields\FieldHandlerFactory', function($app){
 					return new FieldHandlerFactory(
 						$app['app'],
-						$app->make('Cookbook\Eav\Managers\AttributeManager')
+						$app->make('Congraph\Eav\Managers\AttributeManager')
 					);
 				});
 
 		$this->app->alias(
-			'Cookbook\Eav\Fields\FieldHandlerFactory', 'Cookbook\Contracts\Eav\FieldHandlerFactoryContract'
+			'Congraph\Eav\Fields\FieldHandlerFactory', 'Congraph\Contracts\Eav\FieldHandlerFactoryContract'
 		);
 
 		$this 	->app
-				->singleton('Cookbook\Eav\Fields\FieldValidatorFactory', function($app){
+				->singleton('Congraph\Eav\Fields\FieldValidatorFactory', function($app){
 					return new FieldValidatorFactory(
 						$app['app'],
-						$app->make('Cookbook\Eav\Managers\AttributeManager')
+						$app->make('Congraph\Eav\Managers\AttributeManager')
 					);
 				});
 
 		$this->app->alias(
-			'Cookbook\Eav\Fields\FieldValidatorFactory', 'Cookbook\Contracts\Eav\FieldValidatorFactoryContract'
+			'Congraph\Eav\Fields\FieldValidatorFactory', 'Congraph\Contracts\Eav\FieldValidatorFactoryContract'
 		);
 	}
 
@@ -108,92 +108,92 @@ class FieldsServiceProvider extends ServiceProvider {
 	*/
 	protected function registerFieldHandlers() {
 
-		$this->app->singleton('Cookbook\Eav\Fields\Asset\AssetFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Asset\AssetFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Asset\AssetFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Asset\AssetFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Filesystem\FileRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Filesystem\FileRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Boolean\BooleanFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Boolean\BooleanFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Boolean\BooleanFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Boolean\BooleanFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Datetime\DatetimeFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Datetime\DatetimeFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Decimal\DecimalFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Decimal\DecimalFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Decimal\DecimalFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Decimal\DecimalFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Integer\IntegerFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Integer\IntegerFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Integer\IntegerFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Integer\IntegerFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Relation\RelationFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Relation\RelationFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Relation\RelationFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Relation\RelationFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Select\SelectFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Select\SelectFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Select\SelectFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Select\SelectFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Text\TextFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Text\TextFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Text\TextFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Text\TextFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Textarea\TextareaFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Textarea\TextareaFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Textarea\TextareaFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Textarea\TextareaFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Location\LocationFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Location\LocationFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Location\LocationFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Location\LocationFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Compound\CompoundFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Compound\CompoundFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Compound\CompoundFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Compound\CompoundFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
-		$this->app->singleton('Cookbook\Eav\Fields\Node\NodeFieldHandler', function($app) {
-			return new \Cookbook\Eav\Fields\Node\NodeFieldHandler( 
+		$this->app->singleton('Congraph\Eav\Fields\Node\NodeFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Node\NodeFieldHandler( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
 	}
@@ -204,97 +204,97 @@ class FieldsServiceProvider extends ServiceProvider {
 	* @return void
 	*/
 	protected function registerFieldValidators() {
-		// $field_types = $this->app['config']->get('cookbook.field_types');
+		// $field_types = $this->app['config']->get('congraph.field_types');
 
 		// if( ! is_array($field_types) )
 		// {
 		// 	return;
 		// }
-		$this->app->bind('Cookbook\Eav\Fields\Asset\AssetFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Asset\AssetFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Asset\AssetFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Asset\AssetFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Filesystem\FileRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Filesystem\FileRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Boolean\BooleanFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Boolean\BooleanFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Boolean\BooleanFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Boolean\BooleanFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Datetime\DatetimeFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Datetime\DatetimeFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Datetime\DatetimeFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Datetime\DatetimeFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Decimal\DecimalFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Decimal\DecimalFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Decimal\DecimalFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Decimal\DecimalFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Integer\IntegerFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Integer\IntegerFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Integer\IntegerFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Integer\IntegerFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Relation\RelationFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Relation\RelationFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Relation\RelationFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Relation\RelationFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Select\SelectFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Select\SelectFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Select\SelectFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Select\SelectFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Text\TextFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Text\TextFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Text\TextFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Text\TextFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Textarea\TextareaFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Textarea\TextareaFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Textarea\TextareaFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Textarea\TextareaFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Location\LocationFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Location\LocationFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Location\LocationFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Location\LocationFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Compound\CompoundFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Compound\CompoundFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Compound\CompoundFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Compound\CompoundFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Fields\Node\NodeFieldValidator', function($app) {
-			return new \Cookbook\Eav\Fields\Node\NodeFieldValidator( 
+		$this->app->bind('Congraph\Eav\Fields\Node\NodeFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Node\NodeFieldValidator( 
 				$app['db']->connection(),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
 
@@ -306,7 +306,7 @@ class FieldsServiceProvider extends ServiceProvider {
 
 		// 			return new $settings['validator']( 
 		// 				$app['db']->connection(),
-		// 				$app->make('Cookbook\Eav\Managers\AttributeManager'),
+		// 				$app->make('Congraph\Eav\Managers\AttributeManager'),
 		// 				$settings['table']
 		// 			);
 		// 		});
@@ -324,11 +324,11 @@ class FieldsServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		$provides = [
-			'Cookbook\Eav\Fields\FieldHandlerFactory',
-			'Cookbook\Contracts\Eav\FieldHandlerFactoryContract'
+			'Congraph\Eav\Fields\FieldHandlerFactory',
+			'Congraph\Contracts\Eav\FieldHandlerFactoryContract'
 		];
 
-		$field_types = $this->app['config']->get('cookbook');
+		$field_types = $this->app['config']->get('congraph');
 
 		if( ! is_array($field_types) )
 		{

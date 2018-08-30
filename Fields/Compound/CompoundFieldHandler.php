@@ -1,6 +1,6 @@
 <?php 
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,16 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields\Compound;
+namespace Congraph\Eav\Fields\Compound;
 
 use Illuminate\Support\Facades\Config;
-use Cookbook\Eav\Fields\AbstractFieldHandler;
-use Cookbook\Eav\Managers\AttributeManager;
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Contracts\Eav\EntityRepositoryContract;
+use Congraph\Eav\Fields\AbstractFieldHandler;
+use Congraph\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\EntityRepositoryContract;
 use Illuminate\Database\Connection;
-use Cookbook\Core\Exceptions\BadRequestException;
-use Cookbook\Eav\Facades\MetaData;
+use Congraph\Core\Exceptions\BadRequestException;
+use Congraph\Eav\Facades\MetaData;
 use Illuminate\Support\Facades\Event;
 use \Exception;
 
@@ -29,7 +29,7 @@ use \Exception;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -48,7 +48,7 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 	/**
 	 * Repository for entities
 	 * 
-	 * @var Cookbook\Contracts\Eav\EntityRepositoryContract
+	 * @var Congraph\Contracts\Eav\EntityRepositoryContract
 	 */
 	public $entityRepository;
 
@@ -57,7 +57,7 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 	 * Create new CompoundFieldHandler
 	 * 
 	 * @param Illuminate\Database\Connection 			$db
-	 * @param Cookbook\Eav\Managers\AttributeManager 	$attributeManager
+	 * @param Congraph\Eav\Managers\AttributeManager 	$attributeManager
 	 * @param string 									$table
 	 *  
 	 * @return void
@@ -140,7 +140,7 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 						
 					}
 
-					if ($entity instanceof \Cookbook\Core\Repositories\Model && $takeFromEntity && property_exists($entity->fields, $code))
+					if ($entity instanceof \Congraph\Core\Repositories\Model && $takeFromEntity && property_exists($entity->fields, $code))
 					{
 						// var_dump('calculate from entity - ' . $localeCode . ' - ' . $locale);
 						// var_dump($entity->fields->$code);

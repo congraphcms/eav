@@ -29,17 +29,17 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Filesystem/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Workflows/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
 		]);
 
 		$this->artisan('db:seed', [
@@ -95,7 +95,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 			'driver'   	=> 'mysql',
 			'host'      => '127.0.0.1',
 			'port'		=> '3306',
-			'database'	=> 'cookbook_testbench',
+			'database'	=> 'congraph_testbench',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',
@@ -114,7 +114,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
 
 		// $app['config']->set(
-		// 	'Cookbook::eav', $config
+		// 	'Congraph::eav', $config
 		// );
 
 		// var_dump('CONFIG SETTED');
@@ -123,11 +123,11 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\Core\CoreServiceProvider', 
-			'Cookbook\Locales\LocalesServiceProvider', 
-			'Cookbook\Eav\EavServiceProvider', 
-			'Cookbook\Filesystem\FilesystemServiceProvider',
-			'Cookbook\Workflows\WorkflowsServiceProvider'
+			'Congraph\Core\CoreServiceProvider', 
+			'Congraph\Locales\LocalesServiceProvider', 
+			'Congraph\Eav\EavServiceProvider', 
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
 		];
 	}
 
@@ -149,15 +149,15 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeCreateCommand($params) );
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeCreateCommand($params) );
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		// $this->d->dump($result->toArray());
 	}
 
 	/**
-	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
+	 * @expectedException \Congraph\Core\Exceptions\ValidationException
 	 */
 	public function testCreateException()
 	{
@@ -176,7 +176,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeCreateCommand($params) );
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeCreateCommand($params) );
 	}
 
 	public function testUpdateEntityType()
@@ -191,16 +191,16 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeUpdateCommand($params, 1) );
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeUpdateCommand($params, 1) );
 		
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test_type_changed', $result->code);
 		// $this->d->dump($result->toArray());
 	}
 
 	/**
-	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
+	 * @expectedException \Congraph\Core\Exceptions\ValidationException
 	 */
 	public function testUpdateException()
 	{
@@ -214,7 +214,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeUpdateCommand($params, 1) );
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeUpdateCommand($params, 1) );
 	}
 
 
@@ -225,14 +225,14 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeDeleteCommand([], 1) );
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeDeleteCommand([], 1) );
 
 		$this->assertEquals(1, $result->id);
 		// $this->d->dump($result);
 	}
 
 	/**
-	 * @expectedException \Cookbook\Core\Exceptions\NotFoundException
+	 * @expectedException \Congraph\Core\Exceptions\NotFoundException
 	 */
 	public function testDeleteException()
 	{
@@ -241,7 +241,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeDeleteCommand([], 133) );
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeDeleteCommand([], 133) );
 	}
 
 	public function testFetchEntityType()
@@ -251,9 +251,9 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeFetchCommand([], 1));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeFetchCommand([], 1));
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(1, $result->id);
 		// $this->d->dump($result->toArray());
@@ -266,9 +266,9 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeFetchCommand(['include' => 'workflow, default_point, attribute_sets.attributes'], 1));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeFetchCommand(['include' => 'workflow, default_point, attribute_sets.attributes'], 1));
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(1, $result->id);
 		$this->assertEquals(3, count($result->attribute_sets));
@@ -282,7 +282,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 	}
 
 	/**
-	 * @expectedException \Cookbook\Core\Exceptions\NotFoundException
+	 * @expectedException \Congraph\Core\Exceptions\NotFoundException
 	 */
 	public function testFetchException()
 	{
@@ -291,7 +291,7 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeFetchCommand([], 133));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeFetchCommand([], 133));
 	}
 
 	public function testGetEntityTypes()
@@ -300,9 +300,9 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand([]));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeGetCommand([]));
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		$this->assertEquals(4, count($result));
 		// $this->d->dump($result->toArray());
 
@@ -315,9 +315,9 @@ class EntityTypeTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand(['sort' => ['-code'], 'limit' => 2, 'offset' => 1, 'include' => ['workflow', 'default_point', 'attribute_sets.attributes']]));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\EntityTypes\EntityTypeGetCommand(['sort' => ['-code'], 'limit' => 2, 'offset' => 1, 'include' => ['workflow', 'default_point', 'attribute_sets.attributes']]));
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		$this->assertEquals(count($result), 2);
 
 		// $this->d->dump($result->toArray());

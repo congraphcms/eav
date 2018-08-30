@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -18,7 +18,7 @@ return array(
 	/**
 	 * List of data types supported by application
 	 * 
-	 * Each data type need to have unique key that will be used by cookbook administration
+	 * Each data type need to have unique key that will be used by congraph administration
 	 * to create suitable directive for input of this type
 	 * 
 	 * Warning: 
@@ -60,9 +60,9 @@ return array(
 		'text' => array(
 			'label'						=> 'Text',
 			'table' 					=> 'attribute_values_text',
-			'handler'					=> 'Cookbook\Eav\Fields\Text\TextFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Text\TextFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Text\TextFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Text\TextFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Text\TextFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Text\TextFieldValidator',
 			'handler_name'				=> 'TextFieldHandler',
 			'can_have_default_value'	=> true,
 			'can_be_unique'				=> true,
@@ -77,9 +77,9 @@ return array(
 		'tags' => array(
 			'label'						=> 'Tags',
 			'table' 					=> 'attribute_values_text',
-			'handler'					=> 'Cookbook\Eav\Fields\Text\TextFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Text\TextFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Text\TextFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Text\TextFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Text\TextFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Text\TextFieldValidator',
 			'handler_name'				=> 'TextFieldHandler',
 			'can_have_default_value'	=> true,
 			'can_be_unique'				=> true,
@@ -94,9 +94,9 @@ return array(
 		'boolean' => array(
 			'label'						=> 'Boolean',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Boolean\BooleanFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Boolean\BooleanFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Boolean\BooleanFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Boolean\BooleanFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Boolean\BooleanFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Boolean\BooleanFieldValidator',
 			'handler_name'				=> 'BooleanFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -121,9 +121,9 @@ return array(
 		'select' => array(
 			'label'						=> 'Select',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Select\SelectFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Select\SelectFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Select\SelectFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Select\SelectFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Select\SelectFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Select\SelectFieldValidator',
 			'handler_name'				=> 'SelectFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -137,9 +137,9 @@ return array(
 		'multiselect' => array(
 			'label'						=> 'Multiselect',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Select\SelectFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Select\SelectFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Select\SelectFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Select\SelectFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Select\SelectFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Select\SelectFieldValidator',
 			'handler_name'				=> 'SelectFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -157,9 +157,9 @@ return array(
 		'integer' => array(
 			'label'						=> 'Integer Number',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Integer\IntegerFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Integer\IntegerFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Integer\IntegerFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Integer\IntegerFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Integer\IntegerFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Integer\IntegerFieldValidator',
 			'handler_name'				=> 'IntegerFieldHandler',
 			'can_have_default_value'	=> true,
 			'can_be_unique'				=> true,
@@ -177,9 +177,9 @@ return array(
 		'decimal' => array(
 			'label'						=> 'Decimal Number',
 			'table' 					=> 'attribute_values_decimal',
-			'handler'					=> 'Cookbook\Eav\Fields\Decimal\DecimalFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Decimal\DecimalFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Decimal\DecimalFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Decimal\DecimalFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Decimal\DecimalFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Decimal\DecimalFieldValidator',
 			'handler_name'				=> 'DecimalFieldHandler',
 			'can_have_default_value'	=> true,
 			'can_be_unique'				=> true,
@@ -197,9 +197,9 @@ return array(
 		'datetime' => array(
 			'label'						=> 'Date & Time',
 			'table' 					=> 'attribute_values_datetime',
-			'handler'					=> 'Cookbook\Eav\Fields\Datetime\DatetimeFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Datetime\DatetimeFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Datetime\DatetimeFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Datetime\DatetimeFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Datetime\DatetimeFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Datetime\DatetimeFieldValidator',
 			'handler_name'				=> 'DatetimeFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> true,
@@ -217,9 +217,9 @@ return array(
 		'relation' => array(
 			'label'						=> 'Relation',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Relation\RelationFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Relation\RelationFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Relation\RelationFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Relation\RelationFieldValidator',
 			'handler_name'				=> 'RelationFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -233,9 +233,9 @@ return array(
 		'relation_collection' => array(
 			'label'						=> 'Relations',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Relation\RelationFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Relation\RelationFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Relation\RelationFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Relation\RelationFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Relation\RelationFieldValidator',
 			'handler_name'				=> 'RelationFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -253,9 +253,9 @@ return array(
 		'node' => array(
 			'label'						=> 'Node',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Node\NodeFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Node\NodeFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Node\NodeFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Node\NodeFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Node\NodeFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Node\NodeFieldValidator',
 			'handler_name'				=> 'NodeFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -269,9 +269,9 @@ return array(
 		'node_collection' => array(
 			'label'						=> 'Nodes',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Node\NodeFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Node\NodeFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Node\NodeFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Node\NodeFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Node\NodeFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Node\NodeFieldValidator',
 			'handler_name'				=> 'NodeFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -289,9 +289,9 @@ return array(
 		'asset' => array(
 			'label'						=> 'Asset',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Asset\AssetFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Asset\AssetFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Asset\AssetFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Asset\AssetFieldValidator',
 			'handler_name'				=> 'AssetFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -305,9 +305,9 @@ return array(
 		'asset_collection' => array(
 			'label'						=> 'Assets',
 			'table' 					=> 'attribute_values_integer',
-			'handler'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Asset\AssetFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Asset\AssetFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Asset\AssetFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Asset\AssetFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Asset\AssetFieldValidator',
 			'handler_name'				=> 'AssetFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -321,9 +321,9 @@ return array(
 		'location' => array(
 			'label'						=> 'Location',
 			'table' 					=> 'attribute_values_text',
-			'handler'					=> 'Cookbook\Eav\Fields\Location\LocationFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Location\LocationFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Location\LocationFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Location\LocationFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Location\LocationFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Location\LocationFieldValidator',
 			'handler_name'				=> 'LocationFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,
@@ -338,9 +338,9 @@ return array(
 		'compound' => array(
 			'label'						=> 'Compound',
 			'table' 					=> 'attribute_values_text',
-			'handler'					=> 'Cookbook\Eav\Fields\Compound\CompoundFieldHandler',
-			'elastic_handler'			=> 'Cookbook\EntityElastic\Fields\Compound\CompoundFieldHandler',
-			'validator'					=> 'Cookbook\Eav\Fields\Compound\CompoundFieldValidator',
+			'handler'					=> 'Congraph\Eav\Fields\Compound\CompoundFieldHandler',
+			'elastic_handler'			=> 'Congraph\EntityElastic\Fields\Compound\CompoundFieldHandler',
+			'validator'					=> 'Congraph\Eav\Fields\Compound\CompoundFieldValidator',
 			'handler_name'				=> 'CompoundFieldHandler',
 			'can_have_default_value'	=> false,
 			'can_be_unique'				=> false,

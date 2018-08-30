@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,33 +8,33 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Validators;
+namespace Congraph\Eav\Validators;
 
 use Illuminate\Support\ServiceProvider;
 
-use Cookbook\Eav\Validators\Attributes\AttributeCreateValidator;
-use Cookbook\Eav\Validators\Attributes\AttributeUpdateValidator;
-use Cookbook\Eav\Validators\Attributes\AttributeDeleteValidator;
-use Cookbook\Eav\Validators\Attributes\AttributeFetchValidator;
-use Cookbook\Eav\Validators\Attributes\AttributeGetValidator;
+use Congraph\Eav\Validators\Attributes\AttributeCreateValidator;
+use Congraph\Eav\Validators\Attributes\AttributeUpdateValidator;
+use Congraph\Eav\Validators\Attributes\AttributeDeleteValidator;
+use Congraph\Eav\Validators\Attributes\AttributeFetchValidator;
+use Congraph\Eav\Validators\Attributes\AttributeGetValidator;
 
-use Cookbook\Eav\Validators\AttributeSets\AttributeSetCreateValidator;
-use Cookbook\Eav\Validators\AttributeSets\AttributeSetUpdateValidator;
-use Cookbook\Eav\Validators\AttributeSets\AttributeSetDeleteValidator;
-use Cookbook\Eav\Validators\AttributeSets\AttributeSetFetchValidator;
-use Cookbook\Eav\Validators\AttributeSets\AttributeSetGetValidator;
+use Congraph\Eav\Validators\AttributeSets\AttributeSetCreateValidator;
+use Congraph\Eav\Validators\AttributeSets\AttributeSetUpdateValidator;
+use Congraph\Eav\Validators\AttributeSets\AttributeSetDeleteValidator;
+use Congraph\Eav\Validators\AttributeSets\AttributeSetFetchValidator;
+use Congraph\Eav\Validators\AttributeSets\AttributeSetGetValidator;
 
-use Cookbook\Eav\Validators\EntityTypes\EntityTypeCreateValidator;
-use Cookbook\Eav\Validators\EntityTypes\EntityTypeUpdateValidator;
-use Cookbook\Eav\Validators\EntityTypes\EntityTypeDeleteValidator;
-use Cookbook\Eav\Validators\EntityTypes\EntityTypeFetchValidator;
-use Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator;
+use Congraph\Eav\Validators\EntityTypes\EntityTypeCreateValidator;
+use Congraph\Eav\Validators\EntityTypes\EntityTypeUpdateValidator;
+use Congraph\Eav\Validators\EntityTypes\EntityTypeDeleteValidator;
+use Congraph\Eav\Validators\EntityTypes\EntityTypeFetchValidator;
+use Congraph\Eav\Validators\EntityTypes\EntityTypeGetValidator;
 
-use Cookbook\Eav\Validators\Entities\EntityCreateValidator;
-use Cookbook\Eav\Validators\Entities\EntityUpdateValidator;
-use Cookbook\Eav\Validators\Entities\EntityDeleteValidator;
-use Cookbook\Eav\Validators\Entities\EntityFetchValidator;
-use Cookbook\Eav\Validators\Entities\EntityGetValidator;
+use Congraph\Eav\Validators\Entities\EntityCreateValidator;
+use Congraph\Eav\Validators\Entities\EntityUpdateValidator;
+use Congraph\Eav\Validators\Entities\EntityDeleteValidator;
+use Congraph\Eav\Validators\Entities\EntityFetchValidator;
+use Congraph\Eav\Validators\Entities\EntityGetValidator;
 
 /**
  * ValidatorsServiceProvider service provider for validators
@@ -45,7 +45,7 @@ use Cookbook\Eav\Validators\Entities\EntityGetValidator;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -79,53 +79,53 @@ class ValidatorsServiceProvider extends ServiceProvider {
 		
 		$mappings = [
 			// Attributes
-			'Cookbook\Eav\Commands\Attributes\AttributeCreateCommand' => 
-				'Cookbook\Eav\Validators\Attributes\AttributeCreateValidator@validate',
-			'Cookbook\Eav\Commands\Attributes\AttributeUpdateCommand' => 
-				'Cookbook\Eav\Validators\Attributes\AttributeUpdateValidator@validate',
-			'Cookbook\Eav\Commands\Attributes\AttributeDeleteCommand' => 
-				'Cookbook\Eav\Validators\Attributes\AttributeDeleteValidator@validate',
-			'Cookbook\Eav\Commands\Attributes\AttributeFetchCommand' => 
-				'Cookbook\Eav\Validators\Attributes\AttributeFetchValidator@validate',
-			'Cookbook\Eav\Commands\Attributes\AttributeGetCommand' => 
-				'Cookbook\Eav\Validators\Attributes\AttributeGetValidator@validate',
+			'Congraph\Eav\Commands\Attributes\AttributeCreateCommand' => 
+				'Congraph\Eav\Validators\Attributes\AttributeCreateValidator@validate',
+			'Congraph\Eav\Commands\Attributes\AttributeUpdateCommand' => 
+				'Congraph\Eav\Validators\Attributes\AttributeUpdateValidator@validate',
+			'Congraph\Eav\Commands\Attributes\AttributeDeleteCommand' => 
+				'Congraph\Eav\Validators\Attributes\AttributeDeleteValidator@validate',
+			'Congraph\Eav\Commands\Attributes\AttributeFetchCommand' => 
+				'Congraph\Eav\Validators\Attributes\AttributeFetchValidator@validate',
+			'Congraph\Eav\Commands\Attributes\AttributeGetCommand' => 
+				'Congraph\Eav\Validators\Attributes\AttributeGetValidator@validate',
 
 			// Attribute sets
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand' => 
-				'Cookbook\Eav\Validators\AttributeSets\AttributeSetCreateValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand' => 
-				'Cookbook\Eav\Validators\AttributeSets\AttributeSetUpdateValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand' => 
-				'Cookbook\Eav\Validators\AttributeSets\AttributeSetDeleteValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand' => 
-				'Cookbook\Eav\Validators\AttributeSets\AttributeSetFetchValidator@validate',
-			'Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand' => 
-				'Cookbook\Eav\Validators\AttributeSets\AttributeSetGetValidator@validate',
+			'Congraph\Eav\Commands\AttributeSets\AttributeSetCreateCommand' => 
+				'Congraph\Eav\Validators\AttributeSets\AttributeSetCreateValidator@validate',
+			'Congraph\Eav\Commands\AttributeSets\AttributeSetUpdateCommand' => 
+				'Congraph\Eav\Validators\AttributeSets\AttributeSetUpdateValidator@validate',
+			'Congraph\Eav\Commands\AttributeSets\AttributeSetDeleteCommand' => 
+				'Congraph\Eav\Validators\AttributeSets\AttributeSetDeleteValidator@validate',
+			'Congraph\Eav\Commands\AttributeSets\AttributeSetFetchCommand' => 
+				'Congraph\Eav\Validators\AttributeSets\AttributeSetFetchValidator@validate',
+			'Congraph\Eav\Commands\AttributeSets\AttributeSetGetCommand' => 
+				'Congraph\Eav\Validators\AttributeSets\AttributeSetGetValidator@validate',
 
 			// Entity types
-			'Cookbook\Eav\Commands\EntityTypes\EntityTypeCreateCommand' => 
-				'Cookbook\Eav\Validators\EntityTypes\EntityTypeCreateValidator@validate',
-			'Cookbook\Eav\Commands\EntityTypes\EntityTypeUpdateCommand' => 
-				'Cookbook\Eav\Validators\EntityTypes\EntityTypeUpdateValidator@validate',
-			'Cookbook\Eav\Commands\EntityTypes\EntityTypeDeleteCommand' => 
-				'Cookbook\Eav\Validators\EntityTypes\EntityTypeDeleteValidator@validate',
-			'Cookbook\Eav\Commands\EntityTypes\EntityTypeFetchCommand' => 
-				'Cookbook\Eav\Validators\EntityTypes\EntityTypeFetchValidator@validate',
-			'Cookbook\Eav\Commands\EntityTypes\EntityTypeGetCommand' => 
-				'Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator@validate',
+			'Congraph\Eav\Commands\EntityTypes\EntityTypeCreateCommand' => 
+				'Congraph\Eav\Validators\EntityTypes\EntityTypeCreateValidator@validate',
+			'Congraph\Eav\Commands\EntityTypes\EntityTypeUpdateCommand' => 
+				'Congraph\Eav\Validators\EntityTypes\EntityTypeUpdateValidator@validate',
+			'Congraph\Eav\Commands\EntityTypes\EntityTypeDeleteCommand' => 
+				'Congraph\Eav\Validators\EntityTypes\EntityTypeDeleteValidator@validate',
+			'Congraph\Eav\Commands\EntityTypes\EntityTypeFetchCommand' => 
+				'Congraph\Eav\Validators\EntityTypes\EntityTypeFetchValidator@validate',
+			'Congraph\Eav\Commands\EntityTypes\EntityTypeGetCommand' => 
+				'Congraph\Eav\Validators\EntityTypes\EntityTypeGetValidator@validate',
 
 
 			// Entities
-			'Cookbook\Eav\Commands\Entities\EntityCreateCommand' => 
-				'Cookbook\Eav\Validators\Entities\EntityCreateValidator@validate',
-			'Cookbook\Eav\Commands\Entities\EntityUpdateCommand' => 
-				'Cookbook\Eav\Validators\Entities\EntityUpdateValidator@validate',
-			'Cookbook\Eav\Commands\Entities\EntityDeleteCommand' => 
-				'Cookbook\Eav\Validators\Entities\EntityDeleteValidator@validate',
-			'Cookbook\Eav\Commands\Entities\EntityFetchCommand' => 
-				'Cookbook\Eav\Validators\Entities\EntityFetchValidator@validate',
-			'Cookbook\Eav\Commands\Entities\EntityGetCommand' => 
-				'Cookbook\Eav\Validators\Entities\EntityGetValidator@validate',
+			'Congraph\Eav\Commands\Entities\EntityCreateCommand' => 
+				'Congraph\Eav\Validators\Entities\EntityCreateValidator@validate',
+			'Congraph\Eav\Commands\Entities\EntityUpdateCommand' => 
+				'Congraph\Eav\Validators\Entities\EntityUpdateValidator@validate',
+			'Congraph\Eav\Commands\Entities\EntityDeleteCommand' => 
+				'Congraph\Eav\Validators\Entities\EntityDeleteValidator@validate',
+			'Congraph\Eav\Commands\Entities\EntityFetchCommand' => 
+				'Congraph\Eav\Validators\Entities\EntityFetchValidator@validate',
+			'Congraph\Eav\Commands\Entities\EntityGetCommand' => 
+				'Congraph\Eav\Validators\Entities\EntityGetValidator@validate',
 		];
 
 		$this->app->make('Illuminate\Contracts\Bus\Dispatcher')->mapValidators($mappings);
@@ -139,129 +139,129 @@ class ValidatorsServiceProvider extends ServiceProvider {
 	public function registerValidators() {
 
 		// Attributes
-		$this->app->bind('Cookbook\Eav\Validators\Attributes\AttributeCreateValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\Attributes\AttributeCreateValidator', function($app){
 			return new AttributeCreateValidator(
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\FieldValidatorFactoryContract')
 			);
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\Attributes\AttributeUpdateValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\Attributes\AttributeUpdateValidator', function($app){
 			return new AttributeUpdateValidator(
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\FieldValidatorFactoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\Attributes\AttributeDeleteValidator', function($app){
-			return new AttributeDeleteValidator($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
+		$this->app->bind('Congraph\Eav\Validators\Attributes\AttributeDeleteValidator', function($app){
+			return new AttributeDeleteValidator($app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\Attributes\AttributeFetchValidator', function($app){
-			return new AttributeFetchValidator($app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'));
+		$this->app->bind('Congraph\Eav\Validators\Attributes\AttributeFetchValidator', function($app){
+			return new AttributeFetchValidator($app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\Attributes\AttributeGetValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\Attributes\AttributeGetValidator', function($app){
 			return new AttributeGetValidator();
 		});
 
 
 		// Attribute sets
-		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetCreateValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\AttributeSets\AttributeSetCreateValidator', function($app){
 			return new AttributeSetCreateValidator(
-				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetUpdateValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\AttributeSets\AttributeSetUpdateValidator', function($app){
 			return new AttributeSetUpdateValidator(
-				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract')
+				$app->make('Congraph\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetDeleteValidator', function($app){
-			return new AttributeSetDeleteValidator($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
+		$this->app->bind('Congraph\Eav\Validators\AttributeSets\AttributeSetDeleteValidator', function($app){
+			return new AttributeSetDeleteValidator($app->make('Congraph\Contracts\Eav\AttributeSetRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetFetchValidator', function($app){
-			return new AttributeSetFetchValidator($app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'));
+		$this->app->bind('Congraph\Eav\Validators\AttributeSets\AttributeSetFetchValidator', function($app){
+			return new AttributeSetFetchValidator($app->make('Congraph\Contracts\Eav\AttributeSetRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\AttributeSets\AttributeSetGetValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\AttributeSets\AttributeSetGetValidator', function($app){
 			return new AttributeSetGetValidator();
 		});
 
 
 		// Entity types
-		$this->app->bind('Cookbook\Eav\Validators\EntityTypes\EntityTypeCreateValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\EntityTypes\EntityTypeCreateValidator', function($app){
 			return new EntityTypeCreateValidator();
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\EntityTypes\EntityTypeUpdateValidator', function($app){
-			return new EntityTypeUpdateValidator($app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'));
+		$this->app->bind('Congraph\Eav\Validators\EntityTypes\EntityTypeUpdateValidator', function($app){
+			return new EntityTypeUpdateValidator($app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\EntityTypes\EntityTypeDeleteValidator', function($app){
-			return new EntityTypeDeleteValidator($app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'));
+		$this->app->bind('Congraph\Eav\Validators\EntityTypes\EntityTypeDeleteValidator', function($app){
+			return new EntityTypeDeleteValidator($app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\EntityTypes\EntityTypeFetchValidator', function($app){
-			return new EntityTypeFetchValidator($app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'));
+		$this->app->bind('Congraph\Eav\Validators\EntityTypes\EntityTypeFetchValidator', function($app){
+			return new EntityTypeFetchValidator($app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'));
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\EntityTypes\EntityTypeGetValidator', function($app){
 			return new EntityTypeGetValidator();
 		});
 
 
 		// Entities
-		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityCreateValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\Entities\EntityCreateValidator', function($app){
 			return new EntityCreateValidator(
-				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract'),
-				$app->make('Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract'),
-				$app->make('Cookbook\Eav\Managers\AttributeManager')
+				$app->make('Congraph\Contracts\Eav\FieldValidatorFactoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Locales\LocaleRepositoryContract'),
+				$app->make('Congraph\Contracts\Workflows\WorkflowPointRepositoryContract'),
+				$app->make('Congraph\Eav\Managers\AttributeManager')
 			);
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityUpdateValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\Entities\EntityUpdateValidator', function($app){
 			return new EntityUpdateValidator(
-				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract'),
-				$app->make('Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract'),
-				$app->make('Cookbook\Eav\Managers\AttributeManager')
+				$app->make('Congraph\Contracts\Eav\FieldValidatorFactoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Locales\LocaleRepositoryContract'),
+				$app->make('Congraph\Contracts\Workflows\WorkflowPointRepositoryContract'),
+				$app->make('Congraph\Eav\Managers\AttributeManager')
 			);
 		});
 
-		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityDeleteValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\Entities\EntityDeleteValidator', function($app){
 			return new EntityDeleteValidator(
-				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract')
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityFetchValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\Entities\EntityFetchValidator', function($app){
 			return new EntityFetchValidator(
-				$app->make('Cookbook\Contracts\Eav\EntityRepositoryContract'),
-				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract'),
+				$app->make('Congraph\Contracts\Locales\LocaleRepositoryContract')
 			);
 		});
-		$this->app->bind('Cookbook\Eav\Validators\Entities\EntityGetValidator', function($app){
+		$this->app->bind('Congraph\Eav\Validators\Entities\EntityGetValidator', function($app){
 			return new EntityGetValidator(
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\FieldValidatorFactoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\FieldValidatorFactoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Locales\LocaleRepositoryContract')
 			);
 		});
 	}
@@ -276,32 +276,32 @@ class ValidatorsServiceProvider extends ServiceProvider {
 	{
 		return [
 			// Attributes
-			'Cookbook\Eav\Validators\Attributes\AttributeCreateValidator',
-			'Cookbook\Eav\Validators\Attributes\AttributeUpdateValidator',
-			'Cookbook\Eav\Validators\Attributes\AttributeDeleteValidator',
-			'Cookbook\Eav\Validators\Attributes\AttributeFetchValidator',
-			'Cookbook\Eav\Validators\Attributes\AttributeGetValidator',
+			'Congraph\Eav\Validators\Attributes\AttributeCreateValidator',
+			'Congraph\Eav\Validators\Attributes\AttributeUpdateValidator',
+			'Congraph\Eav\Validators\Attributes\AttributeDeleteValidator',
+			'Congraph\Eav\Validators\Attributes\AttributeFetchValidator',
+			'Congraph\Eav\Validators\Attributes\AttributeGetValidator',
 
 			// Attribute sets
-			'Cookbook\Eav\Validators\AttributeSets\AttributeSetCreateValidator',
-			'Cookbook\Eav\Validators\AttributeSets\AttributeSetUpdateValidator',
-			'Cookbook\Eav\Validators\AttributeSets\AttributeSetDeleteValidator',
-			'Cookbook\Eav\Validators\AttributeSets\AttributeSetFetchValidator',
-			'Cookbook\Eav\Validators\AttributeSets\AttributeSetGetValidator',
+			'Congraph\Eav\Validators\AttributeSets\AttributeSetCreateValidator',
+			'Congraph\Eav\Validators\AttributeSets\AttributeSetUpdateValidator',
+			'Congraph\Eav\Validators\AttributeSets\AttributeSetDeleteValidator',
+			'Congraph\Eav\Validators\AttributeSets\AttributeSetFetchValidator',
+			'Congraph\Eav\Validators\AttributeSets\AttributeSetGetValidator',
 
 			// Entity types
-			'Cookbook\Eav\Validators\EntityTypes\EntityTypeCreateValidator',
-			'Cookbook\Eav\Validators\EntityTypes\EntityTypeUpdateValidator',
-			'Cookbook\Eav\Validators\EntityTypes\EntityTypeDeleteValidator',
-			'Cookbook\Eav\Validators\EntityTypes\EntityTypeFetchValidator',
-			'Cookbook\Eav\Validators\EntityTypes\EntityTypeGetValidator',
+			'Congraph\Eav\Validators\EntityTypes\EntityTypeCreateValidator',
+			'Congraph\Eav\Validators\EntityTypes\EntityTypeUpdateValidator',
+			'Congraph\Eav\Validators\EntityTypes\EntityTypeDeleteValidator',
+			'Congraph\Eav\Validators\EntityTypes\EntityTypeFetchValidator',
+			'Congraph\Eav\Validators\EntityTypes\EntityTypeGetValidator',
 
 			// Entities
-			'Cookbook\Eav\Validators\Entities\EntityCreateValidator',
-			'Cookbook\Eav\Validators\Entities\EntityUpdateValidator',
-			'Cookbook\Eav\Validators\Entities\EntityDeleteValidator',
-			'Cookbook\Eav\Validators\Entities\EntityFetchValidator',
-			'Cookbook\Eav\Validators\Entities\EntityGetValidator'
+			'Congraph\Eav\Validators\Entities\EntityCreateValidator',
+			'Congraph\Eav\Validators\Entities\EntityUpdateValidator',
+			'Congraph\Eav\Validators\Entities\EntityDeleteValidator',
+			'Congraph\Eav\Validators\Entities\EntityFetchValidator',
+			'Congraph\Eav\Validators\Entities\EntityGetValidator'
 
 		];
 	}

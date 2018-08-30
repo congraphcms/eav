@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav;
+namespace Congraph\Eav;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +21,7 @@ use Illuminate\Support\ServiceProvider;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -57,31 +57,31 @@ class EavServiceProvider extends ServiceProvider {
 	protected function registerServiceProviders(){
 		// Managers
 		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Eav\Managers\ManagersServiceProvider');
+		$this->app->register('Congraph\Eav\Managers\ManagersServiceProvider');
 
 		// Fields
 		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Eav\Fields\FieldsServiceProvider');
+		$this->app->register('Congraph\Eav\Fields\FieldsServiceProvider');
 
 		// Commands
 		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Eav\Commands\CommandsServiceProvider');
+		$this->app->register('Congraph\Eav\Commands\CommandsServiceProvider');
 
 		// Handlers
 		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Eav\Handlers\HandlersServiceProvider');
+		$this->app->register('Congraph\Eav\Handlers\HandlersServiceProvider');
 
 		// Validators
 		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Eav\Validators\ValidatorsServiceProvider');
+		$this->app->register('Congraph\Eav\Validators\ValidatorsServiceProvider');
 
 		// Services
 		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Eav\Services\ServicesServiceProvider');
+		$this->app->register('Congraph\Eav\Services\ServicesServiceProvider');
 
 		// Repositories
 		// -----------------------------------------------------------------------------
-		$this->app->register('Cookbook\Eav\Repositories\RepositoriesServiceProvider');
+		$this->app->register('Congraph\Eav\Repositories\RepositoriesServiceProvider');
 
 		
 

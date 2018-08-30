@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,22 +8,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Services;
+namespace Congraph\Eav\Services;
 
 use Carbon\Carbon;
-use Cookbook\Contracts\Eav\AttributeRepositoryContract;
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
-use Cookbook\Contracts\Locales\LocaleRepositoryContract;
-use Cookbook\Contracts\Workflows\WorkflowRepositoryContract;
-use Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract;
-use Cookbook\Core\Facades\Trunk;
-use Cookbook\Core\Repositories\Collection;
-use Cookbook\Core\Repositories\Model;
-use Cookbook\Core\Repositories\UsesCache;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\AttributeSetRepositoryContract;
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
+use Congraph\Contracts\Locales\LocaleRepositoryContract;
+use Congraph\Contracts\Workflows\WorkflowRepositoryContract;
+use Congraph\Contracts\Workflows\WorkflowPointRepositoryContract;
+use Congraph\Core\Facades\Trunk;
+use Congraph\Core\Repositories\Collection;
+use Congraph\Core\Repositories\Model;
+use Congraph\Core\Repositories\UsesCache;
+use Congraph\Eav\Managers\AttributeManager;
 
-use Cookbook\Eav\Traits\ElasticQueryBuilderTrait;
+use Congraph\Eav\Traits\ElasticQueryBuilderTrait;
 
 
 use Elasticsearch\ClientBuilder;
@@ -38,13 +38,13 @@ use stdClass;
  * Repository for fetching meta data for each request
  *
  * @uses        Illuminate\Database\Connection
- * @uses        Cookbook\Core\Repository\AbstractRepository
- * @uses        Cookbook\Contracts\Eav\AttributeHandlerFactoryContract
- * @uses        Cookbook\Eav\Managers\AttributeManager
+ * @uses        Congraph\Core\Repository\AbstractRepository
+ * @uses        Congraph\Contracts\Eav\AttributeHandlerFactoryContract
+ * @uses        Congraph\Eav\Managers\AttributeManager
  *
  * @author      Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright   Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package     cookbook/eav
+ * @package     congraph/eav
  * @since       0.1.0-alpha
  * @version     0.1.0-alpha
  */
@@ -54,42 +54,42 @@ class MetaDataService//, UsesCache
     /**
      * Repository for handling attributes
      *
-     * @var \Cookbook\Contracts\Eav\AttributeRepositoryContract
+     * @var \Congraph\Contracts\Eav\AttributeRepositoryContract
      */
     protected $attributeRepository;
 
     /**
      * Repository for handling attribute sets
      *
-     * @var \Cookbook\Contracts\Eav\AttributeSetRepositoryContract
+     * @var \Congraph\Contracts\Eav\AttributeSetRepositoryContract
      */
     protected $attributeSetRepository;
 
     /**
      * Repository for handling entity types
      *
-     * @var \Cookbook\Contracts\Eav\AttributeRepositoryContract
+     * @var \Congraph\Contracts\Eav\AttributeRepositoryContract
      */
     protected $entityTypeRepository;
 
     /**
      * Repository for handling workflows
      *
-     * @var \Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract
+     * @var \Congraph\Contracts\Workflows\WorkflowPointRepositoryContract
      */
     protected $workflowRepository;
 
     /**
      * Repository for handling workflow points
      *
-     * @var \Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract
+     * @var \Congraph\Contracts\Workflows\WorkflowPointRepositoryContract
      */
     protected $workflowPointRepository;
 
     /**
      * Repository for handling locales
      *
-     * @var \Cookbook\Contracts\Locales\LocaleRepositoryContract
+     * @var \Congraph\Contracts\Locales\LocaleRepositoryContract
      */
     protected $localeRepository;
 
@@ -111,13 +111,13 @@ class MetaDataService//, UsesCache
     /**
      * Create new MetaDataService
      *
-     * @param Cookbook\Eav\Handlers\AttributeHandlerFactoryContract $attributeHandlerFactory
-     * @param Cookbook\Eav\Managers\AttributeManager $attributeManager
-     * @param Cookbook\Contracts\Eav\AttributeSetRepositoryContract $attributeSetRepository
-     * @param Cookbook\Contracts\Eav\AttributeRepositoryContract $attributeRepository
-     * @param Cookbook\Contracts\Eav\EntityTypeRepositoryContract $entityTypeRepository
-     * @param Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract $workflowPointRepository
-     * @param Cookbook\Contracts\Locales\LocaleRepositoryContract $localeRepository
+     * @param Congraph\Eav\Handlers\AttributeHandlerFactoryContract $attributeHandlerFactory
+     * @param Congraph\Eav\Managers\AttributeManager $attributeManager
+     * @param Congraph\Contracts\Eav\AttributeSetRepositoryContract $attributeSetRepository
+     * @param Congraph\Contracts\Eav\AttributeRepositoryContract $attributeRepository
+     * @param Congraph\Contracts\Eav\EntityTypeRepositoryContract $entityTypeRepository
+     * @param Congraph\Contracts\Workflows\WorkflowPointRepositoryContract $workflowPointRepository
+     * @param Congraph\Contracts\Locales\LocaleRepositoryContract $localeRepository
      *
      * @return void
      */

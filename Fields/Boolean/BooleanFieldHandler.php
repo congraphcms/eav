@@ -1,6 +1,6 @@
 <?php 
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,10 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Fields\Boolean;
+namespace Congraph\Eav\Fields\Boolean;
 
 use Illuminate\Support\Facades\Config;
-use Cookbook\Eav\Fields\AbstractFieldHandler;
+use Congraph\Eav\Fields\AbstractFieldHandler;
 
 /**
  * BooleanFieldHandler class
@@ -21,7 +21,7 @@ use Cookbook\Eav\Fields\AbstractFieldHandler;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */

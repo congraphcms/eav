@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Cache;
-use Cookbook\Core\Facades\Trunk;
+use Congraph\Core\Facades\Trunk;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\DB;
 
@@ -29,17 +29,17 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Filesystem/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Workflows/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
 		]);
 
 		$this->artisan('db:seed', [
@@ -95,7 +95,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 			'driver'   	=> 'mysql',
 			'host'      => '127.0.0.1',
 			'port'		=> '3306',
-			'database'	=> 'cookbook_testbench',
+			'database'	=> 'congraph_testbench',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',
@@ -114,7 +114,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
 
 		// $app['config']->set(
-		// 	'Cookbook::eav', $config
+		// 	'Congraph::eav', $config
 		// );
 
 		// var_dump('CONFIG SETTED');
@@ -123,11 +123,11 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\Core\CoreServiceProvider', 
-			'Cookbook\Locales\LocalesServiceProvider', 
-			'Cookbook\Eav\EavServiceProvider', 
-			'Cookbook\Filesystem\FilesystemServiceProvider',
-			'Cookbook\Workflows\WorkflowsServiceProvider'
+			'Congraph\Core\CoreServiceProvider', 
+			'Congraph\Locales\LocalesServiceProvider', 
+			'Congraph\Eav\EavServiceProvider', 
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
 		];
 	}
 
@@ -149,15 +149,15 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetCreateCommand($params));
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		// $this->d->dump($result->toArray());
 	}
 
 	/**
-	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
+	 * @expectedException \Congraph\Core\Exceptions\ValidationException
 	 */
 	public function testCreateException()
 	{
@@ -176,7 +176,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetCreateCommand($params));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetCreateCommand($params));
 	}
 
 	public function testUpdateAttributeSet()
@@ -190,9 +190,9 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand($params, 1));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetUpdateCommand($params, 1));
 		
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('attribute_set_changed', $result->code);
 		$this->assertEquals(3, count($result->attributes));
@@ -225,20 +225,20 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		try{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand($params, 1));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetUpdateCommand($params, 1));
 		} catch(\Exception $e) {
 			$this->d->dump($e->getErrors());
 		}
 		
 		
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(3, count($result->attributes));
 		// $this->d->dump($result->toArray());
 	}
 
 	/**
-	 * @expectedException \Cookbook\Core\Exceptions\ValidationException
+	 * @expectedException \Congraph\Core\Exceptions\ValidationException
 	 */
 	public function testUpdateException()
 	{
@@ -251,7 +251,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetUpdateCommand($params, 1));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetUpdateCommand($params, 1));
 	}
 
 
@@ -261,14 +261,14 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand([], 1));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetDeleteCommand([], 1));
 
 		$this->assertEquals(1, $result->id);
 		// $this->d->dump($result);
 	}
 
 	/**
-	 * @expectedException \Cookbook\Core\Exceptions\NotFoundException
+	 * @expectedException \Congraph\Core\Exceptions\NotFoundException
 	 */
 	public function testDeleteException()
 	{
@@ -276,7 +276,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetDeleteCommand([], 133));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetDeleteCommand([], 133));
 	}
 
 	public function testFetchAttributeSet()
@@ -285,9 +285,9 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand([], 1));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetFetchCommand([], 1));
 		
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(3, count($result->attributes));
 		// $this->d->dump($result->toArray());
@@ -299,9 +299,9 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand(['include' => 'attributes'], 1));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetFetchCommand(['include' => 'attributes'], 1));
 		
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals(3, count($result->attributes));
 		// $this->d->dump($result->toArray());
@@ -316,7 +316,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 	}
 
 	/**
-	 * @expectedException \Cookbook\Core\Exceptions\NotFoundException
+	 * @expectedException \Congraph\Core\Exceptions\NotFoundException
 	 */
 	public function testFetchException()
 	{
@@ -324,7 +324,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetFetchCommand([], 133));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetFetchCommand([], 133));
 	}
 
 	public function testGetAttributeSets()
@@ -333,9 +333,9 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand([]));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetGetCommand([]));
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		// $this->assertEquals(4, count($result));
 		// $this->d->dump($result->toArray());
 
@@ -348,9 +348,9 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$app = $this->createApplication();
 		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
-		$result = $bus->dispatch( new Cookbook\Eav\Commands\AttributeSets\AttributeSetGetCommand(['sort' => ['-code'], 'limit' => 2, 'offset' => 1]));
+		$result = $bus->dispatch( new Congraph\Eav\Commands\AttributeSets\AttributeSetGetCommand(['sort' => ['-code'], 'limit' => 2, 'offset' => 1]));
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Collection);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		$this->assertEquals(2, count($result));
 
 		// $this->d->dump($result->toArray());

@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Managers;
+namespace Congraph\Eav\Managers;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +21,7 @@ use Illuminate\Support\ServiceProvider;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -50,7 +50,7 @@ class ManagersServiceProvider extends ServiceProvider {
 	* @return void
 	*/
 	public function registerManagers() {
-		$this->app->singleton('Cookbook\Eav\Managers\AttributeManager', function($app) {
+		$this->app->singleton('Congraph\Eav\Managers\AttributeManager', function($app) {
 			return new AttributeManager($this->app['config']);
 		});
 	}
@@ -62,6 +62,6 @@ class ManagersServiceProvider extends ServiceProvider {
      */
 	public function provides()
 	{
-		return ['Cookbook\Eav\Managers\AttributeManager'];
+		return ['Congraph\Eav\Managers\AttributeManager'];
 	}
 }

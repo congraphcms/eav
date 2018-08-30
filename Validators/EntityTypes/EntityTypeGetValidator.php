@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Validators\EntityTypes;
+namespace Congraph\Eav\Validators\EntityTypes;
 
-use Cookbook\Contracts\Eav\EntityTypeRepositoryContract;
-use Cookbook\Core\Bus\RepositoryCommand;
-use Cookbook\Core\Exceptions\BadRequestException;
-use Cookbook\Core\Validation\Validator;
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
+use Congraph\Core\Bus\RepositoryCommand;
+use Congraph\Core\Exceptions\BadRequestException;
+use Congraph\Core\Validation\Validator;
 
 
 /**
@@ -24,7 +24,7 @@ use Cookbook\Core\Validation\Validator;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -91,7 +91,7 @@ class EntityTypeGetValidator extends Validator
 	/**
 	 * Validate RepositoryCommand
 	 * 
-	 * @param Cookbook\Core\Bus\RepositoryCommand $command
+	 * @param Congraph\Core\Bus\RepositoryCommand $command
 	 * 
 	 * @todo  Create custom validation for all db related checks (DO THIS FOR ALL VALIDATORS)
 	 * @todo  Check all db rules | make validators on repositories

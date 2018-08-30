@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,19 +8,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Repositories;
+namespace Congraph\Eav\Repositories;
 
-use Cookbook\Contracts\Eav\AttributeHandlerFactoryContract;
-use Cookbook\Contracts\Eav\AttributeSetRepositoryContract;
-use Cookbook\Contracts\Eav\EntityRepositoryContract;
-use Cookbook\Core\Exceptions\BadRequestException;
-use Cookbook\Core\Exceptions\Exception;
-use Cookbook\Core\Exceptions\NotFoundException;
-use Cookbook\Core\Repositories\AbstractRepository;
-use Cookbook\Core\Repositories\Collection;
-use Cookbook\Core\Repositories\Model;
-use Cookbook\Core\Facades\Trunk;
-use Cookbook\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Eav\AttributeHandlerFactoryContract;
+use Congraph\Contracts\Eav\AttributeSetRepositoryContract;
+use Congraph\Contracts\Eav\EntityRepositoryContract;
+use Congraph\Core\Exceptions\BadRequestException;
+use Congraph\Core\Exceptions\Exception;
+use Congraph\Core\Exceptions\NotFoundException;
+use Congraph\Core\Repositories\AbstractRepository;
+use Congraph\Core\Repositories\Collection;
+use Congraph\Core\Repositories\Model;
+use Congraph\Core\Facades\Trunk;
+use Congraph\Eav\Managers\AttributeManager;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
@@ -34,14 +34,14 @@ use stdClass;
  * Repository for attribute set database queries
  * 
  * @uses   		Illuminate\Database\Connection
- * @uses   		Cookbook\Core\Repository\AbstractRepository
- * @uses   		Cookbook\Contracts\Eav\AttributeHandlerFactoryContract
- * @uses   		Cookbook\Eav\Managers\AttributeManager
- * @uses   		Cookbook\Eav\Repositories\EntityRepository
+ * @uses   		Congraph\Core\Repository\AbstractRepository
+ * @uses   		Congraph\Contracts\Eav\AttributeHandlerFactoryContract
+ * @uses   		Congraph\Eav\Managers\AttributeManager
+ * @uses   		Congraph\Eav\Repositories\EntityRepository
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */

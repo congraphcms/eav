@@ -1,7 +1,7 @@
 <?php
 
 // include_once(realpath(__DIR__.'/../LaravelMocks.php'));
-use Cookbook\Core\Exceptions\ValidationException;
+use Congraph\Core\Exceptions\ValidationException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -29,12 +29,12 @@ class MixTest extends Orchestra\Testbench\TestCase
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Locales/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
 		]);
 
 		$this->artisan('migrate', [
 			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Cookbook/Workflows/database/migrations'),
+			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
 		]);
 
 		$this->artisan('db:seed', [
@@ -87,7 +87,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 			'driver'   	=> 'mysql',
 			'host'      => '127.0.0.1',
 			'port'		=> '3306',
-			'database'	=> 'cookbook_testbench',
+			'database'	=> 'congraph_testbench',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',
@@ -105,7 +105,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
 
 		// $app['config']->set(
-		// 	'Cookbook::eav', $config
+		// 	'Congraph::eav', $config
 		// );
 
 		// var_dump('CONFIG SETTED');
@@ -114,11 +114,11 @@ class MixTest extends Orchestra\Testbench\TestCase
 	protected function getPackageProviders($app)
 	{
 		return [
-			'Cookbook\Core\CoreServiceProvider', 
-			'Cookbook\Locales\LocalesServiceProvider', 
-			'Cookbook\Eav\EavServiceProvider', 
-			'Cookbook\Filesystem\FilesystemServiceProvider',
-			'Cookbook\Workflows\WorkflowsServiceProvider'
+			'Congraph\Core\CoreServiceProvider', 
+			'Congraph\Locales\LocalesServiceProvider', 
+			'Congraph\Eav\EavServiceProvider', 
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
 		];
 	}
 
@@ -141,7 +141,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		];
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		}
 		catch(ValidationException $e)
 		{
@@ -149,7 +149,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 			throw $e;
 		}
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('draft', $result->status);
 		$this->assertFalse(isset($result->locale));
@@ -172,7 +172,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		}
 		catch(ValidationException $e)
 		{
@@ -180,7 +180,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 			throw $e;
 		}
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('published', $result->status);
 		$this->assertFalse(isset($result->locale));
@@ -205,7 +205,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		}
 		catch(ValidationException $e)
 		{
@@ -213,7 +213,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 			throw $e;
 		}
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('draft', $result->status);
 		$this->assertEquals('en_US', $result->locale);
@@ -229,14 +229,14 @@ class MixTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, 'fetch half made entity (doesn\'t have all locales)' . "\n");
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand([], $result->id));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand([], $result->id));
 		}
 		catch(ValidationException $e)
 		{
 			$this->d->dump($e->getErrors());
 			throw $e;
 		}
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('draft', $result->status);
 		$this->assertFalse(isset($result->locale));
@@ -251,14 +251,14 @@ class MixTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, 'fetch locale that isn\'t made' . "\n");
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityFetchCommand(['locale' => 'fr_FR'], $result->id));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand(['locale' => 'fr_FR'], $result->id));
 		}
 		catch(ValidationException $e)
 		{
 			$this->d->dump($e->getErrors());
 			throw $e;
 		}
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('draft', $result->status);
 		$this->assertEquals('fr_FR', $result->locale);
@@ -293,7 +293,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 		
 		try
 		{
-			$result = $bus->dispatch( new Cookbook\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
 		}
 		catch(ValidationException $e)
 		{
@@ -301,7 +301,7 @@ class MixTest extends Orchestra\Testbench\TestCase
 			throw $e;
 		}
 
-		$this->assertTrue($result instanceof Cookbook\Core\Repositories\Model);
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('draft', $result->status);
 		$this->assertFalse(isset($result->locale));

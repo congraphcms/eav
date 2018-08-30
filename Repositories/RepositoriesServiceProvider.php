@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Repositories;
+namespace Congraph\Eav\Repositories;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +21,7 @@ use Illuminate\Support\ServiceProvider;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -63,11 +63,11 @@ class RepositoriesServiceProvider extends ServiceProvider {
 	 */
 	protected function registerListeners()
 	{
-		// $this->app['events']->listen('cb.after.entity.type.create', 'Cookbook\Eav\Repositories\EntityElasticRepository@onEntityTypeCreated');
-		// $this->app['events']->listen('cb.before.entity.type.update', 'Cookbook\Eav\Repositories\EntityElasticRepository@onBeforeEntityTypeUpdated');
-		// $this->app['events']->listen('cb.after.entity.type.update', 'Cookbook\Eav\Repositories\EntityElasticRepository@onEntityTypeUpdated');
-		// $this->app['events']->listen('cb.before.entity.type.delete', 'Cookbook\Eav\Repositories\EntityElasticRepository@onBeforeEntityTypeDeleted');
-		// $this->app['events']->listen('cb.after.entity.type.delete', 'Cookbook\Eav\Repositories\EntityElasticRepository@onEntityTypeDeleted');
+		// $this->app['events']->listen('cb.after.entity.type.create', 'Congraph\Eav\Repositories\EntityElasticRepository@onEntityTypeCreated');
+		// $this->app['events']->listen('cb.before.entity.type.update', 'Congraph\Eav\Repositories\EntityElasticRepository@onBeforeEntityTypeUpdated');
+		// $this->app['events']->listen('cb.after.entity.type.update', 'Congraph\Eav\Repositories\EntityElasticRepository@onEntityTypeUpdated');
+		// $this->app['events']->listen('cb.before.entity.type.delete', 'Congraph\Eav\Repositories\EntityElasticRepository@onBeforeEntityTypeDeleted');
+		// $this->app['events']->listen('cb.after.entity.type.delete', 'Congraph\Eav\Repositories\EntityElasticRepository@onEntityTypeDeleted');
 	}
 
 	/**
@@ -76,22 +76,22 @@ class RepositoriesServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function registerRepositories() {
-		$this->app->singleton('Cookbook\Eav\Repositories\AttributeRepository', function($app) {
+		$this->app->singleton('Congraph\Eav\Repositories\AttributeRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
 			return new AttributeRepository(
 				$app['db']->connection(),
-				$app->make('Cookbook\Contracts\Eav\FieldHandlerFactoryContract'),
-				$app->make('Cookbook\Eav\Managers\AttributeManager')
+				$app->make('Congraph\Contracts\Eav\FieldHandlerFactoryContract'),
+				$app->make('Congraph\Eav\Managers\AttributeManager')
 			);
 		});
 
 		$this->app->alias(
-			'Cookbook\Eav\Repositories\AttributeRepository', 'Cookbook\Contracts\Eav\AttributeRepositoryContract'
+			'Congraph\Eav\Repositories\AttributeRepository', 'Congraph\Contracts\Eav\AttributeRepositoryContract'
 		);
 
 
 
-		$this->app->singleton('Cookbook\Eav\Repositories\AttributeSetRepository', function($app) {
+		$this->app->singleton('Congraph\Eav\Repositories\AttributeSetRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
 			return new AttributeSetRepository( 
 				$app['db']->connection()
@@ -99,10 +99,10 @@ class RepositoriesServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->alias(
-			'Cookbook\Eav\Repositories\AttributeSetRepository', 'Cookbook\Contracts\Eav\AttributeSetRepositoryContract'
+			'Congraph\Eav\Repositories\AttributeSetRepository', 'Congraph\Contracts\Eav\AttributeSetRepositoryContract'
 		);
 
-		$this->app->singleton('Cookbook\Eav\Repositories\EntityTypeRepository', function($app) {
+		$this->app->singleton('Congraph\Eav\Repositories\EntityTypeRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
 			return new EntityTypeRepository(
 				$app['db']->connection()
@@ -110,25 +110,25 @@ class RepositoriesServiceProvider extends ServiceProvider {
 		});
 
 		$this->app->alias(
-			'Cookbook\Eav\Repositories\EntityTypeRepository', 'Cookbook\Contracts\Eav\EntityTypeRepositoryContract'
+			'Congraph\Eav\Repositories\EntityTypeRepository', 'Congraph\Contracts\Eav\EntityTypeRepositoryContract'
 		);
 
-		$this->app->singleton('Cookbook\Eav\Repositories\EntityRepository', function($app) {
+		$this->app->singleton('Congraph\Eav\Repositories\EntityRepository', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
 			return new EntityRepository(
 				$app['db']->connection(),
-				$app->make('Cookbook\Contracts\Eav\FieldHandlerFactoryContract'),
-				$app->make('Cookbook\Eav\Managers\AttributeManager'),
-				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract'),
-				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
+				$app->make('Congraph\Contracts\Eav\FieldHandlerFactoryContract'),
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Congraph\Contracts\Workflows\WorkflowPointRepositoryContract'),
+				$app->make('Congraph\Contracts\Locales\LocaleRepositoryContract')
 			);
 		});
 
 		$this->app->alias(
-			'Cookbook\Eav\Repositories\EntityRepository', 'Cookbook\Contracts\Eav\EntityRepositoryContract'
+			'Congraph\Eav\Repositories\EntityRepository', 'Congraph\Contracts\Eav\EntityRepositoryContract'
 		);
 	}
 
@@ -139,13 +139,13 @@ class RepositoriesServiceProvider extends ServiceProvider {
 	 */
 	public function mapObjectResolvers() {
 		$mappings = [
-			'attribute' => 'Cookbook\Eav\Repositories\AttributeRepository',
-			'attribute-set' => 'Cookbook\Eav\Repositories\AttributeSetRepository',
-			'entity-type' => 'Cookbook\Eav\Repositories\EntityTypeRepository',
-			'entity' => 'Cookbook\Eav\Repositories\EntityRepository',
+			'attribute' => 'Congraph\Eav\Repositories\AttributeRepository',
+			'attribute-set' => 'Congraph\Eav\Repositories\AttributeSetRepository',
+			'entity-type' => 'Congraph\Eav\Repositories\EntityTypeRepository',
+			'entity' => 'Congraph\Eav\Repositories\EntityRepository',
 		];
 
-		$this->app->make('Cookbook\Contracts\Core\ObjectResolverContract')->maps($mappings);
+		$this->app->make('Congraph\Contracts\Core\ObjectResolverContract')->maps($mappings);
 	}
 
 	/**
@@ -156,14 +156,14 @@ class RepositoriesServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'Cookbook\Eav\Repositories\AttributeRepository',
-			'Cookbook\Contracts\Eav\AttributeRepositoryContract',
-			'Cookbook\Eav\Repositories\AttributeSetRepository',
-			'Cookbook\Contracts\Eav\AttributeSetRepositoryContract',
-			'Cookbook\Eav\Repositories\EntityTypeRepository',
-			'Cookbook\Contracts\Eav\EntityTypeRepositoryContract',
-			'Cookbook\Eav\Repositories\EntityRepository',
-			'Cookbook\Contracts\Eav\EntityRepositoryContract'
+			'Congraph\Eav\Repositories\AttributeRepository',
+			'Congraph\Contracts\Eav\AttributeRepositoryContract',
+			'Congraph\Eav\Repositories\AttributeSetRepository',
+			'Congraph\Contracts\Eav\AttributeSetRepositoryContract',
+			'Congraph\Eav\Repositories\EntityTypeRepository',
+			'Congraph\Contracts\Eav\EntityTypeRepositoryContract',
+			'Congraph\Eav\Repositories\EntityRepository',
+			'Congraph\Contracts\Eav\EntityRepositoryContract'
 		];
 	}
 

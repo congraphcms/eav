@@ -1,6 +1,6 @@
 <?php
 /*
- * This file is part of the cookbook/eav package.
+ * This file is part of the congraph/eav package.
  *
  * (c) Nikola Plavšić <nikolaplavsic@gmail.com>
  *
@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Cookbook\Eav\Services;
+namespace Congraph\Eav\Services;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +21,7 @@ use Illuminate\Support\ServiceProvider;
  * 
  * @author  	Nikola Plavšić <nikolaplavsic@gmail.com>
  * @copyright  	Nikola Plavšić <nikolaplavsic@gmail.com>
- * @package 	cookbook/eav
+ * @package 	congraph/eav
  * @since 		0.1.0-alpha
  * @version  	0.1.0-alpha
  */
@@ -54,15 +54,15 @@ class ServicesServiceProvider extends ServiceProvider {
 	 * @return void
 	 */
 	public function registerServices() {
-		$this->app->singleton('Cookbook\Eav\Services\MetaDataService', function($app) {
+		$this->app->singleton('Congraph\Eav\Services\MetaDataService', function($app) {
 			// var_dump('Contract for attribute repository resolving...');
 			return new MetaDataService(
-				$app->make('Cookbook\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\AttributeSetRepositoryContract'),
-				$app->make('Cookbook\Contracts\Eav\EntityTypeRepositoryContract'),
-				$app->make('Cookbook\Contracts\Workflows\WorkflowRepositoryContract'),
-				$app->make('Cookbook\Contracts\Workflows\WorkflowPointRepositoryContract'),
-				$app->make('Cookbook\Contracts\Locales\LocaleRepositoryContract')
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\AttributeSetRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract'),
+				$app->make('Congraph\Contracts\Workflows\WorkflowRepositoryContract'),
+				$app->make('Congraph\Contracts\Workflows\WorkflowPointRepositoryContract'),
+				$app->make('Congraph\Contracts\Locales\LocaleRepositoryContract')
 			);
 		});
 	}
@@ -75,7 +75,7 @@ class ServicesServiceProvider extends ServiceProvider {
 	public function provides()
 	{
 		return [
-			'Cookbook\Eav\Services\MetaDataService'
+			'Congraph\Eav\Services\MetaDataService'
 		];
 	}
 
