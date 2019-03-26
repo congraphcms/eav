@@ -74,8 +74,6 @@ class AttributeSetCreateValidator extends Validator
 		$this->rules = [
 			'code'					=> 'required|unique:attribute_sets,code',
 			'entity_type_id'        => ['required_without:entity_type', 'exists:entity_types,id' ],
-			'entity_type'           => ['sometimes', 'required'],
-			'entity_type.id'        => ['sometimes', 'exists:entity_types,id'],
 			'name'					=> 'required',
 			'primary_attribute_id'	=> 'sometimes|required|exists:attributes,id',
 			'primary_attribute'     => [ 'required_without:primary_attribute_id', 'exists:attributes,code' ],
@@ -113,29 +111,21 @@ class AttributeSetCreateValidator extends Validator
 			}
 		}
 
-		$validator = $this->newValidator($command->params, $this->rules, true);
-
-		// if( isset($command->params['attributes']) ) {
-		// 	$validator->each('attributes', $this->attributeRules);
-
-			
-		// }
-
 		if( ! isset($command->params['entity_type_id']) ) {
-			$this->rules['entity_type'] = 'required';
+			$this->rules['entity_type'] = 'required|array';
 			if( isset($command->params['entity_type']) && is_string($command->params['entity_type'])) {
-				$this->rules['entity_type'] = 'required|exists:entity_types,code';
+				$this->rules['entity_type'] = 'required_without:entity_type_id|exists:entity_types,code';
 			}
 			else {
-				$this->rules['entity_type.id'] = 'required|exists:entity_types,id';
+				$this->rules['entity_type.id'] = 'required_without:entity_type_id|exists:entity_types,id';
 			}
 		}
+
+		$validator = $this->newValidator($command->params, $this->rules, true);
 
 		$this->setValidator($validator);
 
 		$this->validateParams($command->params, null, true);
-
-		unset($command->params['entity_type']);
 
 		if( $this->exception->hasErrors() ) {
 			throw $this->exception;
@@ -159,6 +149,8 @@ class AttributeSetCreateValidator extends Validator
 				throw $this->exception;
 			}
 		}
+
+		unset($command->params['entity_type']);
 
 		if( !isset($command->params[ 'primary_attribute_id']) 
 			&& isset($command->params['primary_attribute']) 

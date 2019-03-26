@@ -138,7 +138,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		$params = [
 			'code' => 'test-attr-set',
 			'name' => 'Test Attr Set',
-			'entity_type_id' => 1,
+			'entity_type' => 'tests',
 			'primary_attribute' => 'attribute1',
 			'attributes' => [
 				['code' => 'attribute1'],
@@ -152,7 +152,7 @@ class AttributeSetTest extends Orchestra\Testbench\TestCase
 		try{
 			$result = $bus->dispatch(new Congraph\Eav\Commands\AttributeSets\AttributeSetCreateCommand($params));
 		} catch(\Exception $e) {
-			$this->d->dump($e->getMessage());
+			$this->d->dump($e->getErrors());
 		}
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
