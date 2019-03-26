@@ -77,14 +77,16 @@ class AttributeSetCreateValidator extends Validator
 			'entity_type'           => ['sometimes', 'required'],
 			'entity_type.id'        => ['sometimes', 'exists:entity_types,id'],
 			'name'					=> 'required',
-			'primary_attribute_id'	=> 'required|exists:attributes,id',
+			'primary_attribute_id'	=> 'sometimes|required|exists:attributes,id',
+			'primary_attribute'     => [ 'required_without:primary_attribute_id', 'exists:attributes,code' ],
 			'attributes'			=> 'sometimes|array'
 		];
 
-		$this->attributeRules = 
-		[
-			'id'			=> 'required|integer|exists:attributes,id'
-		];
+		// $this->attributeRules = 
+		// [
+		// 	'id'			=> ['required_without:attributes.code', 'integer', 'exists:attributes,id'],
+		// 	'code'			=> [ 'required_without:attributes.id', 'string', 'exists:attributes,code']
+		// ];
 
 		parent::__construct();
 
@@ -104,23 +106,27 @@ class AttributeSetCreateValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
+		if(isset($command->params['attributes'])) {
+			foreach ($command->params['attributes'] as $key => $attr) {
+				$this->rules['attributes.' . $key . '.id'] = [ 'required_without:attributes.'.$key.'.code', 'integer', 'exists:attributes,id'];
+				$this->rules['attributes.' . $key . '.code'] = [ 'required_without:attributes.'.$key.'.id', 'string', 'exists:attributes,code'];
+			}
+		}
 
 		$validator = $this->newValidator($command->params, $this->rules, true);
 
-		if( isset($command->params['attributes']) )
-		{
-			$validator->each('attributes', $this->attributeRules);
-		}
+		// if( isset($command->params['attributes']) ) {
+		// 	$validator->each('attributes', $this->attributeRules);
 
-		if( ! isset($command->params['entity_type_id']) )
-		{
+			
+		// }
+
+		if( ! isset($command->params['entity_type_id']) ) {
 			$this->rules['entity_type'] = 'required';
-			if( isset($command->params['entity_type']) && is_string($command->params['entity_type']))
-			{
+			if( isset($command->params['entity_type']) && is_string($command->params['entity_type'])) {
 				$this->rules['entity_type'] = 'required|exists:entity_types,code';
 			}
-			else
-			{
+			else {
 				$this->rules['entity_type.id'] = 'required|exists:entity_types,id';
 			}
 		}
@@ -129,83 +135,85 @@ class AttributeSetCreateValidator extends Validator
 
 		$this->validateParams($command->params, null, true);
 
-		if ( ! isset($command->params['entity_type_id']) )
-		{
-			if( isset($command->params['entity_type']) && is_string($command->params['entity_type']) )
-			{
+		unset($command->params['entity_type']);
+
+		if( $this->exception->hasErrors() ) {
+			throw $this->exception;
+		}
+
+		if ( ! isset($command->params['entity_type_id']) ) {
+			if( isset($command->params['entity_type']) && is_string($command->params['entity_type']) ) {
 				$entityType = $this->entityTypeRepository->get(['code' => $command->params['entity_type']]);
-				if( empty($entityType) )
-				{
+				if( empty($entityType) ) {
 					$this->exception->addErrors(['entity_type' => 'Invalid entity type.']);
 					throw $this->exception;
 				}
 				$entityType = $entityType[0];
 				$command->params['entity_type_id'] = $entityType->id;
 			}
-			elseif( isset($command->params['entity_type']) && is_array($command->params['entity_type']) && isset($command->params['entity_type']['id']))
-			{
+			elseif( isset($command->params['entity_type']) && is_array($command->params['entity_type']) && isset($command->params['entity_type']['id'])) {
 				$command->params['entity_type_id'] = $command->params['entity_type']['id'];
 			}
-			else
-			{
+			else {
 				$this->exception->addErrors(['entity_type_id' => 'This is required.']);
 				throw $this->exception;
 			}
 		}
 
-		unset($command->params['entity_type']);
-
-		if( $this->exception->hasErrors() )
-		{
-			throw $this->exception;
+		if( !isset($command->params[ 'primary_attribute_id']) 
+			&& isset($command->params['primary_attribute']) 
+			&& is_string($command->params['primary_attribute'])) {
+				
+			$attribute = $this->attributeRepository->get(['code' => $command->params[ 'primary_attribute']]);
+			$attribute = $attribute[0];
+			$command->params[ 'primary_attribute_id'] = $attribute->id;
+			unset( $command->params['primary_attribute'] );
 		}
 
 		$invalidPrimaryAttribute = true;
 
-		if( ! empty($command->params['attributes']) )
-		{
-			$entityType = $this->entityTypeRepository->fetch($command->params['entity_type_id']);
-
+		if( ! empty($command->params['attributes']) ) {
 			$attributeIds = [];
-			foreach ($command->params['attributes'] as $key => $value)
-			{
-				if(in_array($value['id'], $attributeIds))
-				{
+			foreach ($command->params['attributes'] as $key => &$value) {
+				if(!isset( $value['id'])) {
+					$attributes = $this->attributeRepository->get(['code' => $value['code']]);
+					$attribute = $attributes[0];
+					$value['id'] = $attribute->id;
+				}
+				unset( $value['code']) ;
+				if(in_array($value['id'], $attributeIds)) {
 					$this->exception->setErrorKey('attribute-set.attributes.' . $key);
-					$this->exception->addErrors('Can\'t use same attribute more than once.');
-					$key2 = array_search($value['id'], $attributeIds);
-					$this->exception->setErrorKey('attribute-set.attributes.' . $key2);
 					$this->exception->addErrors('Can\'t use same attribute more than once.');
 				}
 				$attributeIds[$key] = $value['id'];
 
-				if($value['id'] == $command->params['primary_attribute_id'])
-				{
+				if($value['id'] === $command->params['primary_attribute_id']) {
 					$invalidPrimaryAttribute = false;
 				}
 			}
 
-			$attributes = $this->attributeRepository->get(['id' => ['in' => $attributeIds]]);
+			$entityType = $this->entityTypeRepository->fetch($command->params['entity_type_id']);
 
-			foreach ($attributes as $attribute)
-			{
-				if( $attribute->localized && ! $entityType->localized )
-				{
-					$key = array_search($attribute->id, $attributeIds);
-					$this->exception->setErrorKey('attribute-set.attributes.' . $key);
-					$this->exception->addErrors('Can\'t add localized attribute to entity type that isn\'t localized');
+			if( !$entityType->localized ) {
+				$attributes = $this->attributeRepository->get(['id' => ['in' => $attributeIds]]);
+
+				foreach ($attributes as $attribute) {
+					if( $attribute->localized ) {
+						$key = array_search($attribute->id, $attributeIds);
+						$this->exception->setErrorKey('attribute-set.attributes.' . $key);
+						$this->exception->addErrors('Can\'t add localized attribute to entity type that isn\'t localized');
+					}
 				}
 			}
+			
 		}
 
-		if($invalidPrimaryAttribute)
-		{
+		if($invalidPrimaryAttribute) {
 			$this->exception->setErrorKey('attribute-set.primary_attribute_id');
 			$this->exception->addErrors('Invalid primary attribute chosen');
 		}
 		
-		if( $this->exception->hasErrors() )
-		{
+		if( $this->exception->hasErrors() ) {
 			throw $this->exception;
 		}
 		
