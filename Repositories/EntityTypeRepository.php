@@ -257,7 +257,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		
 		if(Trunk::has($params, 'entity-type'))
 		{
-			$entityType = Trunk::get($id, 'entity-type');
+			$entityType = Trunk::get($code, 'entity-type');
 			$entityType->clearIncluded();
 			$entityType->load($include);
 			$meta = ['code' => $code, 'include' => $include];

@@ -233,6 +233,47 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals(1, $result->fields->test_asset_attribute->id);
 		$this->assertEquals('file', $result->fields->test_asset_attribute->type);
 
+
+		$params = [
+			'entity_type' => 'test_fields',
+			'attribute_set' => ['id' => 4],
+			'locale' => 'en_US',
+			'fields' => [
+				'test_text_attribute' => 'test value',
+				'test_select_attribute' => 'option2',
+				'test_integer_attribute' => 123,
+				'test_decimal_attribute' => 33.33,
+				'test_datetime_attribute' => '1987-08-19T11:00:00+0200',
+				'test_relation_attribute' => ['id' => 2, 'type' => 'entity'],
+				'test_asset_attribute' => ['url' => 'files/test.jpg', 'type' => 'file']
+			]
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		try {
+			$result = $bus->dispatch(new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
+		} catch (ValidationException $e) {
+			$this->d->dump($e->getErrors);
+		} catch (\Exception $e) {
+            echo $e->getMessage();
+			echo $e->getTraceAsString();
+		}
+
+		// $this->d->dump($result->toArray());
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
+		$this->assertTrue(is_int($result->id));
+		$this->assertEquals('test value', $result->fields->test_text_attribute);
+		$this->assertEquals('option2', $result->fields->test_select_attribute);
+		$this->assertEquals(123, $result->fields->test_integer_attribute);
+		$this->assertEquals(33.33, $result->fields->test_decimal_attribute);
+		$this->assertEquals('1987-08-19T09:00:00+00:00', $result->toArray()['fields']['test_datetime_attribute']);
+		$this->assertEquals(2, $result->fields->test_relation_attribute->id);
+		$this->assertEquals('entity', $result->fields->test_relation_attribute->type);
+		$this->assertEquals(1, $result->fields->test_asset_attribute->id);
+		$this->assertEquals('file', $result->fields->test_asset_attribute->type);
+
 	}
 
 

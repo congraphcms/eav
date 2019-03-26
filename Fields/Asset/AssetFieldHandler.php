@@ -10,9 +10,13 @@
 
 namespace Congraph\Eav\Fields\Asset;
 
+use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
 use Congraph\Eav\Fields\AbstractFieldHandler;
 use stdClass;
+use Congraph\Eav\Managers\AttributeManager;
+use Congraph\Contracts\Filesystem\FileRepositoryContract;
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
 
 /**
  * AssetFieldHandler class
@@ -35,6 +39,35 @@ class AssetFieldHandler extends AbstractFieldHandler {
 	 */
 	protected $table = 'attribute_values_integer';
 
+	/**
+	 * Repository for files
+	 * 
+	 * @var FileRepositoryContract
+	 */
+	public $fileRepository;
+
+	/**
+	 * Create new AssetFieldHandler
+	 * 
+	 * @param Connection 					$db
+	 * @param AttributeManager 				$attributeManager
+	 * @param AttributeRepositoryContract 	$attributeRepository
+	 * @param FileRepositoryContract 		$fileRepository
+	 *  
+	 * @return void
+	 */
+	public function __construct(
+		Connection $db, 
+		AttributeManager $attributeManager, 
+		AttributeRepositoryContract $attributeRepository,
+		FileRepositoryContract $fileRepository)
+	{
+		// Inject dependencies
+		parent::__construct($db, $attributeManager, $attributeRepository);
+
+		$this->fileRepository = $fileRepository;
+	}
+
 
 	/**
 	 * Parse value for database input
@@ -46,11 +79,17 @@ class AssetFieldHandler extends AbstractFieldHandler {
 	 */
 	public function parseValue($value, $attribute, $locale, $params, $entity)
 	{
-		if(empty($value))
-		{
+		if(empty($value)) {
 			return null;
 		}
-		$value = $value['id'];
+		
+		if(isset($value['id'])) {
+			$value = $value['id'];
+			return $value;
+		}
+
+		$file = $this->fileRepository->fetch( $value['url'] );
+		$value = $file->id;
 		return $value;
 	}
 

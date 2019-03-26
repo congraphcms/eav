@@ -172,7 +172,7 @@ class AssetFieldValidator extends AbstractFieldValidator
 			return;
 		}
 
-		if( ! is_array($value) || ! isset($value['id']) || ! isset($value['type']))
+		if( ! is_array($value) || ( ! isset($value['id']) && ! isset($value['url']) ) || ! isset($value['type']))
 		{
 			throw new ValidationException(['Invalid asset object.']);
 		}
@@ -181,10 +181,17 @@ class AssetFieldValidator extends AbstractFieldValidator
 		{
 			throw new ValidationException(['Asset can be made only with files.']);
 		}
+		
+		$id = null;
+		if(isset($value['id'])) {
+			$id = $value['id'];
+		} else {
+			$id = $value['url'];
+		}
 
 		try
 		{
-			$file = $this->fileRepository->fetch($value['id']);
+			$file = $this->fileRepository->fetch( $id );
 		}
 		catch(NotFoundException $e)
 		{
