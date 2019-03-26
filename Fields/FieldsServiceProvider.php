@@ -12,8 +12,6 @@ namespace Congraph\Eav\Fields;
 
 use Illuminate\Support\ServiceProvider;
 
-use Congraph\Eav\Fields\Text\TextFieldHandler;
-
 /**
  * FieldsServiceProvider service provider for handlers
  * 
@@ -251,7 +249,8 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app['db']->connection(),
 				$app->make('Congraph\Eav\Managers\AttributeManager'),
 				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract'),
-				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract')
+				$app->make('Congraph\Contracts\Eav\EntityRepositoryContract'),
+				$app->make('Congraph\Contracts\Eav\EntityTypeRepositoryContract')
 			);
 		});
 		$this->app->bind('Congraph\Eav\Fields\Select\SelectFieldValidator', function($app) {

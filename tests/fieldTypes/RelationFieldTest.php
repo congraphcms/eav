@@ -157,6 +157,113 @@ class RelationFieldTest extends Orchestra\Testbench\TestCase
 
 	}
 
+	public function testAllowedTypes()
+	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$params = [
+			'code' => 'relation_attribute',
+			'field_type' => 'relation',
+			'localized' => false,
+			'unique' => false,
+			'required' => false,
+			'filterable' => true
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		$result = $bus->dispatch(new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
+
+		// $this->d->dump($result->toArray());
+
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
+		$this->assertTrue(is_object($result->data));
+		$this->assertFalse($result->data->allowed_types);
+
+		$params = [
+            'code' => 'relation_attribute2',
+            'field_type' => 'relation',
+            'localized' => false,
+            'unique' => false,
+            'required' => false,
+			'filterable' => true,
+			'data' => [
+				'allowed_types' => false
+			]
+        ];
+
+        $app = $this->createApplication();
+        $bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+        $result = $bus->dispatch(new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
+
+        // $this->d->dump($result->toArray());
+
+        $this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
+        $this->assertTrue(is_object($result->data));
+		$this->assertFalse($result->data->allowed_types);
+
+		$params = [
+			'code' => 'relation_attribute3',
+			'field_type' => 'relation',
+			'localized' => false,
+			'unique' => false,
+			'required' => false,
+			'filterable' => true,
+			'data' => [
+				'allowed_types' => 1
+			]
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		try {
+			$result = $bus->dispatch(new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
+		} catch( ValidationException $e) {
+			$this->d->dump($e->getErrors());
+		}
+
+		// $this->d->dump($result->toArray());
+
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
+        $this->assertTrue(is_object($result->data));
+		$this->assertTrue(is_array($result->data->allowed_types));
+		$this->assertEquals(1, count($result->data->allowed_types));
+        $this->assertEquals(1, $result->data->allowed_types[0]);
+
+		$params = [
+			'code' => 'relation_attribute4',
+			'field_type' => 'relation',
+			'localized' => false,
+			'unique' => false,
+			'required' => false,
+			'filterable' => true,
+			'data' => [
+				'allowed_types' => ['tests']
+			]
+		];
+
+		$app = $this->createApplication();
+		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+
+		try {
+			$result = $bus->dispatch(new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
+		} catch( ValidationException $e) {
+			$this->d->dump($e->getErrors());
+		}
+
+		// $this->d->dump($result->toArray());
+
+		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
+        $this->assertTrue(is_object($result->data));
+		$this->assertTrue(is_array($result->data->allowed_types));
+		$this->assertEquals(1, count($result->data->allowed_types));
+        $this->assertEquals(1, $result->data->allowed_types[0]);
+
+	}
+
 	public function testUpdateAttribute()
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");

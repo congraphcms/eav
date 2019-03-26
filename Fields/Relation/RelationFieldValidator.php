@@ -12,6 +12,7 @@ namespace Congraph\Eav\Fields\Relation;
 
 use Congraph\Contracts\Eav\AttributeRepositoryContract;
 use Congraph\Contracts\Eav\EntityRepositoryContract;
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
 use Congraph\Core\Exceptions\NotFoundException;
 use Congraph\Core\Exceptions\ValidationException;
 use Congraph\Eav\Fields\AbstractFieldValidator;
@@ -47,6 +48,13 @@ class RelationFieldValidator extends AbstractFieldValidator
 	protected $entityRepository;
 
 	/**
+	 * Repository for entity types
+	 *
+	 * @var Congraph\Contracts\Eav\EntityTypeRepositoryContract
+	 */
+	protected $entityTypeRepository;
+
+	/**
 	 * DB table for SQL
 	 *
 	 * @var array
@@ -62,13 +70,20 @@ class RelationFieldValidator extends AbstractFieldValidator
 	 *  
 	 * @return void
 	 */
-	public function __construct(Connection $db, AttributeManager $attributeManager, AttributeRepositoryContract $attributeRepository, EntityRepositoryContract $entityRepository)
+	public function __construct(
+		Connection $db, 
+		AttributeManager $attributeManager, 
+		AttributeRepositoryContract $attributeRepository, 
+		EntityRepositoryContract $entityRepository,
+		EntityTypeRepositoryContract $entityTypeRepository)
 	{
 		// Inject dependencies
 		$this->db = $db;
 		$this->attributeManager = $attributeManager;
 		$this->entityRepository = $entityRepository;
 		$this->attributeRepository = $attributeRepository;
+        $this->entityTypeRepository = $entityTypeRepository;
+
 
 		$this->exception = new ValidationException();
 	}
@@ -89,7 +104,7 @@ class RelationFieldValidator extends AbstractFieldValidator
 
 		if ( empty($params['data']) || !is_array($params['data']))
 		{
-			return;
+			$params['data'] = [];
 		}
 
 		$data = $params['data'];
@@ -206,7 +221,11 @@ class RelationFieldValidator extends AbstractFieldValidator
 		$allowedTypes = $data['allowed_types'];
 
 		foreach ($allowedTypes as &$type) {
-			$type = intval(trim($type));
+			$entityType = $this->entityTypeRepository->fetch($type);
+			if(!$entityType) {
+				throw new ValidationException(['Invalid relation restriction type.']);
+			}
+			$type = $entityType->id;
 		}
 
 		$data['allowed_types'] = $allowedTypes;
