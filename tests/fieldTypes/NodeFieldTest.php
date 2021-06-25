@@ -1,7 +1,12 @@
 <?php
 
 use Congraph\Core\Exceptions\ValidationException;
-use Illuminate\Support\Debug\Dumper;
+use Symfony\Component\VarDumper\VarDumper as Dumper;
+use Congraph\Eav\Commands\Attributes\AttributeCreateCommand;
+use Congraph\Eav\Commands\Attributes\AttributeUpdateCommand;
+use Congraph\Eav\Commands\Entities\EntityCreateCommand;
+use Congraph\Eav\Commands\Entities\EntityUpdateCommand;
+use Congraph\Eav\Commands\Entities\EntityFetchCommand;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -14,81 +19,29 @@ require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 class NodeFieldTest extends Orchestra\Testbench\TestCase
 {
 
-	public function setUp()
+	// ----------------------------------------
+    // ENVIRONMENT
+    // ----------------------------------------
+
+    protected function getPackageProviders($app)
 	{
-		// fwrite(STDOUT, __METHOD__ . "\n");
-		parent::setUp();
-		// unset($this->app);
-		// call migrations specific to our tests, e.g. to seed the db
-		// the path option should be relative to the 'path.database'
-		// path unless `--path` option is available.
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'EavDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'LocaleDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'FileDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'WorkflowDbSeeder'
-		]);
-
-		$this->d = new Dumper();
-
-
-		// $this->app = $this->createApplication();
-
-		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
-
+		return [
+			'Congraph\Core\CoreServiceProvider', 
+			'Congraph\Locales\LocalesServiceProvider', 
+			'Congraph\Eav\EavServiceProvider', 
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
-	public function tearDown()
-	{
-		// fwrite(STDOUT, __METHOD__ . "\n");
-		// parent::tearDown();
-		$this->artisan('db:seed', [
-			'--class' => 'ClearDB'
-		]);
-		DB::disconnect();
-		// $this->artisan('migrate:reset');
-		// unset($this->app);
-
-		parent::tearDown();
-	}
-
-	/**
+    /**
 	 * Define environment setup.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
 	 *
 	 * @return void
 	 */
-	protected function getEnvironmentSetUp($app)
+	protected function defineEnvironment($app)
 	{
 		$app['config']->set('database.default', 'testbench');
 		$app['config']->set('database.connections.testbench', [
@@ -104,31 +57,120 @@ class NodeFieldTest extends Orchestra\Testbench\TestCase
 		]);
 
 		$app['config']->set('cache.default', 'file');
+		$app['config']->set('app.timezone', 'Europe/Belgrade');
 
 		$app['config']->set('cache.stores.file', [
 			'driver'	=> 'file',
 			'path'   	=> realpath(__DIR__ . '/../storage/cache/'),
 		]);
-
-		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
-
-		// $app['config']->set(
-		// 	'Congraph::eav', $config
-		// );
-
-		// var_dump('CONFIG SETTED');
 	}
 
-	protected function getPackageProviders($app)
-	{
-		return [
-			'Congraph\Core\CoreServiceProvider',
-			'Congraph\Locales\LocalesServiceProvider',
-			'Congraph\Eav\EavServiceProvider',
-			'Congraph\Filesystem\FilesystemServiceProvider',
-			'Congraph\Workflows\WorkflowsServiceProvider'
-		];
+    // ----------------------------------------
+    // DATABASE
+    // ----------------------------------------
+
+    /**
+     * Define database migrations.
+     *
+     * @return void
+     */
+    protected function defineDatabaseMigrations()
+    {
+		/**
+		 * EAV Migrations
+		 */
+        $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * FileSystem Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * Locales Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * Workflows Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+        $this->beforeApplicationDestroyed(function () {
+			/**
+			 * EAV Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * FileSystem Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * Locales Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * Workflows Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+        });
+    }
+
+
+    // ----------------------------------------
+    // SETUP
+    // ----------------------------------------
+
+    public function setUp(): void {
+		parent::setUp();
+
+		$this->d = new Dumper();
+
+        $this->artisan('db:seed', [
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'FileDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'WorkflowDbSeeder'
+		]);
 	}
+
+	public function tearDown(): void {
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+		parent::tearDown();
+	}
+
+    // ----------------------------------------
+    // TESTS **********************************
+    // ----------------------------------------
 
 	public function testCreateAttribute()
 	{
@@ -145,9 +187,12 @@ class NodeFieldTest extends Orchestra\Testbench\TestCase
 		];
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(AttributeCreateCommand::class);
+		$command->setParams($params);
+		// $command->setId($id);
+		
+		$result = $bus->dispatch($command);
 
 		// $this->d->dump($result->toArray());
 
@@ -164,11 +209,15 @@ class NodeFieldTest extends Orchestra\Testbench\TestCase
 		$params = [
 			'admin_label' => 'node_attribute_changed'
 		];
+		$id = 13;
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeUpdateCommand($params, 13) );
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(AttributeUpdateCommand::class);
+		$command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
 
 		// $this->d->dump($result->toArray());
 
@@ -192,9 +241,12 @@ class NodeFieldTest extends Orchestra\Testbench\TestCase
 		];
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(EntityCreateCommand::class);
+		$command->setParams($params);
+		// $command->setId($id);
+		
+		$result = $bus->dispatch($command);
 		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -209,7 +261,7 @@ class NodeFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
 
 		$params = [
 			'locale' => 'en_US',
@@ -217,9 +269,12 @@ class NodeFieldTest extends Orchestra\Testbench\TestCase
 				'test_node_attribute' => ['id' => 2, 'type' => 'entity']
 			]
 		];
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, 4));
-
+		$id = 4;
+		$command = $app->make(EntityUpdateCommand::class);
+		$command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 
@@ -235,9 +290,13 @@ class NodeFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand([], 4));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$id = 4;
+		$command = $app->make(EntityFetchCommand::class);
+		// $command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
 		// $this->d->dump($result->toArray(true, true));
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -249,8 +308,13 @@ class NodeFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('entity', $result->fields->test_node_attribute->type);
 		$this->assertEquals('tests', $result->toArray()['fields']['test_node_attribute']['entity_type']);
 
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand(['locale' => 'en_US'], 4));
+		$params = ['locale' => 'en_US'];
+		$id = 4;
+		$command = $app->make(EntityFetchCommand::class);
+		$command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
 		// $this->d->dump($result->toArray(true, true));
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));

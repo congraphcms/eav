@@ -10,6 +10,7 @@
 
 namespace Congraph\Eav\Commands\Attributes;
 
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
 use Congraph\Core\Bus\RepositoryCommand;
 
 /**
@@ -25,6 +26,33 @@ use Congraph\Core\Bus\RepositoryCommand;
  */
 class AttributeGetCommand extends RepositoryCommand
 {
+	/**
+	 * Create new AttributeGetCommand
+	 * 
+	 * @param Congraph\Contracts\Eav\Repositories\AttributeRepositoryContract $repository
+	 * 
+	 * @return void
+	 */
+	public function __construct(AttributeRepositoryContract $repository)
+	{
+		parent::__construct($repository);
+	}
+
+	/**
+	 * Handle RepositoryCommand
+	 * 
+	 * @return void
+	 */
+	public function handle()
+	{
+		return $this->repository->get(
+			(!empty($this->params['filter']))?$this->params['filter']:[],
+			(!empty($this->params['offset']))?$this->params['offset']:0,
+			(!empty($this->params['limit']))?$this->params['limit']:0,
+			(!empty($this->params['sort']))?$this->params['sort']:[],
+			(!empty($this->params['include']))?$this->params['include']:[]
+		);
+	}
 
 }
 

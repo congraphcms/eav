@@ -183,7 +183,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			$valueParams['value'] = $parsedValue;
 		}
 		// var_dump($valueParams['value']);
-		Event::fire('cb.before.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
+		Event::dispatch('cb.before.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
 
 		if($attributeSettings['has_multiple_values'])
 		{
@@ -211,7 +211,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			}
 		}
 
-		Event::fire('cb.after.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
+		Event::dispatch('cb.after.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
 	}
 
 
@@ -249,7 +249,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			$valueParams['value'] = $parsedValue;
 		}
 
-		Event::fire('cb.before.entity.field.update', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
+		Event::dispatch('cb.before.entity.field.update', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
 
 		// delete all values for provided entity, attribute and language
 		$this	->db->table( $this->table )
@@ -295,7 +295,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 			}
 		}
 
-		Event::fire('cb.after.entity.field.update', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
+		Event::dispatch('cb.after.entity.field.update', [$valueParams, $attribute, $attributeSettings, $params, $entity]);
 	}
 
 	/**

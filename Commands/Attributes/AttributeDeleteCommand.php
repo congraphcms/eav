@@ -10,6 +10,9 @@
 
 namespace Congraph\Eav\Commands\Attributes;
 
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
+use Congraph\Contracts\Eav\AttributeSetRepositoryContract;
+use Congraph\Contracts\Eav\EntityRepositoryContract;
 use Congraph\Core\Bus\RepositoryCommand;
 
 /**
@@ -25,5 +28,55 @@ use Congraph\Core\Bus\RepositoryCommand;
  */
 class AttributeDeleteCommand extends RepositoryCommand
 {
+	/**
+	 * Repository for handling attribute sets
+	 * 
+	 * @var Congraph\Contracts\Eav\AttributeSetRepositoryContract
+	 */
+	protected $attributeSetRepository;
+
+	/**
+	 * Repository for handling entities
+	 * 
+	 * @var Congraph\Contracts\Eav\EntityRepositoryContract
+	 */
+	protected $entityRepository;
+
+
+
+	/**
+	 * Create new AttributeDeleteCommand
+	 * 
+	 * @param Congraph\Contracts\Eav\Repositories\AttributeRepositoryContract $repository
+	 * @param Congraph\Contracts\Eav\Repositories\AttributeSetRepositoryContract $attributeSetRepository
+	 * @param Congraph\Contracts\Eav\Repositories\EntityRepositoryContract $entityRepository
+	 * 
+	 * @return void
+	 */
+	public function __construct(
+		AttributeRepositoryContract $repository,
+		AttributeSetRepositoryContract $attributeSetRepository,
+		EntityRepositoryContract $entityRepository
+	) {
+		parent::__construct($repository);
+		$this->attributeSetRepository = $attributeSetRepository;
+		$this->entityRepository = $entityRepository;
+	}
+
+	/**
+	 * Handle RepositoryCommand
+	 * 
+	 * @return void
+	 */
+	public function handle()
+	{
+		$attribute = $this->repository->delete($this->id);
+
+		$this->attributeSetRepository->deleteByAttribute($attribute);
+
+		$this->entityRepository->deleteByAttribute($attribute);
+
+		return $attribute;
+	}
 
 }

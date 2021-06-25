@@ -215,7 +215,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 								  ->where('entity_type_id', '=', $id)
 								  ->get();
 
-		$entityType->attribute_sets = $attributeSets;
+		$entityType->attribute_sets = $attributeSets->toArray();
 
 		$workflow = new stdClass();
 		$workflow->id = $entityType->workflow_id;
@@ -277,7 +277,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 								  ->where('entity_type_id', '=', $entityType->id)
 								  ->get();
 
-		$entityType->attribute_sets = $attributeSets;
+		$entityType->attribute_sets = $attributeSets->toArray();
 
 		$workflow = new stdClass();
 		$workflow->id = $entityType->workflow_id;
@@ -339,6 +339,8 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		$query = $this->parseSorting($query, $sort);
 		
 		$entityTypes = $query->get();
+
+		$entityTypes = $entityTypes->toArray();
 
 		if( ! $entityTypes )
 		{

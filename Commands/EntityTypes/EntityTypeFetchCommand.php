@@ -10,6 +10,7 @@
 
 namespace Congraph\Eav\Commands\EntityTypes;
 
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
 use Congraph\Core\Bus\RepositoryCommand;
 
 /**
@@ -25,5 +26,27 @@ use Congraph\Core\Bus\RepositoryCommand;
  */
 class EntityTypeFetchCommand extends RepositoryCommand
 {
+	/**
+	 * Create new EntityTypeCreateHandler
+	 * 
+	 * @param ookbook\Contracts\Eav\EntityTypeRepositoryContract $repository
+	 * 
+	 * @return void
+	 */
+	public function __construct(EntityTypeRepositoryContract $repository)
+	{
+		parent::__construct($repository);
+	}
+
+	/**
+	 * Handle RepositoryCommand
+	 * 
+	 * @return void
+	 */
+	public function handle()
+	{
+		$include = (!empty($this->params['include']))?$this->params['include']:[];
+		return $this->repository->fetch($this->id, $include);
+	}
 
 }

@@ -10,6 +10,7 @@
 
 namespace Congraph\Eav\Commands\Entities;
 
+use Congraph\Contracts\Eav\EntityRepositoryContract;
 use Congraph\Core\Bus\RepositoryCommand;
 
 /**
@@ -25,5 +26,29 @@ use Congraph\Core\Bus\RepositoryCommand;
  */
 class EntityFetchCommand extends RepositoryCommand
 {
+	/**
+	 * Create new EntityFetchCommand
+	 * 
+	 * @param Congraph\Contracts\Eav\EntityRepositoryContract $repository
+	 * 
+	 * @return void
+	 */
+	public function __construct(EntityRepositoryContract $repository)
+	{
+		parent::__construct($repository);
+	}
+
+	/**
+	 * Handle RepositoryCommand
+	 * 
+	 * @return void
+	 */
+	public function handle()
+	{
+		$locale = (!empty($this->params['locale']))?$this->params['locale']:null;
+		$include = (!empty($this->params['include']))?$this->params['include']:[];
+		$status = (!empty($this->params['status']))?$this->params['status']:null;
+		return $this->repository->fetch($this->id, $include, $locale, $status);
+	}
 
 }

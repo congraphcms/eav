@@ -55,13 +55,11 @@ class AttributeSetDeleteHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Congraph\Core\Bus\RepositoryCommand $command
-	 * 
 	 * @return void
 	 */
-	public function handle(RepositoryCommand $command)
+	public function handle()
 	{
-		$attributeSet = $this->repository->delete($command->id);
+		$attributeSet = $this->repository->delete($this->id);
 
 		$this->entityRepository->deleteByAttributeSet($attributeSet);
 

@@ -263,7 +263,7 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 			$valueParams['value'] = $parsedValue;
 		}
 
-		Event::fire('cb.before.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $entity]);
+		Event::dispatch('cb.before.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $entity]);
 
 		if($attributeSettings['has_multiple_values'])
 		{
@@ -290,7 +290,7 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 			}
 		}
 
-		Event::fire('cb.after.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $entity]);
+		Event::dispatch('cb.after.entity.field.insert', [$valueParams, $attribute, $attributeSettings, $entity]);
 	}
 
 
@@ -406,7 +406,7 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 			$parsedValue = $this->parseValue($newValueParams['value'], $compoundAttribute, $entity);
 			$newValueParams['value'] = $parsedValue;
 
-			Event::fire('cb.before.entity.field.update', [$newValueParams, $compoundAttribute, $attrSettings, $entity]);
+			Event::dispatch('cb.before.entity.field.update', [$newValueParams, $compoundAttribute, $attrSettings, $entity]);
 
 			// delete all values for provided entity, attribute and language
 			$this	->db->table( $this->table )
@@ -463,7 +463,7 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 				}
 			}
 
-			Event::fire('cb.after.entity.field.update', [$newValueParams, $compoundAttribute, $attrSettings, $entity]);
+			Event::dispatch('cb.after.entity.field.update', [$newValueParams, $compoundAttribute, $attrSettings, $entity]);
 		}
 	}
 

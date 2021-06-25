@@ -45,12 +45,10 @@ class EntityCreateHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Congraph\Core\Bus\RepositoryCommand $command
-	 * 
 	 * @return void
 	 */
-	public function handle(RepositoryCommand $command)
+	public function handle()
 	{
-		return $this->repository->create($command->params);
+		return $this->repository->create($this->params);
 	}
 }

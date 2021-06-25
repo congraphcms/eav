@@ -104,16 +104,12 @@ class AttributeUpdateValidator extends Validator
 			'filterable'			=> 'sometimes|boolean',
 			// 'searchable'			=> 'sometimes|boolean',
 			'data'					=> 'sometimes',
-			'options'				=> 'sometimes|array'
-		];
-
-		$this->optionRules = 
-		[
-			'id'					=> 'sometimes|required|integer',
-			'locale' 				=> 'sometimes|required|integer',
-			'label'					=> 'required|max:250',
-			'value'					=> 'required|max:250',
-			'default'				=> 'boolean'
+			'options'				=> 'sometimes|array',
+			'options.*.id'			=> 'sometimes|required|integer',
+			'options.*.locale' 		=> 'sometimes|integer',
+			'options.*.label'		=> 'required|max:250',
+			'options.*.value'		=> 'required|max:250',
+			'options.*.default'		=> 'boolean'
 		];
 
 		parent::__construct();
@@ -150,10 +146,6 @@ class AttributeUpdateValidator extends Validator
 			}
 		}
 
-		if( isset($command->params['options']) && $attributeSettings['has_options'] )
-		{
-			$validator->each('options', $this->optionRules);
-		}
 		$this->setValidator($validator);
 
 		$this->validateParams($command->params, null, true);

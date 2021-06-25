@@ -45,13 +45,11 @@ class EntityDeleteHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Congraph\Core\Bus\RepositoryCommand $command
-	 * 
 	 * @return void
 	 */
-	public function handle(RepositoryCommand $command)
+	public function handle()
 	{
-		$entity = $this->repository->delete($command->id);
+		$entity = $this->repository->delete($this->id);
 
 		return $entity;
 	}

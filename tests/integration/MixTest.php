@@ -2,7 +2,7 @@
 
 // include_once(realpath(__DIR__.'/../LaravelMocks.php'));
 use Congraph\Core\Exceptions\ValidationException;
-use Illuminate\Support\Debug\Dumper;
+use Symfony\Component\VarDumper\VarDumper as Dumper;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -13,74 +13,29 @@ require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class MixTest extends Orchestra\Testbench\TestCase
 {
+// ----------------------------------------
+    // ENVIRONMENT
+    // ----------------------------------------
 
-	public function setUp()
+    protected function getPackageProviders($app)
 	{
-		// fwrite(STDOUT, __METHOD__ . "\n");
-		parent::setUp();
-		// unset($this->app);
-		// call migrations specific to our tests, e.g. to seed the db
-		// the path option should be relative to the 'path.database'
-		// path unless `--path` option is available.
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'LocaleDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'WorkflowDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'MixDbSeeder'
-		]);
-
-		$this->d = new Dumper();
-
-
-		// $this->app = $this->createApplication();
-
-		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
-
+		return [
+			'Congraph\Core\CoreServiceProvider', 
+			'Congraph\Locales\LocalesServiceProvider', 
+			'Congraph\Eav\EavServiceProvider', 
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
-	public function tearDown()
-	{
-		// fwrite(STDOUT, __METHOD__ . "\n");
-		// parent::tearDown();
-		$this->artisan('db:seed', [
-			'--class' => 'ClearDB'
-		]);
-
-		DB::disconnect();
-		// $this->artisan('migrate:reset');
-		// unset($this->app);
-
-		parent::tearDown();
-	}
-
-	/**
+    /**
 	 * Define environment setup.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
 	 *
 	 * @return void
 	 */
-	protected function getEnvironmentSetUp($app)
+	protected function defineEnvironment($app)
 	{
 		$app['config']->set('database.default', 'testbench');
 		$app['config']->set('database.connections.testbench', [
@@ -96,41 +51,128 @@ class MixTest extends Orchestra\Testbench\TestCase
 		]);
 
 		$app['config']->set('cache.default', 'file');
+		$app['config']->set('app.timezone', 'Europe/Belgrade');
 
 		$app['config']->set('cache.stores.file', [
 			'driver'	=> 'file',
 			'path'   	=> realpath(__DIR__ . '/../storage/cache/'),
 		]);
-
-		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
-
-		// $app['config']->set(
-		// 	'Congraph::eav', $config
-		// );
-
-		// var_dump('CONFIG SETTED');
 	}
 
-	protected function getPackageProviders($app)
-	{
-		return [
-			'Congraph\Core\CoreServiceProvider', 
-			'Congraph\Locales\LocalesServiceProvider', 
-			'Congraph\Eav\EavServiceProvider', 
-			'Congraph\Filesystem\FilesystemServiceProvider',
-			'Congraph\Workflows\WorkflowsServiceProvider'
-		];
+    // ----------------------------------------
+    // DATABASE
+    // ----------------------------------------
+
+    /**
+     * Define database migrations.
+     *
+     * @return void
+     */
+    protected function defineDatabaseMigrations()
+    {
+		/**
+		 * EAV Migrations
+		 */
+        $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * FileSystem Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * Locales Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * Workflows Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+        $this->beforeApplicationDestroyed(function () {
+			/**
+			 * EAV Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * FileSystem Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * Locales Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * Workflows Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+        });
+    }
+
+
+    // ----------------------------------------
+    // SETUP
+    // ----------------------------------------
+
+    public function setUp(): void {
+		parent::setUp();
+
+		$this->d = new Dumper();
+
+        $this->artisan('db:seed', [
+			'--class' => 'MixDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'WorkflowDbSeeder'
+		]);
 	}
+
+	public function tearDown(): void {
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+		parent::tearDown();
+	}
+
+    // ----------------------------------------
+    // TESTS **********************************
+    // ----------------------------------------
 
 	public function testEntity()
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Entities\EntityCreateCommand::class);
 
 		// create nones entity
 		fwrite(STDOUT, 'create nones entity' . "\n");
+
 		$params = [
 			'entity_type' => ['id' => 1],
 			'attribute_set' => ['id' => 1],
@@ -139,9 +181,12 @@ class MixTest extends Orchestra\Testbench\TestCase
 				'simple_select' => 'option1'
 			]
 		];
+
+		$command->setParams($params);
+		
 		try
 		{
-			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch($command);
 		}
 		catch(ValidationException $e)
 		{
@@ -170,9 +215,11 @@ class MixTest extends Orchestra\Testbench\TestCase
 			]
 		];
 		
+		$command->setParams($params);
+		
 		try
 		{
-			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch($command);
 		}
 		catch(ValidationException $e)
 		{
@@ -203,9 +250,11 @@ class MixTest extends Orchestra\Testbench\TestCase
 			]
 		];
 		
+		$command->setParams($params);
+		
 		try
 		{
-			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch($command);
 		}
 		catch(ValidationException $e)
 		{
@@ -227,9 +276,16 @@ class MixTest extends Orchestra\Testbench\TestCase
 
 		// fetch half made entity (doesn't have all locales)
 		fwrite(STDOUT, 'fetch half made entity (doesn\'t have all locales)' . "\n");
+		$params = [];
+		$id = $result->id;
+
+		$command = $app->make(\Congraph\Eav\Commands\Entities\EntityFetchCommand::class);
+		$command->setParams($params);
+		$command->setId($id);
+		
 		try
 		{
-			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand([], $result->id));
+			$result = $bus->dispatch($command);
 		}
 		catch(ValidationException $e)
 		{
@@ -249,9 +305,15 @@ class MixTest extends Orchestra\Testbench\TestCase
 
 		// fetch locale that isn\'t made
 		fwrite(STDOUT, 'fetch locale that isn\'t made' . "\n");
+		$params = ['locale' => 'fr_FR'];
+		$id = $result->id;
+
+		$command->setParams($params);
+		$command->setId($id);
+		
 		try
 		{
-			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand(['locale' => 'fr_FR'], $result->id));
+			$result = $bus->dispatch($command);
 		}
 		catch(ValidationException $e)
 		{
@@ -287,13 +349,15 @@ class MixTest extends Orchestra\Testbench\TestCase
 				'simple_select' => 'option1'
 			]
 		];
+		$id = null;
 
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Entities\EntityCreateCommand::class);
+		$command->setParams($params);
+		$command->setId($id);
 		
 		try
 		{
-			$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch($command);
 		}
 		catch(ValidationException $e)
 		{

@@ -600,6 +600,8 @@ class AttributeRepository extends AbstractRepository implements AttributeReposit
 		
 		$attributes = $query->get();
 
+		$attributes = $attributes->toArray();
+
 		if( ! $attributes )
 		{
 			$attributes = [];	
