@@ -502,6 +502,21 @@ class EavDbSeeder extends Seeder {
 				'created_at' => date("Y-m-d H:i:s"),
 				'updated_at' => date("Y-m-d H:i:s")
 			],
+			[
+				'code' => 'test_date_attribute',
+				'field_type' => 'date',
+				'table' => 'attribute_values_date',
+				'localized' => false,
+				'default_value' => null,
+				'unique' => false,
+				'required' => false,
+				'filterable' => true,
+				'searchable' => false,
+				'data' => json_encode([]),
+				'status' => 'user_defined',
+				'created_at' => date("Y-m-d H:i:s"),
+				'updated_at' => date("Y-m-d H:i:s")
+			],
 			
 		]);
 
@@ -700,6 +715,11 @@ class EavDbSeeder extends Seeder {
 				'attribute_set_id' => 4,
 				'attribute_id' => 24,
 				'sort_order' => 15
+			],
+			[
+				'attribute_set_id' => 4,
+				'attribute_id' => 25,
+				'sort_order' => 16
 			],
 			[
 				'attribute_set_id' => 5,
@@ -1086,6 +1106,19 @@ class EavDbSeeder extends Seeder {
 				'locale_id' => 0,
 				'sort_order' => 0,
 				'value' => Carbon::now()->toDateTimeString(),
+			]
+		]);
+
+		DB::table('attribute_values_date')->truncate();
+		DB::table('attribute_values_date')->insert([
+			[
+				'entity_id' => 4,
+				'entity_type_id' => 4,
+				'attribute_set_id' => 4,
+				'attribute_id' => 25,
+				'locale_id' => 0,
+				'sort_order' => 0,
+				'value' => Carbon::now()->toDateString(),
 			]
 		]);
 

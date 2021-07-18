@@ -1335,6 +1335,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
     protected function getValuesAll($entityIds, $locale = null)
     {
         // get values from various tables
+        $valuesDate = $this->getValuesDate($entityIds, $locale);
         $valuesDatetime = $this->getValuesDatetime($entityIds, $locale);
         $valuesDecimal = $this->getValuesDecimal($entityIds, $locale);
         $valuesInteger = $this->getValuesInteger($entityIds, $locale);
@@ -1343,6 +1344,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         // get all values
         $values = array_merge(
+            $valuesDate,
             $valuesDatetime,
             $valuesDecimal,
             $valuesInteger,
@@ -1350,6 +1352,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         );
 
         return $values;
+    }
+
+    protected function getValuesDate($entityIds, $locale = null)
+    {
+        return $this->getValues('attribute_values_date', $entityIds, $locale);
     }
 
     protected function getValuesDatetime($entityIds, $locale = null)
