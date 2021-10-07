@@ -707,6 +707,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             foreach ($status as &$s) {
                 $s = trim($s);
             }
+            if (count($status) === 1) {
+                $status = $status[0];
+            }
         }
 
         $locale_ids = [0];
@@ -798,6 +801,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             $status = explode(',', $status);
             foreach ($status as &$s) {
                 $s = trim($s);
+            }
+            if (count($status) === 1) {
+                $status = $status[0];
             }
         }
 
