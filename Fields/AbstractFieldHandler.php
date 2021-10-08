@@ -589,6 +589,7 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 		);
 		
 		$query = $query->orderBy('sort_' . $code . '.value', $direction);
+		$query = $query->groupBy('sort_' . $code . '.value');
 
 		return $query;
 	}
