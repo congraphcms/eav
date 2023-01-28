@@ -167,8 +167,8 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 			'--class' => 'WorkflowDbSeeder'
 		]);
 
-		Storage::deleteDir('files');
-		Storage::deleteDir('uploads');
+		Storage::deleteDirectory('files');
+		Storage::deleteDirectory('uploads');
 
 		Storage::copy('temp/test.jpg', 'files/test.jpg');
 		Storage::copy('temp/test.jpg', 'files/test2.jpg');
@@ -181,8 +181,8 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 			'--class' => 'ClearDB'
 		]);
 
-		Storage::deleteDir('files');
-		Storage::deleteDir('uploads');
+		Storage::deleteDirectory('files');
+		Storage::deleteDirectory('uploads');
 
 		parent::tearDown();
 	}
