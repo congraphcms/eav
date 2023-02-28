@@ -10,6 +10,7 @@
 
 namespace Congraph\Eav\Commands\Entities;
 
+use Congraph\Contracts\Eav\EntityRepositoryContract;
 use Congraph\Core\Bus\RepositoryCommand;
 
 /**
@@ -25,5 +26,26 @@ use Congraph\Core\Bus\RepositoryCommand;
  */
 class EntityUpdateCommand extends RepositoryCommand
 {
+	/**
+	 * Create new EntityUpdateCommand
+	 * 
+	 * @param Congraph\Contracts\Eav\EntityRepositoryContract $repository
+	 * 
+	 * @return void
+	 */
+	public function __construct(EntityRepositoryContract $repository)
+	{
+		parent::__construct($repository);
+	}
+
+	/**
+	 * Handle RepositoryCommand
+	 * 
+	 * @return void
+	 */
+	public function handle()
+	{
+		return $this->repository->update($this->id, $this->params);
+	}
 
 }

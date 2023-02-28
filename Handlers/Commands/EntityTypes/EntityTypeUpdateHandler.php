@@ -45,12 +45,10 @@ class EntityTypeUpdateHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Congraph\Core\Bus\RepositoryCommand $command
-	 * 
 	 * @return void
 	 */
-	public function handle(RepositoryCommand $command)
+	public function handle()
 	{
-		return $this->repository->update($command->id, $command->params);
+		return $this->repository->update($this->id, $this->params);
 	}
 }

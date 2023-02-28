@@ -84,7 +84,7 @@ class AttributeCreateValidator extends Validator
 			'code'					=> ['required', 'unique:attributes,code', 'regex:/^[0-9a-zA-Z-_]*$/'],
 			'admin_label'			=> 'sometimes|max:100',
 			'admin_notice'			=> 'sometimes|max:1000',
-			'field_type' 			=> 'required|in:' . implode(array_keys($this->availableFieldTypes), ','),
+			'field_type' 			=> 'required|in:' . implode(',', array_keys($this->availableFieldTypes)),
 			'default_value'			=> '',
 			'localized'				=> 'boolean',
 			'unique'				=> 'boolean',
@@ -92,16 +92,12 @@ class AttributeCreateValidator extends Validator
 			'filterable'			=> 'boolean',
 			'searchable'			=> 'boolean',
 			'data'					=> '',
-			'options'				=> 'sometimes|array'
-		];
-
-		$this->optionRules = 
-		[
-			'locale' 				=> 'sometimes|integer',
-			'label'					=> 'required|max:250',
-			'value'					=> 'required|max:250',
-			'default'				=> 'boolean'
-		];
+			'options'				=> 'sometimes|array',
+			'options.*.locale' 		=> 'sometimes|integer',
+			'options.*.label'		=> 'required|max:250',
+			'options.*.value'		=> 'required|max:250',
+			'options.*.default'		=> 'boolean'
+		];;
 
 		parent::__construct();
 
@@ -124,10 +120,6 @@ class AttributeCreateValidator extends Validator
 
 		$validator = $this->newValidator($command->params, $this->rules, true);
 
-		if( isset($command->params['options']) )
-		{
-			$validator->each('options', $this->optionRules);
-		}
 		$this->setValidator($validator);
 
 		$this->validateParams($command->params, null, true);

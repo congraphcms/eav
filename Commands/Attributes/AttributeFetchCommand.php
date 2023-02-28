@@ -10,6 +10,7 @@
 
 namespace Congraph\Eav\Commands\Attributes;
 
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
 use Congraph\Core\Bus\RepositoryCommand;
 
 /**
@@ -25,6 +26,28 @@ use Congraph\Core\Bus\RepositoryCommand;
  */
 class AttributeFetchCommand extends RepositoryCommand
 {
+	/**
+	 * Create new AttributeFetchCommand
+	 * 
+	 * @param Congraph\Contracts\Eav\Repositories\AttributeRepositoryContract $repository
+	 * 
+	 * @return void
+	 */
+	public function __construct(AttributeRepositoryContract $repository)
+	{
+		parent::__construct($repository);
+	}
+
+	/**
+	 * Handle RepositoryCommand
+	 * 
+	 * @return void
+	 */
+	public function handle()
+	{
+		$include = (!empty($this->params['include']))?$this->params['include']:[];
+		return $this->repository->fetch($this->id, $include);
+	}
 
 }
 

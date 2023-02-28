@@ -45,15 +45,13 @@ class EntityFetchHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Congraph\Core\Bus\RepositoryCommand $command
-	 * 
 	 * @return void
 	 */
-	public function handle(RepositoryCommand $command)
+	public function handle()
 	{
-		$locale = (!empty($command->params['locale']))?$command->params['locale']:null;
-		$include = (!empty($command->params['include']))?$command->params['include']:[];
-		$status = (!empty($command->params['status']))?$command->params['status']:null;
-		return $this->repository->fetch($command->id, $include, $locale, $status);
+		$locale = (!empty($this->params['locale']))?$this->params['locale']:null;
+		$include = (!empty($this->params['include']))?$this->params['include']:[];
+		$status = (!empty($this->params['status']))?$this->params['status']:null;
+		return $this->repository->fetch($this->id, $include, $locale, $status);
 	}
 }

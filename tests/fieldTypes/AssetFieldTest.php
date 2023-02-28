@@ -1,7 +1,12 @@
 <?php
 
 use Congraph\Core\Exceptions\ValidationException;
-use Illuminate\Support\Debug\Dumper;
+use Symfony\Component\VarDumper\VarDumper as Dumper;
+use Congraph\Eav\Commands\Attributes\AttributeCreateCommand;
+use Congraph\Eav\Commands\Attributes\AttributeUpdateCommand;
+use Congraph\Eav\Commands\Entities\EntityCreateCommand;
+use Congraph\Eav\Commands\Entities\EntityUpdateCommand;
+use Congraph\Eav\Commands\Entities\EntityFetchCommand;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -14,92 +19,29 @@ require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 class AssetFieldTest extends Orchestra\Testbench\TestCase
 {
 
-	public function setUp()
+	// ----------------------------------------
+    // ENVIRONMENT
+    // ----------------------------------------
+
+    protected function getPackageProviders($app)
 	{
-		// fwrite(STDOUT, __METHOD__ . "\n");
-		parent::setUp();
-		// unset($this->app);
-		// call migrations specific to our tests, e.g. to seed the db
-		// the path option should be relative to the 'path.database'
-		// path unless `--path` option is available.
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'EavDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'LocaleDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'FileDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'WorkflowDbSeeder'
-		]);
-
-		$this->d = new Dumper();
-
-		Storage::deleteDir('files');
-		Storage::deleteDir('uploads');
-
-		Storage::copy('temp/test.jpg', 'files/test.jpg');
-		Storage::copy('temp/test.jpg', 'files/test2.jpg');
-
-		Storage::copy('temp/test.jpg', 'uploads/1.jpg');
-
-
-		// $this->app = $this->createApplication();
-
-		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
-
+		return [
+			'Congraph\Core\CoreServiceProvider', 
+			'Congraph\Locales\LocalesServiceProvider', 
+			'Congraph\Eav\EavServiceProvider', 
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
-	public function tearDown()
-	{
-		// fwrite(STDOUT, __METHOD__ . "\n");
-		// parent::tearDown();
-		$this->artisan('db:seed', [
-			'--class' => 'ClearDB'
-		]);
-
-		Storage::deleteDir('files');
-		Storage::deleteDir('uploads');
-		DB::disconnect();
-		// $this->artisan('migrate:reset');
-		// unset($this->app);
-
-		parent::tearDown();
-	}
-
-	/**
+    /**
 	 * Define environment setup.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
 	 *
 	 * @return void
 	 */
-	protected function getEnvironmentSetUp($app)
+	protected function defineEnvironment($app)
 	{
 		$app['config']->set('database.default', 'testbench');
 		$app['config']->set('database.connections.testbench', [
@@ -115,6 +57,7 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		]);
 
 		$app['config']->set('cache.default', 'file');
+		$app['config']->set('app.timezone', 'Europe/Belgrade');
 
 		$app['config']->set('cache.stores.file', [
 			'driver'	=> 'file',
@@ -127,26 +70,126 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 			'driver'	=> 'local',
 			'root'   	=> realpath(__DIR__ . '/../storage/'),
 		]);
-
-		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
-
-		// $app['config']->set(
-		// 	'Congraph::eav', $config
-		// );
-
-		// var_dump('CONFIG SETTED');
 	}
 
-	protected function getPackageProviders($app)
-	{
-		return [
-			'Congraph\Core\CoreServiceProvider',
-			'Congraph\Locales\LocalesServiceProvider',
-			'Congraph\Eav\EavServiceProvider',
-			'Congraph\Filesystem\FilesystemServiceProvider',
-			'Congraph\Workflows\WorkflowsServiceProvider'
-		];
+    // ----------------------------------------
+    // DATABASE
+    // ----------------------------------------
+
+    /**
+     * Define database migrations.
+     *
+     * @return void
+     */
+    protected function defineDatabaseMigrations()
+    {
+		/**
+		 * EAV Migrations
+		 */
+        $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * FileSystem Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * Locales Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * Workflows Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+        $this->beforeApplicationDestroyed(function () {
+			/**
+			 * EAV Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * FileSystem Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * Locales Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * Workflows Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+        });
+    }
+
+
+    // ----------------------------------------
+    // SETUP
+    // ----------------------------------------
+
+    public function setUp(): void {
+		parent::setUp();
+
+		$this->d = new Dumper();
+
+        $this->artisan('db:seed', [
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'FileDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'WorkflowDbSeeder'
+		]);
+
+		Storage::deleteDirectory('files');
+		Storage::deleteDirectory('uploads');
+
+		Storage::copy('temp/test.jpg', 'files/test.jpg');
+		Storage::copy('temp/test.jpg', 'files/test2.jpg');
+
+		Storage::copy('temp/test.jpg', 'uploads/1.jpg');
 	}
+
+	public function tearDown(): void {
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+
+		Storage::deleteDirectory('files');
+		Storage::deleteDirectory('uploads');
+
+		parent::tearDown();
+	}
+
+    // ----------------------------------------
+    // TESTS **********************************
+    // ----------------------------------------
 
 	public function testCreateAttribute()
 	{
@@ -163,9 +206,11 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		];
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeCreateCommand::class);
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		// $this->d->dump($result->toArray());
 
@@ -182,11 +227,15 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		$params = [
 			'admin_label' => 'asset_attribute_changed'
 		];
+		$id = 14;
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeUpdateCommand($params, 14) );
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeUpdateCommand::class);
+		$command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
 
 		// $this->d->dump($result->toArray());
 
@@ -216,9 +265,12 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		];
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Entities\EntityCreateCommand::class);
+		$command->setParams($params);
+		// $command->setId($id);
+		
+		$result = $bus->dispatch($command);
 
 		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
@@ -250,10 +302,13 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		];
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Entities\EntityCreateCommand::class);
+		$command->setParams($params);
+		// $command->setId($id);
 
 		try {
-			$result = $bus->dispatch(new Congraph\Eav\Commands\Entities\EntityCreateCommand($params));
+			$result = $bus->dispatch($command);
 		} catch (ValidationException $e) {
 			$this->d->dump($e->getErrors);
 		} catch (\Exception $e) {
@@ -281,17 +336,22 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
 		$params = [
 			'locale' => 'en_US',
 			'fields' => [
 				'test_asset_attribute' => ['id' => 2, 'type' => 'file']
 			]
 		];
+		$id = 4;
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityUpdateCommand($params, 4));
+		$app = $this->createApplication();
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Entities\EntityUpdateCommand::class);
+		$command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
+
 		// $this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
@@ -313,10 +373,15 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$id = 4;
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand([], 4));
+		$app = $this->createApplication();
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Entities\EntityFetchCommand::class);
+		// $command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
 		// $this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -329,7 +394,14 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals(1, $result->fields->test_asset_attribute->id);
 		$this->assertEquals('file', $result->fields->test_asset_attribute->type);
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand(['include' => 'fields.test_asset_attribute, fields.test_relation_attribute'], 4));
+		$params = ['include' => 'fields.test_asset_attribute, fields.test_relation_attribute'];
+		$id = 4;
+
+		$command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
+
 		// $this->d->dump($result->toArray(false, true));
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -349,13 +421,23 @@ class AssetFieldTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
+		$id = 1;
+
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Filesystem\Commands\Files\FileDeleteCommand([], 1));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Filesystem\Commands\Files\FileDeleteCommand::class);
+		// $command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
+		
 		// $this->d->dump($result);
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Entities\EntityFetchCommand([], 4));
+		$id = 4;
+		$command = $app->make(\Congraph\Eav\Commands\Entities\EntityFetchCommand::class);
+		// $command->setParams($params);
+		$command->setId($id);
+		
+		$result = $bus->dispatch($command);
 		// $this->d->dump($result->toArray());
 		$this->assertFalse(isset($result->fields->test_asset_attribute));
 	}

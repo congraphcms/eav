@@ -123,7 +123,7 @@ class NodeFieldHandler extends AbstractFieldHandler {
 		
 		$entityIds = $this->db->table('entities')
 							  ->where('attribute_set_id', '=', $attributeSet->id)
-							  ->lists('id');
+							  ->pluck('id');
 		if( ! empty($entityIds) )
 		{
 			$this->db->table($this->table)
@@ -155,7 +155,7 @@ class NodeFieldHandler extends AbstractFieldHandler {
 		
 		$entityIds = $this->db->table('entities')
 							  ->where('entity_type_id', '=', $entityType->id)
-							  ->lists('id');
+							  ->pluck('id');
 		if( ! empty($entityIds) )
 		{
 			$this->db->table($this->table)

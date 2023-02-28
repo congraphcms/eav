@@ -67,10 +67,6 @@ class EavServiceProvider extends ServiceProvider {
 		// -----------------------------------------------------------------------------
 		$this->app->register('Congraph\Eav\Commands\CommandsServiceProvider');
 
-		// Handlers
-		// -----------------------------------------------------------------------------
-		$this->app->register('Congraph\Eav\Handlers\HandlersServiceProvider');
-
 		// Validators
 		// -----------------------------------------------------------------------------
 		$this->app->register('Congraph\Eav\Validators\ValidatorsServiceProvider');

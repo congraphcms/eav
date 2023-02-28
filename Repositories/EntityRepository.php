@@ -186,11 +186,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         if (Config::get('cb.eav.allow_manual_timestamps')) {
             if (!empty($model['created_at'])) {
-                $entityParams['created_at'] = Carbon::parse($model['created_at'])->tz($timezone)->toDateTimeString();
+                $entityParams['created_at'] = Carbon::parse($model['created_at'])->tz('UTC')->toDateTimeString();
             }
 
             if (!empty($model['updated_at'])) {
-                $entityParams['updated_at'] = Carbon::parse($model['updated_at'])->tz($timezone)->toDateTimeString();
+                $entityParams['updated_at'] = Carbon::parse($model['updated_at'])->tz('UTC')->toDateTimeString();
             }
         }
         // insert entity
@@ -353,11 +353,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         $timezone = (Config::get('app.timezone'))?Config::get('app.timezone'):'UTC';
         if (Config::get('cb.eav.allow_manual_timestamps')) {
             if (!empty($model['created_at'])) {
-                $entityParams['created_at'] = Carbon::parse($model['created_at'])->tz($timezone)->toDateTimeString();
+                $entityParams['created_at'] = Carbon::parse($model['created_at'])->tz('UTC')->toDateTimeString();
             }
 
             if (!empty($model['updated_at'])) {
-                $entityParams['updated_at'] = Carbon::parse($model['updated_at'])->tz($timezone)->toDateTimeString();
+                $entityParams['updated_at'] = Carbon::parse($model['updated_at'])->tz('UTC')->toDateTimeString();
             }
         }
 
@@ -707,6 +707,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             foreach ($status as &$s) {
                 $s = trim($s);
             }
+            if (count($status) === 1) {
+                $status = $status[0];
+            }
         }
 
         $locale_ids = [0];
@@ -799,6 +802,9 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
             foreach ($status as &$s) {
                 $s = trim($s);
             }
+            if (count($status) === 1) {
+                $status = $status[0];
+            }
         }
 
         $locale_ids = [0];
@@ -826,6 +832,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         $total = $query->select($this->db->raw('count(DISTINCT entities.id) as count'));
         $total = $query->get();
+        $total = $total->toArray();
         $total = $total[0]->count;
 
         $query->groupBy('entities.id');
@@ -851,6 +858,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         
         // dd($query->toSql());
         $entities = $query->get();
+        $entities = $entities->toArray();
 
         if (! $entities) {
             $entities = [];
@@ -1194,6 +1202,8 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         // }
         $statuses = $query->orderBy('entities.id')
                           ->get();
+        
+        $statuses = $statuses->toArray();
 
         return $statuses;
     }
@@ -1331,6 +1341,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
     protected function getValuesAll($entityIds, $locale = null)
     {
         // get values from various tables
+        $valuesDate = $this->getValuesDate($entityIds, $locale);
         $valuesDatetime = $this->getValuesDatetime($entityIds, $locale);
         $valuesDecimal = $this->getValuesDecimal($entityIds, $locale);
         $valuesInteger = $this->getValuesInteger($entityIds, $locale);
@@ -1339,6 +1350,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
         // get all values
         $values = array_merge(
+            $valuesDate,
             $valuesDatetime,
             $valuesDecimal,
             $valuesInteger,
@@ -1346,6 +1358,11 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         );
 
         return $values;
+    }
+
+    protected function getValuesDate($entityIds, $locale = null)
+    {
+        return $this->getValues('attribute_values_date', $entityIds, $locale);
     }
 
     protected function getValuesDatetime($entityIds, $locale = null)
@@ -1398,6 +1415,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         }
         $values = $query->orderBy($table . '.sort_order')
                         ->get();
+        $values = $values->toArray();
 
         return $values;
     }

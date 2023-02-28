@@ -8,6 +8,8 @@
  * file that was distributed with this source code.
  */ 
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +51,11 @@ class SampleBlogCommandSeeder extends Seeder {
         $workflowResults = [];
         foreach ($workflows as $workflow)
         {
-            $result = $bus->dispatch(new Congraph\Workflows\Commands\Workflows\WorkflowCreateCommand($workflow));
+            $command = App::make(\Congraph\Workflows\Commands\Workflows\WorkflowCreateCommand::class);
+            $command->setParams($workflow);
+            // $command->setId($id);
+            
+            $result = $bus->dispatch($command);
             $workflowResults[] = $result;
         }
 
@@ -103,7 +109,11 @@ class SampleBlogCommandSeeder extends Seeder {
         $workflowPointResults = [];
         foreach ($workflowPoints as $workflowPoint)
         {
-            $result = $bus->dispatch(new Congraph\Workflows\Commands\WorkflowPoints\WorkflowPointCreateCommand($workflowPoint));
+            $command = App::make(\Congraph\Workflows\Commands\WorkflowPoints\WorkflowPointCreateCommand::class);
+            $command->setParams($workflowPoint);
+            // $command->setId($id);
+            
+            $result = $bus->dispatch($command);
             $workflowPointResults[] = $result;
         }
 
@@ -148,7 +158,11 @@ class SampleBlogCommandSeeder extends Seeder {
         $workflowPointResults = [$workflowPointResults[0]];
         foreach ($workflowPointUpdates as $workflowPoint)
         {
-            $result = $bus->dispatch(new Congraph\Workflows\Commands\WorkflowPoints\WorkflowPointUpdateCommand($workflowPoint, $workflowPoint['id']));
+            $command = App::make(\Congraph\Workflows\Commands\WorkflowPoints\WorkflowPointUpdateCommand::class);
+            $command->setParams($workflowPoint);
+            $command->setId($workflowPoint['id']);
+            
+            $result = $bus->dispatch($command);
             $workflowPointResults[] = $result;
         }
 
@@ -168,7 +182,11 @@ class SampleBlogCommandSeeder extends Seeder {
         $localeResults = [];
         foreach ($locales as $locale)
         {
-            $result = $bus->dispatch(new Congraph\Locales\Commands\Locales\LocaleCreateCommand($locale));
+            $command = App::make(\Congraph\Locales\Commands\Locales\LocaleCreateCommand::class);
+            $command->setParams($locale);
+            // $command->setId($workflowPoint['id']);
+            
+            $result = $bus->dispatch($command);
             $localeResults[] = $result;
         }
 
@@ -212,7 +230,11 @@ class SampleBlogCommandSeeder extends Seeder {
         $entityTypeResults = [];
         foreach ($entityTypes as $entityType)
         {
-            $result = $bus->dispatch(new Congraph\Eav\Commands\EntityTypes\EntityTypeCreateCommand($entityType));
+            $command = App::make(\Congraph\Eav\Commands\EntityTypes\EntityTypeCreateCommand::class);
+            $command->setParams($entityType);
+            // $command->setId($workflowPoint['id']);
+            
+            $result = $bus->dispatch($command);
             $entityTypeResults[] = $result;
         }
 
@@ -334,7 +356,11 @@ class SampleBlogCommandSeeder extends Seeder {
         $attributeResults = [];
         foreach ($attributes as $attribute)
         {
-            $result = $bus->dispatch(new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($attribute));
+            $command = App::make(\Congraph\Eav\Commands\Attributes\AttributeCreateCommand::class);
+            $command->setParams($attribute);
+            // $command->setId($workflowPoint['id']);
+            
+            $result = $bus->dispatch($command);
             $attributeResults[] = $result;
         }
 
@@ -422,7 +448,11 @@ class SampleBlogCommandSeeder extends Seeder {
         $attributeSetResults = [];
         foreach ($attributeSets as $attributeSet)
         {
-            $result = $bus->dispatch(new Congraph\Eav\Commands\AttributeSets\AttributeSetCreateCommand($attributeSet));
+            $command = App::make(\Congraph\Eav\Commands\AttributeSets\AttributeSetCreateCommand::class);
+            $command->setParams($attributeSet);
+            // $command->setId($workflowPoint['id']);
+            
+            $result = $bus->dispatch($command);
             $attributeSetResults[] = $result;
         }
 
@@ -529,7 +559,11 @@ class SampleBlogCommandSeeder extends Seeder {
         $entityResults = [];
         foreach ($entities as $entity)
         {
-            $result = $bus->dispatch(new Congraph\Eav\Commands\Entities\EntityCreateCommand($entity));
+            $command = App::make(\Congraph\Eav\Commands\Entities\EntityCreateCommand::class);
+            $command->setParams($entity);
+            // $command->setId($workflowPoint['id']);
+            
+            $result = $bus->dispatch($command);
             $entityResults[] = $result;
         }
     }

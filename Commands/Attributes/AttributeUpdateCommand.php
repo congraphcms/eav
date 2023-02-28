@@ -10,6 +10,7 @@
 
 namespace Congraph\Eav\Commands\Attributes;
 
+use Congraph\Contracts\Eav\AttributeRepositoryContract;
 use Congraph\Core\Bus\RepositoryCommand;
 
 /**
@@ -25,6 +26,27 @@ use Congraph\Core\Bus\RepositoryCommand;
  */
 class AttributeUpdateCommand extends RepositoryCommand
 {
+	/**
+	 * Create new AttributeUpdateCommand
+	 * 
+	 * @param Congraph\Contracts\Eav\Repositories\AttributeRepositoryContract $repository
+	 * 
+	 * @return void
+	 */
+	public function __construct(AttributeRepositoryContract $repository)
+	{
+		parent::__construct($repository);
+	}
+
+	/**
+	 * Handle RepositoryCommand
+	 * 
+	 * @return void
+	 */
+	public function handle()
+	{
+		return $this->repository->update($this->id, $this->params);
+	}
 
 }
 

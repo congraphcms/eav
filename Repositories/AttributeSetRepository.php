@@ -200,12 +200,12 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		// get the sets
 		$setIDs = $this->db ->table('attribute_sets')
 							->where('entity_type_id', '=', $entityType->id)
-							->lists('id');
+							->pluck('id');
 
 		if( ! empty($setIDs) )
 		{
 			Trunk::forgetType('attribute-set');
-			$this->deleteSetAttributes($setIDs);
+			$this->deleteSetAttributes($setIDs->toArray());
 
 			// delete the attribute set
 			$this->db->table('attribute_sets')->where('entity_type_id', '=', $entityType->id)->delete();
@@ -322,7 +322,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		}
 
 		$this->db->table('set_attributes')
-				 ->whereIn('attribute_set_id', $attributeSetIds)
+				 ->whereIntegerInRaw('attribute_set_id', $attributeSetIds)
 				 ->delete();
 	}
 
@@ -343,7 +343,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		}
 
 		$this->db->table('set_attributes')
-				 ->whereIn('attribute_id', $attributeIds)
+				 ->whereIntegerInRaw('attribute_id', $attributeIds)
 				 ->delete();
 	}
 
@@ -388,7 +388,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 								  ->orderBy('sort_order')
 								  ->get();
 
-		$attributeSet->attributes = $setAttributes;
+		$attributeSet->attributes = $setAttributes->toArray();
 
 		$attributeSet->type = 'attribute-set';
 
@@ -447,6 +447,8 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		
 		$attributeSets = $query->get();
 
+		$attributeSets = $attributeSets->toArray();
+
 		if( ! $attributeSets )
 		{
 			$attributeSets = [];	
@@ -474,7 +476,7 @@ class AttributeSetRepository extends AbstractRepository implements AttributeSetR
 		{
 			$setAttributes = $this->db->table('set_attributes')
 								  ->select('attribute_id', 'attribute_set_id')
-								  ->whereIn('attribute_set_id', $ids)
+								  ->whereIntegerInRaw('attribute_set_id', $ids)
 								  ->orderBy('sort_order')
 								  ->get();
 		}

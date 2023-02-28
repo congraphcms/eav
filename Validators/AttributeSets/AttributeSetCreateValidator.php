@@ -77,7 +77,9 @@ class AttributeSetCreateValidator extends Validator
 			'name'					=> 'required',
 			'primary_attribute_id'	=> 'sometimes|required|exists:attributes,id',
 			'primary_attribute'     => [ 'required_without:primary_attribute_id', 'exists:attributes,code' ],
-			'attributes'			=> 'sometimes|array'
+			'attributes'			=> 'sometimes|array',
+			'attributes.*.id'		=> 'required_without:attributes.*.code|integer|exists:attributes,id',
+			'attributes.*.code'		=> 'required_without:attributes.*.id|string|exists:attributes,code'
 		];
 
 		// $this->attributeRules = 
@@ -104,13 +106,6 @@ class AttributeSetCreateValidator extends Validator
 	 */
 	public function validate(RepositoryCommand $command)
 	{
-		if(isset($command->params['attributes'])) {
-			foreach ($command->params['attributes'] as $key => $attr) {
-				$this->rules['attributes.' . $key . '.id'] = [ 'required_without:attributes.'.$key.'.code', 'integer', 'exists:attributes,id'];
-				$this->rules['attributes.' . $key . '.code'] = [ 'required_without:attributes.'.$key.'.id', 'string', 'exists:attributes,code'];
-			}
-		}
-
 		if( ! isset($command->params['entity_type_id']) ) {
 			$this->rules['entity_type'] = 'required|array';
 			if( isset($command->params['entity_type']) && is_string($command->params['entity_type'])) {

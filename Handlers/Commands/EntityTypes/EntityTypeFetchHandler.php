@@ -45,13 +45,11 @@ class EntityTypeFetchHandler extends RepositoryCommandHandler
 	/**
 	 * Handle RepositoryCommand
 	 * 
-	 * @param Congraph\Core\Bus\RepositoryCommand $command
-	 * 
 	 * @return void
 	 */
-	public function handle(RepositoryCommand $command)
+	public function handle()
 	{
-		$include = (!empty($command->params['include']))?$command->params['include']:[];
-		return $this->repository->fetch($command->id, $include);
+		$include = (!empty($this->params['include']))?$this->params['include']:[];
+		return $this->repository->fetch($this->id, $include);
 	}
 }

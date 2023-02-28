@@ -307,31 +307,24 @@ class CreateAttributeValueTables extends Migration {
 	 */
 	public function down()
 	{
-		// 1.0 Drop table attribute_values_assets
 
-		Schema::drop('attribute_values_assets');
-		
-		// 1.1 Drop table attribute_values_relations
+		// 1.0 Drop table attribute_values_fulltext
 
-		Schema::drop('attribute_values_relations');
+		Schema::drop('attribute_values_fulltext');
 
-		// 1.2 Drop table attribute_values_varchar
-
-		Schema::drop('attribute_values_varchar');
-
-		// 1.3 Drop table attribute_values_text
+		// 1.1 Drop table attribute_values_text
 
 		Schema::drop('attribute_values_text');
 
-		// 1.4 Drop table attribute_values_decimal
+		// 1.2 Drop table attribute_values_decimal
 
 		Schema::drop('attribute_values_decimal');
 
-		// 1.5 Drop table attribute_values_integer
+		// 1.3 Drop table attribute_values_integer
 
 		Schema::drop('attribute_values_integer');
 
-		// 1.6 Drop table attribute_values_datetime
+		// 1.4 Drop table attribute_values_datetime
 
 		Schema::drop('attribute_values_datetime');
 	}

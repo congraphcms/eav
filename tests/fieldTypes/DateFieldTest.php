@@ -17,7 +17,7 @@ require_once(__DIR__ . '/../database/seeders/FileDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/WorkflowDbSeeder.php');
 require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
-class DatetimeFieldTest extends Orchestra\Testbench\TestCase
+class DateFieldTest extends Orchestra\Testbench\TestCase
 {
 // ----------------------------------------
     // ENVIRONMENT
@@ -178,8 +178,8 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'code' => 'datetime_attribute',
-			'field_type' => 'datetime',
+			'code' => 'date_attribute',
+			'field_type' => 'date',
 			'localized' => true,
 			'default_value' => null,
 			'unique' => false,
@@ -199,7 +199,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals('datetime_attribute', $result->code);
+		$this->assertEquals('date_attribute', $result->code);
 
 	}
 
@@ -208,9 +208,9 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$params = [
-			'admin_label' => 'datetime_attribute_changed'
+			'admin_label' => 'date_attribute_changed'
 		];
-		$id = 12;
+		$id = 25;
 
 		$app = $this->createApplication();
 		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
@@ -220,11 +220,11 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		
 		$result = $bus->dispatch($command);
 
-		// $this->d->dump($result->toArray());
+		$this->d->dump($result->toArray());
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
-		$this->assertEquals($result->admin_label, 'datetime_attribute_changed');
+		$this->assertEquals($result->admin_label, 'date_attribute_changed');
 
 	}
 
@@ -241,7 +241,8 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 				'test_select_attribute' => 'option2',
 				'test_integer_attribute' => 123,
 				'test_decimal_attribute' => 33.33,
-				'test_datetime_attribute' => '1987-08-19T11:00:00+0200'
+				'test_datetime_attribute' => '1987-08-19T11:00:00+0200',
+				'test_date_attribute' => '1987-08-19'
 			]
 		];
 
@@ -260,7 +261,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 			$this->d->dump($e->getErrors());
 		}
 
-		// $this->d->dump($result->toArray());
+		$this->d->dump($result->toArray());
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
 		$this->assertEquals('test value', $result->fields->test_text_attribute);
@@ -268,6 +269,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals(123, $result->fields->test_integer_attribute);
 		$this->assertEquals(33.33, $result->fields->test_decimal_attribute);
 		$this->assertEquals('1987-08-19T09:00:00+00:00', $result->toArray()['fields']['test_datetime_attribute']);
+		$this->assertEquals('1987-08-19', $result->toArray()['fields']['test_date_attribute']);
 
 	}
 
@@ -281,7 +283,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		$params = [
 			'locale' => 'en_US',
 			'fields' => [
-				'test_datetime_attribute' => '1987-08-19T11:00:00+0200'
+				'test_date_attribute' => '1987-08-19'
 			]
 		];
 		$id = 4;
@@ -300,7 +302,7 @@ class DatetimeFieldTest extends Orchestra\Testbench\TestCase
 		$this->assertEquals('option1', $result->fields->test_select_attribute);
 		$this->assertEquals(11, $result->fields->test_integer_attribute);
 		$this->assertEquals(11.1, $result->fields->test_decimal_attribute);
-		$this->assertEquals('1987-08-19T09:00:00+00:00', $result->toArray()['fields']['test_datetime_attribute']);
+		$this->assertEquals('1987-08-19', $result->toArray()['fields']['test_date_attribute']);
 		// $this->d->dump($result->toArray());
 	}
 

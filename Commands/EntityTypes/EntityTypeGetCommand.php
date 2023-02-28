@@ -10,6 +10,7 @@
 
 namespace Congraph\Eav\Commands\EntityTypes;
 
+use Congraph\Contracts\Eav\EntityTypeRepositoryContract;
 use Congraph\Core\Bus\RepositoryCommand;
 
 /**
@@ -25,5 +26,32 @@ use Congraph\Core\Bus\RepositoryCommand;
  */
 class EntityTypeGetCommand extends RepositoryCommand
 {
+	/**
+	 * Create new EntityTypeGetCommand
+	 * 
+	 * @param ookbook\Contracts\Eav\EntityTypeRepositoryContract $repository
+	 * 
+	 * @return void
+	 */
+	public function __construct(EntityTypeRepositoryContract $repository)
+	{
+		parent::__construct($repository);
+	}
+
+	/**
+	 * Handle RepositoryCommand
+	 * 
+	 * @return void
+	 */
+	public function handle()
+	{
+		return $this->repository->get(
+			(!empty($this->params['filter']))?$this->params['filter']:[],
+			(!empty($this->params['offset']))?$this->params['offset']:0,
+			(!empty($this->params['limit']))?$this->params['limit']:0,
+			(!empty($this->params['sort']))?$this->params['sort']:[],
+			(!empty($this->params['include']))?$this->params['include']:[]
+		);
+	}
 
 }

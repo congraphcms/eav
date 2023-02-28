@@ -1,6 +1,7 @@
 /vendor
-/tests/storage/cache
+/.vscode
 composer.phar
 composer.lock
 .DS_Store
 Thumbs.db
+.phpunit.result.cache

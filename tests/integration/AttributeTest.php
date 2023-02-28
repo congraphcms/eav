@@ -2,7 +2,7 @@
 
 // include_once(realpath(__DIR__.'/../LaravelMocks.php'));
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Debug\Dumper;
+use Symfony\Component\VarDumper\VarDumper as Dumper;
 use Illuminate\Support\Facades\DB;
 
 require_once(__DIR__ . '/../database/seeders/EavDbSeeder.php');
@@ -13,82 +13,29 @@ require_once(__DIR__ . '/../database/seeders/ClearDB.php');
 
 class AttributeTest extends Orchestra\Testbench\TestCase
 {
+	// ----------------------------------------
+    // ENVIRONMENT
+    // ----------------------------------------
 
-	public function setUp()
+    protected function getPackageProviders($app)
 	{
-		// fwrite(STDOUT, __METHOD__ . "\n");
-		parent::setUp();
-		// unset($this->app);
-		// call migrations specific to our tests, e.g. to seed the db
-		// the path option should be relative to the 'path.database'
-		// path unless `--path` option is available.
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'),
-		]);
-
-		$this->artisan('migrate', [
-			'--database' => 'testbench',
-			'--realpath' => realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'),
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'EavDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'LocaleDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'FileDbSeeder'
-		]);
-
-		$this->artisan('db:seed', [
-			'--class' => 'WorkflowDbSeeder'
-		]);
-
-		$this->d = new Dumper();
-
-
-		// $this->app = $this->createApplication();
-
-		// $this->bus = $this->app->make('Illuminate\Contracts\Bus\Dispatcher');
-
+		return [
+			'Congraph\Core\CoreServiceProvider', 
+			'Congraph\Locales\LocalesServiceProvider', 
+			'Congraph\Eav\EavServiceProvider', 
+			'Congraph\Filesystem\FilesystemServiceProvider',
+			'Congraph\Workflows\WorkflowsServiceProvider'
+		];
 	}
 
-	public function tearDown()
-	{
-		// fwrite(STDOUT, __METHOD__ . "\n");
-		// parent::tearDown();
-		$this->artisan('db:seed', [
-			'--class' => 'ClearDB'
-		]);
-		DB::disconnect();
-		// $this->artisan('migrate:reset');
-		// unset($this->app);
-
-		parent::tearDown();
-	}
-
-	/**
+    /**
 	 * Define environment setup.
 	 *
 	 * @param  \Illuminate\Foundation\Application  $app
 	 *
 	 * @return void
 	 */
-	protected function getEnvironmentSetUp($app)
+	protected function defineEnvironment($app)
 	{
 		$app['config']->set('database.default', 'testbench');
 		$app['config']->set('database.connections.testbench', [
@@ -104,31 +51,120 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		]);
 
 		$app['config']->set('cache.default', 'file');
+		$app['config']->set('app.timezone', 'Europe/Belgrade');
 
 		$app['config']->set('cache.stores.file', [
 			'driver'	=> 'file',
 			'path'   	=> realpath(__DIR__ . '/../storage/cache/'),
 		]);
-
-		// $config = require(realpath(__DIR__.'/../../config/eav.php'));
-
-		// $app['config']->set(
-		// 	'Congraph::eav', $config
-		// );
-
-		// var_dump('CONFIG SETTED');
 	}
 
-	protected function getPackageProviders($app)
-	{
-		return [
-			'Congraph\Core\CoreServiceProvider', 
-			'Congraph\Locales\LocalesServiceProvider', 
-			'Congraph\Eav\EavServiceProvider', 
-			'Congraph\Filesystem\FilesystemServiceProvider',
-			'Congraph\Workflows\WorkflowsServiceProvider'
-		];
+    // ----------------------------------------
+    // DATABASE
+    // ----------------------------------------
+
+    /**
+     * Define database migrations.
+     *
+     * @return void
+     */
+    protected function defineDatabaseMigrations()
+    {
+		/**
+		 * EAV Migrations
+		 */
+        $this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * FileSystem Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * Locales Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+
+		/**
+		 * Workflows Migrations
+		 */
+		$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'));
+
+        $this->artisan('migrate', ['--database' => 'testbench'])->run();
+
+        $this->beforeApplicationDestroyed(function () {
+			/**
+			 * EAV Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * FileSystem Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Filesystem/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * Locales Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Locales/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+
+			/**
+			 * Workflows Migrations
+			 */
+			$this->loadMigrationsFrom(realpath(__DIR__.'/../../vendor/Congraph/Workflows/database/migrations'));
+            $this->artisan('migrate:reset', ['--database' => 'testbench'])->run();
+        });
+    }
+
+
+    // ----------------------------------------
+    // SETUP
+    // ----------------------------------------
+
+    public function setUp(): void {
+		parent::setUp();
+
+		$this->d = new Dumper();
+
+        $this->artisan('db:seed', [
+			'--class' => 'EavDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'LocaleDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'FileDbSeeder'
+		]);
+
+		$this->artisan('db:seed', [
+			'--class' => 'WorkflowDbSeeder'
+		]);
 	}
+
+	public function tearDown(): void {
+		$this->artisan('db:seed', [
+			'--class' => 'ClearDB'
+		]);
+		parent::tearDown();
+	}
+
+    // ----------------------------------------
+    // TESTS **********************************
+    // ----------------------------------------
 
 	public function testCreateAttribute()
 	{
@@ -148,9 +184,12 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		];
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeCreateCommand::class);
+		$command->setParams($params);
+		// $command->setId($id);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -193,9 +232,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		];
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeCreateCommand::class);
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -204,11 +245,12 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		// $this->d->dump($result->toArray());
 	}
 
-	/**
-	 * @expectedException \Congraph\Core\Exceptions\ValidationException
-	 */
 	public function testCreateException()
 	{
+		fwrite(STDOUT, __METHOD__ . "\n");
+
+		$this->expectException(\Congraph\Core\Exceptions\ValidationException::class);
+
 		$params = [
 			'field_type' => 'text',
 			'localized' => false,
@@ -220,17 +262,16 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		];
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeCreateCommand($params) );
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeCreateCommand::class);
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 	}
 
 	public function testUpdateAttribute()
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
-
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
 
 		$params = [
 			// 'code' => 'attribute_updated',
@@ -238,7 +279,13 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 			'admin_notice' => 'changed_notice'
 		];
 		
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeUpdateCommand($params, 1) );
+		$app = $this->createApplication();
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeUpdateCommand::class);
+		$command->setParams($params);
+		$command->setId(1);
+		
+		$result = $bus->dispatch($command);
 		
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -253,16 +300,19 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
 		$params = [
 			'code' => 'attribute1',
 			'admin_label' => 'changed',
 			'admin_notice' => 'changed_notice'
 		];
 		
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeUpdateCommand($params, 1) );
+		$app = $this->createApplication();
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeUpdateCommand::class);
+		$command->setParams($params);
+		$command->setId(1);
+		
+		$result = $bus->dispatch($command);
 		
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -278,15 +328,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		try
-		{
-			$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeDeleteCommand([], 2));
-		}
-		catch (\Exception $e)
-		{
-
-		}
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeDeleteCommand::class);
+		$command->setId(2);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertEquals(2, $result->id);
 		// $this->d->dump($result);
@@ -294,17 +340,18 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 
 	}
 
-	/**
-	 * @expectedException \Congraph\Core\Exceptions\NotFoundException
-	 */
 	public function testDeleteException()
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$this->expectException(\Congraph\Core\Exceptions\NotFoundException::class);
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeDeleteCommand([], 133));
+		$app = $this->createApplication();
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeDeleteCommand::class);
+		$command->setId(233);
+		
+		$result = $bus->dispatch($command);
 	}
 	
 	public function testFetchAttribute()
@@ -313,9 +360,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeFetchCommand([], 1));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeFetchCommand::class);
+		$command->setId(1);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Model);
 		$this->assertTrue(is_int($result->id));
@@ -331,8 +380,10 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		fwrite(STDOUT, __METHOD__ . "\n");
 
 		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand([]));
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeGetCommand::class);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		// $this->assertEquals(16, count($result));
@@ -344,10 +395,18 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
+		$params = [
+			'sort' => ['-code'],
+			'limit' => 3,
+			'offset' => 1
+		];
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand(['sort' => ['-code'], 'limit' => 3, 'offset' => 1]));
+		$app = $this->createApplication();
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeGetCommand::class);
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		$this->assertEquals(3, count($result));
@@ -370,12 +429,15 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 	{
 		fwrite(STDOUT, __METHOD__ . "\n");
 
-		$app = $this->createApplication();
-		$bus = $app->make('Illuminate\Contracts\Bus\Dispatcher');
-
 		$filter = [ 'id' => 5 ];
+		$params = [ 'filter' => $filter ];
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+		$app = $this->createApplication();
+		$bus = $app->make('Congraph\Core\Bus\CommandDispatcher');
+		$command = $app->make(\Congraph\Eav\Commands\Attributes\AttributeGetCommand::class);
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		// $this->d->dump($result->toArray());
 		
@@ -385,8 +447,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		
 
 		$filter = [ 'id' => ['in'=>'5,6,7'] ];
+		$params = [ 'filter' => $filter ];
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		$this->assertEquals(3, count($result));
@@ -394,8 +459,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		// $this->d->dump($result->toArray());
 
 		$filter = [ 'id' => ['nin'=>[5,6,7,1]] ];
+		$params = [ 'filter' => $filter ];
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		// $this->assertEquals(12, count($result));
@@ -403,8 +471,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		// $this->d->dump($result->toArray());
 
 		$filter = [ 'id' => ['lt'=>3] ];
+		$params = [ 'filter' => $filter ];
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		// $this->assertEquals(2, count($result));
@@ -412,8 +483,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		// $this->d->dump($result->toArray());
 
 		$filter = [ 'id' => ['lte'=>3] ];
+		$params = [ 'filter' => $filter ];
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		$this->assertEquals(3, count($result));
@@ -421,8 +495,11 @@ class AttributeTest extends Orchestra\Testbench\TestCase
 		// $this->d->dump($result->toArray());
 
 		$filter = [ 'id' => ['ne'=>3] ];
+		$params = [ 'filter' => $filter ];
 
-		$result = $bus->dispatch( new Congraph\Eav\Commands\Attributes\AttributeGetCommand(['filter' => $filter]));
+		$command->setParams($params);
+		
+		$result = $bus->dispatch($command);
 
 		$this->assertTrue($result instanceof Congraph\Core\Repositories\Collection);
 		// $this->assertEquals(15, count($result));

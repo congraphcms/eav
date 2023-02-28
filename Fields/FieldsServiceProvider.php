@@ -128,6 +128,13 @@ class FieldsServiceProvider extends ServiceProvider {
 				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
 			);
 		});
+		$this->app->singleton('Congraph\Eav\Fields\Date\DateFieldHandler', function($app) {
+			return new \Congraph\Eav\Fields\Date\DateFieldHandler( 
+				$app['db']->connection(),
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
 		$this->app->singleton('Congraph\Eav\Fields\Decimal\DecimalFieldHandler', function($app) {
 			return new \Congraph\Eav\Fields\Decimal\DecimalFieldHandler( 
 				$app['db']->connection(),
@@ -225,6 +232,13 @@ class FieldsServiceProvider extends ServiceProvider {
 		});
 		$this->app->bind('Congraph\Eav\Fields\Datetime\DatetimeFieldValidator', function($app) {
 			return new \Congraph\Eav\Fields\Datetime\DatetimeFieldValidator( 
+				$app['db']->connection(),
+				$app->make('Congraph\Eav\Managers\AttributeManager'),
+				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')
+			);
+		});
+		$this->app->bind('Congraph\Eav\Fields\Date\DateFieldValidator', function($app) {
+			return new \Congraph\Eav\Fields\Date\DateFieldValidator( 
 				$app['db']->connection(),
 				$app->make('Congraph\Eav\Managers\AttributeManager'),
 				$app->make('Congraph\Contracts\Eav\AttributeRepositoryContract')

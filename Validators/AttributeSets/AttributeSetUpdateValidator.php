@@ -85,12 +85,8 @@ class AttributeSetUpdateValidator extends Validator
 			'code'					=> 'sometimes|required|unique:attribute_sets,code',
 			'name'					=> '',
 			'primary_attribute_id'	=> 'sometimes|exists:attributes,id',
-			'attributes'			=> 'sometimes|array'
-		];
-
-		$this->attributeRules = 
-		[
-			'id'			=> 'required|integer|exists:attributes,id'
+			'attributes'			=> 'sometimes|array',
+			'attributes.*.id'		=> 'required|integer|exists:attributes,id'
 		];
 
 		parent::__construct();
@@ -115,10 +111,6 @@ class AttributeSetUpdateValidator extends Validator
 		$command->params['id'] = $command->id;
 		$validator = $this->newValidator($command->params, $this->rules);
 
-		if( isset($command->params['attributes']) )
-		{
-			$validator->each('attributes', $this->attributeRules);
-		}
 		$this->setValidator($validator);
 
 		$this->validateParams($command->params, null, true);
