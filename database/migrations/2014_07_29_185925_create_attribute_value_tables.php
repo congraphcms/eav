@@ -212,7 +212,9 @@ class CreateAttributeValueTables extends Migration {
 			$table->index('locale_id');
 		});
 
-		DB::statement('ALTER TABLE attribute_values_fulltext ADD FULLTEXT(value)');
+		if (DB::connection()->getDriverName() === 'mysql') {
+			DB::statement('ALTER TABLE attribute_values_fulltext ADD FULLTEXT(value)');
+		}
 
 
 		// // 1.4 Create attribute_values_varchar table

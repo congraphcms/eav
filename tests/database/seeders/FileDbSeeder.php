@@ -32,7 +32,7 @@ class FileDbSeeder extends Seeder {
 
 	public function run()
 	{
-		DB::table('files')->truncate();
+		reset_table('files');
 		DB::table('files')->insert([
 			[
 				'url' => 'files/test.jpg',

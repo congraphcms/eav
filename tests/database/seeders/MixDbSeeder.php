@@ -32,7 +32,7 @@ class MixDbSeeder extends Seeder {
 
 	public function run()
 	{
-		DB::table('entity_types')->truncate();
+		reset_table('entity_types');
 
 		DB::table('entity_types')->insert([
 			[
@@ -89,7 +89,7 @@ class MixDbSeeder extends Seeder {
 			],
 		]);
 
-		DB::table('attributes')->truncate();
+		reset_table('attributes');
 
 		DB::table('attributes')->insert([
 			[
@@ -146,7 +146,7 @@ class MixDbSeeder extends Seeder {
 			],
 		]);
 
-		DB::table('attribute_options')->truncate();
+		reset_table('attribute_options');
 
 		DB::table('attribute_options')->insert([
 			[
@@ -200,8 +200,8 @@ class MixDbSeeder extends Seeder {
 			
 		]);
 
-		DB::table('attribute_sets')->truncate();
-		DB::table('set_attributes')->truncate();
+		reset_table('attribute_sets');
+		reset_table('set_attributes');
 
 		DB::table('attribute_sets')->insert([
 			[
@@ -301,7 +301,7 @@ class MixDbSeeder extends Seeder {
 			]
 		]);
 
-		DB::table('entities')->truncate();
+		reset_table('entities');
 		DB::table('entities')->insert([
 			[
 				'entity_type_id' => 1,
@@ -329,7 +329,7 @@ class MixDbSeeder extends Seeder {
 			]
 		]);
 
-		DB::table('entity_statuses')->truncate();
+		reset_table('entity_statuses');
 		DB::table('entity_statuses')->insert([
 			[
 				'entity_id' => 1,
@@ -373,7 +373,7 @@ class MixDbSeeder extends Seeder {
 			],
 		]);
 
-		DB::table('attribute_values_text')->truncate();
+		reset_table('attribute_values_text');
 		DB::table('attribute_values_text')->insert([
 			[
 				'entity_id' => 1,
@@ -449,7 +449,7 @@ class MixDbSeeder extends Seeder {
 			],
 		]);
 
-		DB::table('attribute_values_integer')->truncate();
+		reset_table('attribute_values_integer');
 		DB::table('attribute_values_integer')->insert([
 			[
 				'entity_id' => 1,

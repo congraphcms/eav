@@ -10,6 +10,12 @@
 
 namespace Congraph\Eav;
 
+use Congraph\Eav\Commands\CommandsServiceProvider;
+use Congraph\Eav\Fields\FieldsServiceProvider;
+use Congraph\Eav\Managers\ManagersServiceProvider;
+use Congraph\Eav\Repositories\RepositoriesServiceProvider;
+use Congraph\Eav\Services\ServicesServiceProvider;
+use Congraph\Eav\Validators\ValidatorsServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -57,27 +63,27 @@ class EavServiceProvider extends ServiceProvider {
 	protected function registerServiceProviders(){
 		// Managers
 		// -----------------------------------------------------------------------------
-		$this->app->register('Congraph\Eav\Managers\ManagersServiceProvider');
+		$this->app->register(ManagersServiceProvider::class);
 
 		// Fields
 		// -----------------------------------------------------------------------------
-		$this->app->register('Congraph\Eav\Fields\FieldsServiceProvider');
+		$this->app->register(FieldsServiceProvider::class);
 
 		// Commands
 		// -----------------------------------------------------------------------------
-		$this->app->register('Congraph\Eav\Commands\CommandsServiceProvider');
+		$this->app->register(CommandsServiceProvider::class);
 
 		// Validators
 		// -----------------------------------------------------------------------------
-		$this->app->register('Congraph\Eav\Validators\ValidatorsServiceProvider');
+		$this->app->register(ValidatorsServiceProvider::class);
 
 		// Services
 		// -----------------------------------------------------------------------------
-		$this->app->register('Congraph\Eav\Services\ServicesServiceProvider');
+		$this->app->register(ServicesServiceProvider::class);
 
 		// Repositories
 		// -----------------------------------------------------------------------------
-		$this->app->register('Congraph\Eav\Repositories\RepositoriesServiceProvider');
+		$this->app->register(RepositoriesServiceProvider::class);
 
 		
 

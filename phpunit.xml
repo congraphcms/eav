@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="vendor/autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd" cacheDirectory=".phpunit.cache">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="vendor/autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.0/phpunit.xsd" cacheDirectory=".phpunit.cache">
   <testsuites>
-    <testsuite name="eav">
-      <directory>./tests/</directory>
-    </testsuite>
     <testsuite name="integration">
       <directory>./tests/integration/</directory>
     </testsuite>
     <testsuite name="fields">
       <directory>./tests/fieldTypes/</directory>
+    </testsuite>
+    <testsuite name="sample-blog">
+      <directory>./tests/sampleBlog/</directory>
     </testsuite>
   </testsuites>
 </phpunit>

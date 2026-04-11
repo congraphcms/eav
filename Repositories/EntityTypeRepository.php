@@ -211,7 +211,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		}
 
 		$attributeSets = $this->db->table('attribute_sets')
-								  ->select($this->db->raw('id as id, "attribute-set" as type'))
+								  ->select($this->db->raw("id as id, 'attribute-set' as type"))
 								  ->where('entity_type_id', '=', $id)
 								  ->get();
 
@@ -273,7 +273,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		}
 
 		$attributeSets = $this->db->table('attribute_sets')
-								  ->select($this->db->raw('id as id, "attribute-set" as type'))
+								  ->select($this->db->raw("id as id, 'attribute-set' as type"))
 								  ->where('entity_type_id', '=', $entityType->id)
 								  ->get();
 
@@ -373,7 +373,7 @@ class EntityTypeRepository extends AbstractRepository implements EntityTypeRepos
 		if( ! empty($ids) )
 		{
 			$attributeSets = $this->db->table('attribute_sets')
-								  ->select($this->db->raw('id as id, entity_type_id as entity_type_id, "attribute-set" as type'))
+								  ->select($this->db->raw("id as id, entity_type_id as entity_type_id, 'attribute-set' as type"))
 								  ->whereIn('entity_type_id', $ids)
 								  ->get();
 		}

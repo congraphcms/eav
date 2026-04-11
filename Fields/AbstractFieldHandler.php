@@ -551,7 +551,14 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 					$query = $query->whereNotIn('filter_' . $code . '.value', $value);
 					break;
 				case 'm':
-					$query = $query->whereRaw('MATCH (filter_' . $code . '.value) AGAINST (?)' , array($value));
+					$driver = $this->db->getDriverName();
+
+					if ($driver === 'mysql') {
+						$query = $query->whereRaw('MATCH (filter_' . $code . '.value) AGAINST (?)', [$value]);
+					} else {
+						$operator = $driver === 'pgsql' ? 'ILIKE' : 'LIKE';
+						$query = $query->where('filter_' . $code . '.value', $operator, '%' . $value . '%');
+					}
 					break;
 				
 				default:
@@ -575,6 +582,8 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 	public function sortEntities($query, $attribute, $direction, $locale = null)
 	{
 		$code = $attribute->code;
+		$sortAlias = 'sort_' . $code . '_value';
+
 		$query = $query->leftJoin(
 			$this->table . ' as sort_' . $code, 
 			function($join) use($attribute, $locale)
@@ -587,9 +596,9 @@ abstract class AbstractFieldHandler implements FieldHandlerContract
 				}
 			}
 		);
-		
-		$query = $query->orderBy('sort_' . $code . '.value', $direction);
-		$query = $query->groupBy('sort_' . $code . '.value');
+
+		$query = $query->addSelect($this->db->raw('sort_' . $code . '.value as ' . $sortAlias));
+		$query = $query->orderBy($sortAlias, $direction);
 
 		return $query;
 	}

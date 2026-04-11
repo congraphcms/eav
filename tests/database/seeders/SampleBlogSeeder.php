@@ -322,7 +322,7 @@ class SampleBlogSeeder extends Seeder {
             ]
         ]);
 
-        DB::table('attribute_values_varchar')->truncate();
+        reset_table('attribute_values_varchar');
         DB::table('attribute_values_varchar')->insert([
             [
                 'entity_id' => 1,
@@ -434,7 +434,7 @@ class SampleBlogSeeder extends Seeder {
             ],
         ]);
         
-        DB::table('attribute_values_text')->truncate();
+        reset_table('attribute_values_text');
         DB::table('attribute_values_text')->insert([
             [
                 'entity_id' => 1,

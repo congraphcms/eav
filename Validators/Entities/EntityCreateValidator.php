@@ -232,11 +232,30 @@ class EntityCreateValidator extends Validator
 		// Status
 		if( isset($command->params['status']) )
 		{
-			$workflowPoint = $this->workflowPointRepository->get(['status' => $command->params['status'], 'workflow_id' => $entityType->workflow_id]);
-			if(count($workflowPoint) < 1)
-			{
-				$this->exception->addErrors(['status' => 'This entity type doesn\'t support this status.']);
-				throw $this->exception;
+			if (is_array($command->params['status']) && $entityType->localized_workflow) {
+				foreach ($command->params['status'] as $localeCode => $status) {
+					$workflowPoint = $this->workflowPointRepository->get([
+						'status' => $status,
+						'workflow_id' => $entityType->workflow_id,
+					]);
+
+					if (count($workflowPoint) < 1) {
+						$this->exception->addErrors([
+							"status.$localeCode" => 'This entity type doesn\'t support this status.',
+						]);
+						throw $this->exception;
+					}
+				}
+			} else {
+				$workflowPoint = $this->workflowPointRepository->get([
+					'status' => $command->params['status'],
+					'workflow_id' => $entityType->workflow_id,
+				]);
+				if(count($workflowPoint) < 1)
+				{
+					$this->exception->addErrors(['status' => 'This entity type doesn\'t support this status.']);
+					throw $this->exception;
+				}
 			}
 		}
 

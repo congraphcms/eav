@@ -245,8 +245,22 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         }
 
         if (isset($status)) {
-            $point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
-            $this->insertStatus($entity, $point[0]->id, $locale_ids);
+            if (is_array($status) && $entityType->localized_workflow) {
+                foreach ($locales as $locale) {
+                    if (!array_key_exists($locale->code, $status)) {
+                        continue;
+                    }
+
+                    $point = $this->workflowPointRepository->get([
+                        'status' => $status[$locale->code],
+                        'workflow_id' => $entityType->workflow->id,
+                    ]);
+                    $this->insertStatus($entity, $point[0]->id, [$locale->id]);
+                }
+            } else {
+                $point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
+                $this->insertStatus($entity, $point[0]->id, $locale_ids);
+            }
         } else {
             $this->insertStatus($entity, $entityType->default_point->id, $locale_ids);
         }
@@ -345,8 +359,22 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         }
 
         if (isset($status)) {
-            $point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
-            $this->updateStatus($id, $point[0]->id, $locale_ids);
+            if (is_array($status) && $entityType->localized_workflow) {
+                foreach ($locales as $locale) {
+                    if (!array_key_exists($locale->code, $status)) {
+                        continue;
+                    }
+
+                    $point = $this->workflowPointRepository->get([
+                        'status' => $status[$locale->code],
+                        'workflow_id' => $entityType->workflow->id,
+                    ]);
+                    $this->updateStatus($id, $point[0]->id, [$locale->id]);
+                }
+            } else {
+                $point = $this->workflowPointRepository->get(['status' => $status, 'workflow_id' => $entityType->workflow->id]);
+                $this->updateStatus($id, $point[0]->id, $locale_ids);
+            }
         }
 
         $entityParams = [];
@@ -734,7 +762,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                             'entity_types.workflow_id as workflow_id',
                             'attribute_sets.code as attribute_set_code',
                             'attributes.code as primary_field',
-                            $this->db->raw('"entity" as type'),
+                            $this->db->raw("'entity' as type"),
                             'entities.created_at as created_at',
                             'entities.updated_at as updated_at'
                         )
@@ -835,7 +863,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
         $total = $total->toArray();
         $total = $total[0]->count;
 
-        $query->groupBy('entities.id');
+        $query->distinct();
         $query->select(
                             'entities.id as id',
                             'entities.entity_type_id as entity_type_id',
@@ -846,7 +874,7 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
                             'entity_types.localized_workflow as localized_workflow',
                             'entity_types.workflow_id as workflow_id',
                             'attributes.code as primary_field',
-                            $this->db->raw('"entity" as type'),
+                            $this->db->raw("'entity' as type"),
                             'entities.created_at as created_at',
                             'entities.updated_at as updated_at'
                         );
@@ -989,17 +1017,35 @@ class EntityRepository extends AbstractRepository implements EntityRepositoryCon
 
     protected function parseFulltextSearch($query, $search, $locale = null)
     {
-        $search = $search . '*';
         $query = $query->join(
             'attribute_values_fulltext as fulltextsearch',
             function ($join) {
                 $join->on('fulltextsearch.entity_id', '=', 'entities.id');
             }
         );
+
         if (! is_null($locale)) {
             $query->whereIn('fulltextsearch.locale_id', [0, $locale->id]);
         }
-        $query = $query->whereRaw('MATCH (fulltextsearch.value) AGAINST (?  IN BOOLEAN MODE)', array($search));
+
+        $driver = $this->db->getDriverName();
+
+        if ($driver === 'mysql') {
+            $query = $query->whereRaw('MATCH (fulltextsearch.value) AGAINST (? IN BOOLEAN MODE)', [$search . '*']);
+
+            return $query;
+        }
+
+        $terms = preg_split('/\s+/', trim($search)) ?: [];
+
+        foreach ($terms as $term) {
+            if ($term === '') {
+                continue;
+            }
+
+            $operator = $driver === 'pgsql' ? 'ILIKE' : 'LIKE';
+            $query = $query->where('fulltextsearch.value', $operator, '%' . $term . '%');
+        }
 
         return $query;
     }
