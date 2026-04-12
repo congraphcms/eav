@@ -183,6 +183,11 @@ class NodeFieldHandler extends AbstractFieldHandler {
 
 		foreach ($attributes as $attribute)
 		{
+			if(!is_object($attribute) || !isset($attribute->field_type) || !isset($attribute->code))
+			{
+				continue;
+			}
+
 			if(!in_array($attribute->field_type, ['node', 'node_collection']))
 			{
 				continue;

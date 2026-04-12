@@ -300,6 +300,11 @@ class CompoundFieldHandler extends AbstractFieldHandler {
 
 		foreach ($attributes as $attribute)
 		{
+			if(!is_object($attribute) || !isset($attribute->field_type))
+			{
+				continue;
+			}
+
 			if($attribute->field_type !== 'compound')
 			{
 				continue;

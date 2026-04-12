@@ -30,6 +30,7 @@ use Elasticsearch\ClientBuilder;
 // use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use stdClass;
 
 /**
@@ -142,13 +143,38 @@ class MetaDataService//, UsesCache
     {
         if(self::$attributes === null)
         {
-            // self::$attributes = $this->attributeRepository->get();
-            self::$attributes = Cache::rememberForever('attributes', function() {
-                return $this->attributeRepository->get();
-            });
+            self::$attributes = $this->attributeRepository->get();
+        }
+
+        if (! $this->isValidAttributeCollection(self::$attributes)) {
+            Log::warning('MetaDataService detected malformed attributes metadata. Rebuilding cache.', [
+                'items' => $this->describeCollection(self::$attributes),
+            ]);
+            self::$attributes = $this->attributeRepository->get();
         }
 
         return self::$attributes;
+    }
+
+    protected function isValidAttributeCollection($attributes): bool
+    {
+        $attributes = $this->normalizeMetadataItems($attributes);
+
+        if (! is_iterable($attributes)) {
+            return false;
+        }
+
+        foreach ($attributes as $attribute) {
+            if (! is_object($attribute)) {
+                return false;
+            }
+
+            if (! isset($attribute->id) || ! isset($attribute->field_type) || ! isset($attribute->code)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function getAttributeById($id)
@@ -192,19 +218,52 @@ class MetaDataService//, UsesCache
     {
         if(self::$entityTypes === null)
         {
-            // self::$entityTypes = $this->entityTypeRepository->get();
-            self::$entityTypes = Cache::rememberForever('entityTypes', function() {
-                return $this->entityTypeRepository->get();
-            });
+            self::$entityTypes = $this->entityTypeRepository->get();
+        }
+
+        if (! $this->isValidEntityTypeCollection(self::$entityTypes)) {
+            Log::warning('MetaDataService detected malformed entityTypes metadata. Rebuilding cache.', [
+                'items' => $this->describeCollection(self::$entityTypes),
+            ]);
+            self::$entityTypes = $this->entityTypeRepository->get();
         }
 
         return self::$entityTypes;
+    }
+
+    protected function isValidEntityTypeCollection($entityTypes): bool
+    {
+        $entityTypes = $this->normalizeMetadataItems($entityTypes);
+
+        if (! is_iterable($entityTypes)) {
+            return false;
+        }
+
+        foreach ($entityTypes as $entityType) {
+            if (! is_object($entityType)) {
+                return false;
+            }
+
+            if (! isset($entityType->id) || ! isset($entityType->code)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function getEntityTypeById($id)
     {
         foreach ($this->getEntityTypes() as $type)
         {
+            if (! is_object($type) || ! isset($type->id)) {
+                Log::warning('MetaDataService encountered malformed entity type in getEntityTypeById.', [
+                    'requested_id' => $id,
+                    'item' => $this->describeItem($type),
+                ]);
+                continue;
+            }
+
             if($type->id == $id)
             {
                 return $type;
@@ -218,6 +277,14 @@ class MetaDataService//, UsesCache
     {
         foreach ($this->getEntityTypes() as $type)
         {
+            if (! is_object($type) || ! isset($type->code)) {
+                Log::warning('MetaDataService encountered malformed entity type in getEntityTypeByCode.', [
+                    'requested_code' => $code,
+                    'item' => $this->describeItem($type),
+                ]);
+                continue;
+            }
+
             if($type->code == $code)
             {
                 return $type;
@@ -242,19 +309,52 @@ class MetaDataService//, UsesCache
     {
         if(self::$attributeSets === null)
         {
-            // self::$attributeSets = $this->attributeSetRepository->get();
-            self::$attributeSets = Cache::rememberForever('attributeSets', function() {
-                return $this->attributeSetRepository->get();
-            });
+            self::$attributeSets = $this->attributeSetRepository->get();
+        }
+
+        if (! $this->isValidAttributeSetCollection(self::$attributeSets)) {
+            Log::warning('MetaDataService detected malformed attributeSets metadata. Rebuilding cache.', [
+                'items' => $this->describeCollection(self::$attributeSets),
+            ]);
+            self::$attributeSets = $this->attributeSetRepository->get();
         }
 
         return self::$attributeSets;
+    }
+
+    protected function isValidAttributeSetCollection($attributeSets): bool
+    {
+        $attributeSets = $this->normalizeMetadataItems($attributeSets);
+
+        if (! is_iterable($attributeSets)) {
+            return false;
+        }
+
+        foreach ($attributeSets as $attributeSet) {
+            if (! is_object($attributeSet)) {
+                return false;
+            }
+
+            if (! isset($attributeSet->id) || ! isset($attributeSet->code)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function getAttributeSetById($id)
     {
         foreach ($this->getAttributeSets() as $set)
         {
+            if (! is_object($set) || ! isset($set->id)) {
+                Log::warning('MetaDataService encountered malformed attribute set in getAttributeSetById.', [
+                    'requested_id' => $id,
+                    'item' => $this->describeItem($set),
+                ]);
+                continue;
+            }
+
             if($set->id == $id)
             {
                 return $set;
@@ -268,6 +368,14 @@ class MetaDataService//, UsesCache
     {
         foreach ($this->getAttributeSets() as $set)
         {
+            if (! is_object($set) || ! isset($set->code)) {
+                Log::warning('MetaDataService encountered malformed attribute set in getAttributeSetByCode.', [
+                    'requested_code' => $code,
+                    'item' => $this->describeItem($set),
+                ]);
+                continue;
+            }
+
             if($set->code == $code)
             {
                 return $set;
@@ -292,19 +400,52 @@ class MetaDataService//, UsesCache
     {
         if(self::$locales === null)
         {
-            // self::$locales = $this->localeRepository->get();
-            self::$locales = Cache::rememberForever('locales', function() {
-                return $this->localeRepository->get();
-            });
+            self::$locales = $this->localeRepository->get();
+        }
+
+        if (! $this->isValidLocaleCollection(self::$locales)) {
+            Log::warning('MetaDataService detected malformed locales metadata. Rebuilding cache.', [
+                'items' => $this->describeCollection(self::$locales),
+            ]);
+            self::$locales = $this->localeRepository->get();
         }
 
         return self::$locales;
+    }
+
+    protected function isValidLocaleCollection($locales): bool
+    {
+        $locales = $this->normalizeMetadataItems($locales);
+
+        if (! is_iterable($locales)) {
+            return false;
+        }
+
+        foreach ($locales as $locale) {
+            if (! is_object($locale)) {
+                return false;
+            }
+
+            if (! isset($locale->id) || ! isset($locale->code)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function getLocaleById($id)
     {
         foreach ($this->getLocales() as $locale)
         {
+            if (! is_object($locale) || ! isset($locale->id)) {
+                Log::warning('MetaDataService encountered malformed locale in getLocaleById.', [
+                    'requested_id' => $id,
+                    'item' => $this->describeItem($locale),
+                ]);
+                continue;
+            }
+
             if($locale->id == $id)
             {
                 return $locale;
@@ -318,6 +459,14 @@ class MetaDataService//, UsesCache
     {
         foreach ($this->getLocales() as $locale)
         {
+            if (! is_object($locale) || ! isset($locale->code)) {
+                Log::warning('MetaDataService encountered malformed locale in getLocaleByCode.', [
+                    'requested_code' => $code,
+                    'item' => $this->describeItem($locale),
+                ]);
+                continue;
+            }
+
             if($locale->code == $code)
             {
                 return $locale;
@@ -338,14 +487,64 @@ class MetaDataService//, UsesCache
         return $locale;
     }
 
+    protected function describeCollection($items): array
+    {
+        $normalizedItems = $this->normalizeMetadataItems($items);
+
+        if (! is_iterable($normalizedItems)) {
+            return [[
+                'type' => gettype($items),
+                'class' => is_object($items) ? get_class($items) : null,
+            ]];
+        }
+
+        $description = [];
+
+        foreach ($normalizedItems as $item) {
+            $description[] = $this->describeItem($item);
+        }
+
+        return $description;
+    }
+
+    protected function describeItem($item): array
+    {
+        if (is_object($item)) {
+            return [
+                'type' => get_class($item),
+                'id' => $item->id ?? null,
+                'code' => $item->code ?? null,
+            ];
+        }
+
+        return [
+            'type' => gettype($item),
+            'value' => $item,
+        ];
+    }
+
+    protected function normalizeMetadataItems($items)
+    {
+        if ($items instanceof Collection) {
+            return $items->getData();
+        }
+
+        if ($items instanceof Model) {
+            return [$items];
+        }
+
+        if (is_object($items) && method_exists($items, 'getData')) {
+            return $items->getData();
+        }
+
+        return $items;
+    }
+
     public function getWorkflows()
     {
         if(self::$workflows === null)
         {
-            // self::$workflows = $this->workflowRepository->get();
-            self::$workflows = Cache::rememberForever('workflows', function() {
-                return $this->workflowRepository->get();
-            });
+            self::$workflows = $this->workflowRepository->get();
         }
 
         return self::$workflows;
@@ -392,10 +591,7 @@ class MetaDataService//, UsesCache
     {
         if(self::$workflowPoints === null)
         {
-            // self::$workflowPoints = $this->workflowPointRepository->get();
-            self::$workflowPoints = Cache::rememberForever('workflowPoints', function() {
-                return $this->workflowPointRepository->get();
-            });
+            self::$workflowPoints = $this->workflowPointRepository->get();
         }
 
         return self::$workflowPoints;
